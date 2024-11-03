@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
-import java.util.List;
 
 @Service
 public class JwtProvider {
@@ -17,7 +16,18 @@ public class JwtProvider {
         return Jwts.builder()
                 .setSubject(email)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(new Date().getTime() + 30000)) // Token expires in 1 day
+                .setExpiration(new Date(new Date().getTime() + 30*1000)) // Token expires in 1 day
+                .claim("email", email)
+                .claim("authorities", role)
+                .signWith(key) // Sử dụng HS256 với SecretKey
+                .compact();
+    }
+
+    public String generateRefreshToken(String email, String role) {
+        return Jwts.builder()
+                .setSubject(email)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(new Date().getTime() + 7*24*60*60*1000)) // Token expires in 10 minutes
                 .claim("email", email)
                 .claim("authorities", role)
                 .signWith(key) // Sử dụng HS256 với SecretKey
