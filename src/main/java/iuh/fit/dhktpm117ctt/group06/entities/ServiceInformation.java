@@ -11,7 +11,7 @@ import lombok.*;
 @ToString
 @Entity
 @Table(name = "ServiceInformation")
-public class ServiceInformation {
+public class    ServiceInformation {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
