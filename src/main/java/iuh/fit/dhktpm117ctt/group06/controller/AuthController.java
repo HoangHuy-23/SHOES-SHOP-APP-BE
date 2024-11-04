@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.crypto.SecretKey;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/auth")
@@ -51,20 +52,15 @@ public class AuthController {
 
 
     @PostMapping("/signUp")
-//    @Transactional
     public String createUserHandler(@RequestBody SignUpRequest signUpRequest) throws UserException {
         String email = signUpRequest.getEmail();
         String password = signUpRequest.getPassword();
         String firstName = signUpRequest.getFirstName();
         String lastName = signUpRequest.getLastName();
-//        String username = user.getAccount().getUsername();
-        if (userRepository.existsByAccount_Email(email)) {
+        if (accountRepository.existsByEmail(email)) {
             throw new UserException("Email is already used with another account");
         }
         User createUser = new User();
-//        createUser.setEmail(email);
-//        createUser.setPassword(passwordEncoder.encode(password));
-//        createUser.setUsername(username);
         createUser.setFirstName(firstName);
         createUser.setLastName(lastName);
 
@@ -73,14 +69,9 @@ public class AuthController {
         account.setPassword(passwordEncoder.encode(password));
         account.setUser(createUser);
 
-
-
-        createUser.setAccount(account);
         createUser.setRole(UserRole.CUSTOMER);
         User savedUser = userRepository.save(createUser);
-
         Account savedAcc = accountRepository.save(account);
-
         return "sign up successfully";
     }
 
@@ -89,12 +80,9 @@ public class AuthController {
         Authentication authentication = authenticate(loginRequest.getEmail(), loginRequest.getPassword());
         if (authentication.isAuthenticated()) {
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            User user = userRepository.findByAccount_Email(loginRequest.getEmail()).get();
-
-            if(user==null) {
-                throw new RuntimeException("User not found");
-            }
-
+            //User user = userRepository.findByAccount_Email(loginRequest.getEmail()).get();
+            Optional<Account> account = accountRepository.findByEmail(loginRequest.getEmail());
+            User user = userRepository.getReferenceById(account.get().getUser().getId());
             String accessToken = jwtProvider.generateToken(loginRequest.getEmail(),user.getRole().toString());
             String refreshToken = jwtProvider.generateRefreshToken(loginRequest.getEmail(),user.getRole().toString());
             session.setMaxInactiveInterval(60*60*24*7);
@@ -111,8 +99,10 @@ public class AuthController {
            return ResponseEntity.ok("Refresh token is not in database!");
         }
         String refreshToken = (String) session.getAttribute("REFRESH_TOKEN");
-        User user = userRepository.findByAccount_Email(jwtProvider.getEmailFromToken(refreshToken)).get();
-        String accessToken = jwtProvider.generateToken(user.getAccount().getEmail(),user.getRole().name());
+        //User user = userRepository.findByAccount_Email(jwtProvider.getEmailFromToken(refreshToken)).get();
+        Optional<Account> account = accountRepository.findByEmail(jwtProvider.getEmailFromToken(refreshToken));
+        User user = userRepository.getReferenceById(account.get().getUser().getId());
+        String accessToken = jwtProvider.generateToken(account.get().getEmail(),user.getRole().name());
         return ResponseEntity.ok(accessToken);
     }
 
@@ -128,7 +118,7 @@ public class AuthController {
         SecretKey key = Keys.hmacShaKeyFor(JwtConstants.SECRET_KEY.getBytes());
         Claims claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(jwt).getBody();
         String email = String.valueOf(claims.get("email"));
-        return ResponseEntity.ok(userRepository.findByAccount_Email(email).get());
+        return ResponseEntity.ok(userRepository.findById(accountRepository.findByEmail(email).get().getUser().getId()).get());
     }
 
     private Authentication authenticate(String username, String password) {

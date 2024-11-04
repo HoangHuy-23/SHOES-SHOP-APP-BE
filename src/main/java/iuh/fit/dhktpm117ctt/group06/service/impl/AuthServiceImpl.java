@@ -1,6 +1,7 @@
 package iuh.fit.dhktpm117ctt.group06.service.impl;
 
 
+import iuh.fit.dhktpm117ctt.group06.entities.Account;
 import iuh.fit.dhktpm117ctt.group06.entities.User;
 import iuh.fit.dhktpm117ctt.group06.entities.enums.UserRole;
 import iuh.fit.dhktpm117ctt.group06.repository.AccountRepository;
@@ -28,14 +29,15 @@ public class AuthServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<User> user = userRepository.findByAccount_Email (username);
-        if (user.isEmpty()) {
+        Optional<Account> account = accountRepository.findByEmail(username);
+        if (account.isEmpty()) {
             throw new UsernameNotFoundException("User not found with email: " + username);
         }
+        Optional<User> user = userRepository.findById (account.get().getUser().getId());
         UserRole role = user.get().getRole();
         if (role == null) role = UserRole.CUSTOMER;
         List<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add((new SimpleGrantedAuthority(role.toString())));
-        return new org.springframework.security.core.userdetails.User(user.get().getAccount().getEmail(), user.get().getAccount().getPassword(), authorities);
+        return new org.springframework.security.core.userdetails.User(account.get().getEmail(), account.get().getPassword(), authorities);
     }
 }
