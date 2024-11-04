@@ -8,5 +8,6 @@ import java.util.Optional;
 
 public interface RoomItemRepository extends JpaRepository<RoomItem,String> {
     Optional<RoomItem> findById(String s);
+
     List<RoomItem> findByName(String name);
 }

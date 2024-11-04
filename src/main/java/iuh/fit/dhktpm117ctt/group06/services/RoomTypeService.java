@@ -6,9 +6,13 @@ import java.util.List;
 
 public interface RoomTypeService {
     List<RoomType> findAll();
+
     List<RoomType> findByName(String name);
 
+
     RoomType save(RoomType roomType);
+
     RoomType update(RoomType roomType);
+
     void delete(String id);
 }

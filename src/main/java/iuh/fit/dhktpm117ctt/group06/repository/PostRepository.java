@@ -8,5 +8,6 @@ import java.util.List;
 public interface PostRepository extends JpaRepository<Post, String> {
     List<Post> findByName(String name);
     List<Post> findByTitle(String title);
+
     List<Post> findByAuthor(String author);
 }

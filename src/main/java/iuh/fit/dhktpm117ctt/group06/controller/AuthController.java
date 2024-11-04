@@ -66,8 +66,8 @@ public class AuthController {
             throw new AppException(ErrorCode.USER_EXISTED);
         }
         User createUser = new User();
-        createUser.setFirstName(firstName);
-        createUser.setLastName(lastName);
+//        createUser.setFirstName(firstName);
+//        createUser.setLastName(lastName);
 
         Account account = new Account();
         account.setEmail(email);

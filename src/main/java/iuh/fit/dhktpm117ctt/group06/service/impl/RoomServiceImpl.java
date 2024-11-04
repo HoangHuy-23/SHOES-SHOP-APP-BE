@@ -14,6 +14,7 @@ public class RoomServiceImpl implements RoomService {
 
     private final RoomRepository roomRepository;
 
+
     @Autowired
     public RoomServiceImpl(RoomRepository roomRepository) {
         this.roomRepository = roomRepository;

@@ -10,6 +10,7 @@ import java.util.List;
 @Service
 public class RoomTypeServiceImpl implements RoomTypeService {
 
+
     private RoomTypeRepository roomTypeRepository;
     @Autowired
     public RoomTypeServiceImpl(RoomTypeRepository roomTypeRepository) {

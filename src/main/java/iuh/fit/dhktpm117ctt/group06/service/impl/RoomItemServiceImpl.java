@@ -38,6 +38,7 @@ public class RoomItemServiceImpl implements RoomItemService {
         return roomItemRepository.save(roomItem);
     }
 
+
     @Override
     public void deleteById(String id) {
         roomItemRepository.deleteById(id);

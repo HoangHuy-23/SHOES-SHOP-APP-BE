@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface ServiceInformationRepository extends JpaRepository<ServiceInformation, String> {
         List<ServiceInformation> findByName(String name);
+
 }

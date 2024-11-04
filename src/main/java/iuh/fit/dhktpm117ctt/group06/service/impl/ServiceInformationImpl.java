@@ -39,6 +39,7 @@ public class ServiceInformationImpl implements ServiceInformationService {
         serviceInformationRepository.deleteById(id);
     }
 
+
     @Override
     public ServiceInformation update(ServiceInformation serviceInformation) {
         return serviceInformationRepository.save(serviceInformation);

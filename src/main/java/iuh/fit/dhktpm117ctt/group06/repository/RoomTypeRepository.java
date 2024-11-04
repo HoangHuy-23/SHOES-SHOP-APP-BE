@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface RoomTypeRepository extends JpaRepository<RoomType, String> {
     List<RoomType> findByName(String name);
+
 }
