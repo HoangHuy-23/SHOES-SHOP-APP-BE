@@ -22,11 +22,11 @@ public class BookingDetail {
     private int numOfChildren;
     private int quantity;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "room_item_id")
     private RoomItem roomItem;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "booking_id")
     private Booking booking;
 }
