@@ -1,0 +1,26 @@
+package iuh.fit.dhktpm117ctt.group06.entities;
+
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.util.Date;
+
+@Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
+@Table(name = "payment")
+public class Payment {
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
+    private double amount;
+    private Date paymentDate;
+    private String transactionId;
+    private String content;
+    @OneToOne
+    @JoinColumn(name = "booking_id")
+    private Booking booking;
+}

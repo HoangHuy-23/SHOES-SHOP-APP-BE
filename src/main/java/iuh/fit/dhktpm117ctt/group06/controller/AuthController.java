@@ -4,13 +4,16 @@ package iuh.fit.dhktpm117ctt.group06.controller;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import iuh.fit.dhktpm117ctt.group06.dto.request.SignUpRequest;
+import iuh.fit.dhktpm117ctt.group06.entities.Account;
 import iuh.fit.dhktpm117ctt.group06.entities.User;
-import iuh.fit.dhktpm117ctt.group06.entities.UserRole;
+import iuh.fit.dhktpm117ctt.group06.entities.enums.UserRole;
 import iuh.fit.dhktpm117ctt.group06.exception.UserException;
 import iuh.fit.dhktpm117ctt.group06.jwt.JwtConstants;
 import iuh.fit.dhktpm117ctt.group06.jwt.JwtProvider;
+import iuh.fit.dhktpm117ctt.group06.repository.AccountRepository;
 import iuh.fit.dhktpm117ctt.group06.repository.UserRepository;
-import iuh.fit.dhktpm117ctt.group06.request.LoginRequest;
+import iuh.fit.dhktpm117ctt.group06.dto.request.LoginRequest;
 import iuh.fit.dhktpm117ctt.group06.service.impl.AuthServiceImpl;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +25,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.crypto.SecretKey;
@@ -39,22 +43,43 @@ public class AuthController {
     @Autowired
     private AuthServiceImpl authService;
 
+    @Autowired
+    private AccountRepository accountRepository;
+
+
+
 
 
     @PostMapping("/signUp")
-    public String createUserHandler(@RequestBody User user) throws UserException {
-        String email = user.getEmail();
-        String password = user.getPassword();
-        String username = user.getUsername();
-        if (userRepository.existsByEmail(email)) {
+//    @Transactional
+    public String createUserHandler(@RequestBody SignUpRequest signUpRequest) throws UserException {
+        String email = signUpRequest.getEmail();
+        String password = signUpRequest.getPassword();
+        String firstName = signUpRequest.getFirstName();
+        String lastName = signUpRequest.getLastName();
+//        String username = user.getAccount().getUsername();
+        if (userRepository.existsByAccount_Email(email)) {
             throw new UserException("Email is already used with another account");
         }
         User createUser = new User();
-        createUser.setEmail(email);
-        createUser.setPassword(passwordEncoder.encode(password));
-        createUser.setUsername(username);
+//        createUser.setEmail(email);
+//        createUser.setPassword(passwordEncoder.encode(password));
+//        createUser.setUsername(username);
+        createUser.setFirstName(firstName);
+        createUser.setLastName(lastName);
+
+        Account account = new Account();
+        account.setEmail(email);
+        account.setPassword(passwordEncoder.encode(password));
+        account.setUser(createUser);
+
+
+
+        createUser.setAccount(account);
         createUser.setRole(UserRole.CUSTOMER);
         User savedUser = userRepository.save(createUser);
+
+        Account savedAcc = accountRepository.save(account);
 
         return "sign up successfully";
     }
@@ -64,7 +89,12 @@ public class AuthController {
         Authentication authentication = authenticate(loginRequest.getEmail(), loginRequest.getPassword());
         if (authentication.isAuthenticated()) {
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            User user = userRepository.findByEmail(loginRequest.getEmail()).get();
+            User user = userRepository.findByAccount_Email(loginRequest.getEmail()).get();
+
+            if(user==null) {
+                throw new RuntimeException("User not found");
+            }
+
             String accessToken = jwtProvider.generateToken(loginRequest.getEmail(),user.getRole().toString());
             String refreshToken = jwtProvider.generateRefreshToken(loginRequest.getEmail(),user.getRole().toString());
             session.setMaxInactiveInterval(60*60*24*7);
@@ -81,8 +111,8 @@ public class AuthController {
            return ResponseEntity.ok("Refresh token is not in database!");
         }
         String refreshToken = (String) session.getAttribute("REFRESH_TOKEN");
-        User user = userRepository.findByEmail(jwtProvider.getEmailFromToken(refreshToken)).get();
-        String accessToken = jwtProvider.generateToken(user.getEmail(),user.getRole().name());
+        User user = userRepository.findByAccount_Email(jwtProvider.getEmailFromToken(refreshToken)).get();
+        String accessToken = jwtProvider.generateToken(user.getAccount().getEmail(),user.getRole().name());
         return ResponseEntity.ok(accessToken);
     }
 
@@ -98,7 +128,7 @@ public class AuthController {
         SecretKey key = Keys.hmacShaKeyFor(JwtConstants.SECRET_KEY.getBytes());
         Claims claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(jwt).getBody();
         String email = String.valueOf(claims.get("email"));
-        return ResponseEntity.ok(userRepository.findByEmail(email).get());
+        return ResponseEntity.ok(userRepository.findByAccount_Email(email).get());
     }
 
     private Authentication authenticate(String username, String password) {
