@@ -21,6 +21,7 @@ import java.util.List;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @NotNull
     private String id;
 
     private String firstName;
