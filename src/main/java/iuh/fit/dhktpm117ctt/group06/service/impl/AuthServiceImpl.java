@@ -29,18 +29,15 @@ public class AuthServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-//        Optional<User> user = userRepository.findByAccount_Email (username);
-        Account account = accountRepository.findByEmail(username);
-//        User user = userRepository.findByAccount(account);
-        User user = account.getUser();
-        if (user == null) {
+        Optional<Account> account = accountRepository.findByEmail(username);
+        if (account.isEmpty()) {
             throw new UsernameNotFoundException("User not found with email: " + username);
         }
-        String role = user.getRole().toString();
-//        UserRole role = user.get().getRole();
-        if (role == null) role = String.valueOf(UserRole.CUSTOMER);
+        Optional<User> user = userRepository.findById (account.get().getUser().getId());
+        UserRole role = user.get().getRole();
+        if (role == null) role = UserRole.CUSTOMER;
         List<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add((new SimpleGrantedAuthority(role.toString())));
-        return new org.springframework.security.core.userdetails.User(account.getEmail(), account.getPassword(), authorities);
+        return new org.springframework.security.core.userdetails.User(account.get().getEmail(), account.get().getPassword(), authorities);
     }
 }
