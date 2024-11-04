@@ -23,8 +23,6 @@ public class Booking {
     private Date bookingDate;
     @Enumerated(EnumType.STRING)
     private BookingStatus bookingStatus;
-//    @OneToOne(mappedBy = "booking")
-//    private Payment payment;
 
     @OneToMany(mappedBy = "booking")
     @JsonIgnore
