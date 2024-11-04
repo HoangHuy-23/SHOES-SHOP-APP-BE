@@ -5,9 +5,13 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import iuh.fit.dhktpm117ctt.group06.dto.request.SignUpRequest;
+import iuh.fit.dhktpm117ctt.group06.dto.response.ApiResponse;
+import iuh.fit.dhktpm117ctt.group06.dto.response.AuthResponse;
 import iuh.fit.dhktpm117ctt.group06.entities.Account;
 import iuh.fit.dhktpm117ctt.group06.entities.User;
 import iuh.fit.dhktpm117ctt.group06.entities.enums.UserRole;
+import iuh.fit.dhktpm117ctt.group06.exception.AppException;
+import iuh.fit.dhktpm117ctt.group06.exception.ErrorCode;
 import iuh.fit.dhktpm117ctt.group06.exception.UserException;
 import iuh.fit.dhktpm117ctt.group06.jwt.JwtConstants;
 import iuh.fit.dhktpm117ctt.group06.jwt.JwtProvider;
@@ -16,6 +20,7 @@ import iuh.fit.dhktpm117ctt.group06.repository.UserRepository;
 import iuh.fit.dhktpm117ctt.group06.dto.request.LoginRequest;
 import iuh.fit.dhktpm117ctt.group06.service.impl.AuthServiceImpl;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 
@@ -52,13 +57,13 @@ public class AuthController {
 
 
     @PostMapping("/signUp")
-    public String createUserHandler(@RequestBody SignUpRequest signUpRequest) throws UserException {
+    public ApiResponse<User> createUserHandler(@RequestBody @Valid SignUpRequest signUpRequest) throws UserException {
         String email = signUpRequest.getEmail();
         String password = signUpRequest.getPassword();
         String firstName = signUpRequest.getFirstName();
         String lastName = signUpRequest.getLastName();
         if (accountRepository.existsByEmail(email)) {
-            throw new UserException("Email is already used with another account");
+            throw new AppException(ErrorCode.USER_EXISTED);
         }
         User createUser = new User();
         createUser.setFirstName(firstName);
@@ -71,12 +76,16 @@ public class AuthController {
 
         createUser.setRole(UserRole.CUSTOMER);
         User savedUser = userRepository.save(createUser);
-        Account savedAcc = accountRepository.save(account);
-        return "sign up successfully";
+        accountRepository.save(account);
+
+        ApiResponse<User> response = new ApiResponse<>();
+        response.setMessage("Sign up successfully");
+        response.setResult(savedUser);
+        return response;
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> authenticateAndGetToken(@RequestBody LoginRequest loginRequest, HttpSession session) {
+    public ApiResponse<AuthResponse> authenticateAndGetToken(@RequestBody LoginRequest loginRequest, HttpSession session) {
         Authentication authentication = authenticate(loginRequest.getEmail(), loginRequest.getPassword());
         if (authentication.isAuthenticated()) {
             SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -87,23 +96,31 @@ public class AuthController {
             String refreshToken = jwtProvider.generateRefreshToken(loginRequest.getEmail(),user.getRole().toString());
             session.setMaxInactiveInterval(60*60*24*7);
             session.setAttribute("REFRESH_TOKEN", refreshToken);
-            return ResponseEntity.ok(accessToken);
+
+            ApiResponse<AuthResponse> response = new ApiResponse<>();
+            response.setResult(new AuthResponse(accessToken));
+            return response;
         } else {
             throw new RuntimeException("invalid user request !");
         }
     }
 
     @PostMapping("/refreshToken")
-    public ResponseEntity<String> refreshToken(HttpSession session) {
+    public ApiResponse<AuthResponse> refreshToken(HttpSession session) {
+        ApiResponse<AuthResponse> response = new ApiResponse<>();
         if (((String) session.getAttribute("REFRESH_TOKEN"))==null) {
-           return ResponseEntity.ok("Refresh token is not in database!");
+            response.setCode(ErrorCode.USER_NOT_AUTHORIZED.getCode());
+            response.setMessage("Refresh token is not in database!");
+           return response;
         }
         String refreshToken = (String) session.getAttribute("REFRESH_TOKEN");
         //User user = userRepository.findByAccount_Email(jwtProvider.getEmailFromToken(refreshToken)).get();
         Optional<Account> account = accountRepository.findByEmail(jwtProvider.getEmailFromToken(refreshToken));
         User user = userRepository.getReferenceById(account.get().getUser().getId());
         String accessToken = jwtProvider.generateToken(account.get().getEmail(),user.getRole().name());
-        return ResponseEntity.ok(accessToken);
+
+        response.setResult(new AuthResponse(accessToken));
+        return response;
     }
 
     @PostMapping("/logout")
