@@ -12,14 +12,14 @@ import net.minidev.json.annotate.JsonIgnore;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class User{
+public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
     @NotNull
     private String username;
     @NotNull
-    private  String email;
+    private String email;
     @NotNull
     @JsonIgnore
     private String password;
