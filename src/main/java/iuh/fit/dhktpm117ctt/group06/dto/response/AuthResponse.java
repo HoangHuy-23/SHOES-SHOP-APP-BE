@@ -1,4 +1,4 @@
-package iuh.fit.dhktpm117ctt.group06.response;
+package iuh.fit.dhktpm117ctt.group06.dto.response;
 
 public class AuthResponse {
     private String accessToken;

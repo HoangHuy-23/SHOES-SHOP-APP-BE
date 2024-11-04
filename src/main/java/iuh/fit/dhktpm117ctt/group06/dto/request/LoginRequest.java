@@ -1,4 +1,4 @@
-package iuh.fit.dhktpm117ctt.group06.request;
+package iuh.fit.dhktpm117ctt.group06.dto.request;
 
 public class LoginRequest {
     private String email;
