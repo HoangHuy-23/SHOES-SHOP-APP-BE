@@ -47,9 +47,6 @@ public class AuthController {
     private AccountRepository accountRepository;
 
 
-
-
-
     @PostMapping("/signUp")
 //    @Transactional
     public String createUserHandler(@RequestBody SignUpRequest signUpRequest) throws UserException {
