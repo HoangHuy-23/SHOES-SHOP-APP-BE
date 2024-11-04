@@ -1,5 +1,6 @@
 package iuh.fit.dhktpm117ctt.group06.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -37,8 +38,12 @@ public class Hotel {
     private User admin;
 
     @OneToMany(mappedBy = "hotel")
+    @JsonIgnore
+    @ToString.Exclude
     private List<Post> posts;
 
     @OneToMany(mappedBy = "hotel")
+    @JsonIgnore
+    @ToString.Exclude
     private List<Room> rooms;
 }

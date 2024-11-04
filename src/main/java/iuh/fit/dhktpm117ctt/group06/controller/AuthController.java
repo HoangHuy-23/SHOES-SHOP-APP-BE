@@ -58,7 +58,7 @@ public class AuthController {
         String firstName = signUpRequest.getFirstName();
         String lastName = signUpRequest.getLastName();
 //        String username = user.getAccount().getUsername();
-        if (userRepository.existsByAccount_Email(email)) {
+        if (accountRepository.existsByEmail(email)) {
             throw new UserException("Email is already used with another account");
         }
         User createUser = new User();
@@ -67,17 +67,13 @@ public class AuthController {
 //        createUser.setUsername(username);
         createUser.setFirstName(firstName);
         createUser.setLastName(lastName);
-
+//        createUser.setAccount(account);
+        createUser.setRole(UserRole.CUSTOMER);
+        User savedUser = userRepository.save(createUser);
         Account account = new Account();
         account.setEmail(email);
         account.setPassword(passwordEncoder.encode(password));
-        account.setUser(createUser);
-
-
-
-        createUser.setAccount(account);
-        createUser.setRole(UserRole.CUSTOMER);
-        User savedUser = userRepository.save(createUser);
+        account.setUser(savedUser);
 
         Account savedAcc = accountRepository.save(account);
 
@@ -89,8 +85,9 @@ public class AuthController {
         Authentication authentication = authenticate(loginRequest.getEmail(), loginRequest.getPassword());
         if (authentication.isAuthenticated()) {
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            User user = userRepository.findByAccount_Email(loginRequest.getEmail()).get();
-
+//            User user = userRepository.findByAccount_Email(loginRequest.getEmail()).get();
+            Account account = accountRepository.findByEmail(loginRequest.getEmail());
+            User user = account.getUser();
             if(user==null) {
                 throw new RuntimeException("User not found");
             }
@@ -111,8 +108,15 @@ public class AuthController {
            return ResponseEntity.ok("Refresh token is not in database!");
         }
         String refreshToken = (String) session.getAttribute("REFRESH_TOKEN");
-        User user = userRepository.findByAccount_Email(jwtProvider.getEmailFromToken(refreshToken)).get();
-        String accessToken = jwtProvider.generateToken(user.getAccount().getEmail(),user.getRole().name());
+        Account matchedAccount = accountRepository.findByEmail(jwtProvider.getEmailFromToken(refreshToken));
+//        User user = userRepository.findByAccount_Email(jwtProvider.getEmailFromToken(refreshToken)).get();
+        if(matchedAccount == null) {
+            throw new RuntimeException("Invalid account");
+        }
+
+        User matchedUser = matchedAccount.getUser();
+
+        String accessToken = jwtProvider.generateToken(matchedAccount.getEmail(),matchedUser.getRole().name());
         return ResponseEntity.ok(accessToken);
     }
 
@@ -128,7 +132,8 @@ public class AuthController {
         SecretKey key = Keys.hmacShaKeyFor(JwtConstants.SECRET_KEY.getBytes());
         Claims claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(jwt).getBody();
         String email = String.valueOf(claims.get("email"));
-        return ResponseEntity.ok(userRepository.findByAccount_Email(email).get());
+//        return ResponseEntity.ok(userRepository.findByAccount_Email(email).get());
+        return ResponseEntity.ok(accountRepository.findByEmail(email).getUser());
     }
 
     private Authentication authenticate(String username, String password) {

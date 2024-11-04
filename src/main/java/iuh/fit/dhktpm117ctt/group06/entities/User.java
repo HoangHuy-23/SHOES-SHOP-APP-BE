@@ -1,5 +1,6 @@
 package iuh.fit.dhktpm117ctt.group06.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import iuh.fit.dhktpm117ctt.group06.entities.enums.Gender;
 import iuh.fit.dhktpm117ctt.group06.entities.enums.UserRole;
 import jakarta.persistence.*;
@@ -8,7 +9,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import net.minidev.json.annotate.JsonIgnore;
 
 import java.util.List;
 
@@ -39,18 +39,21 @@ public class User {
 //    @OneToOne(mappedBy = "user")
 //    @JsonIgnore
 //    private Account account;
-    @OneToOne(mappedBy = "user")
-    @JsonIgnore
-    private Cart cart;
+//    @OneToOne(mappedBy = "user")
+//    @JsonIgnore
+//    private Cart cart;
     @OneToMany(mappedBy = "admin")
     @JsonIgnore
+    @ToString.Exclude
     private List<Hotel> hotels;
     @OneToMany(mappedBy = "user")
     @JsonIgnore
+    @ToString.Exclude
     private List<FeedBack> feedBacks;
 
     @OneToMany(mappedBy = "user")
     @JsonIgnore
+    @ToString.Exclude
     private List<Booking> bookings;
 
 }

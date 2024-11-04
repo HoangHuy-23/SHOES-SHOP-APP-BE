@@ -1,5 +1,6 @@
 package iuh.fit.dhktpm117ctt.group06.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -20,6 +21,8 @@ public class RoomType {
     private String description;
 
     @OneToMany(mappedBy = "roomType")
+    @JsonIgnore
+    @ToString.Exclude
     private List<Room> rooms;
 
     @ManyToMany

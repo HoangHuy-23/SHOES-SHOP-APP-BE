@@ -3,6 +3,7 @@ package iuh.fit.dhktpm117ctt.group06.entities;
 import iuh.fit.dhktpm117ctt.group06.entities.enums.BookingStatus;
 import jakarta.persistence.*;
 import lombok.*;
+import net.minidev.json.annotate.JsonIgnore;
 
 import java.util.Date;
 import java.util.List;
@@ -22,13 +23,17 @@ public class Booking {
     private Date bookingDate;
     @Enumerated(EnumType.STRING)
     private BookingStatus bookingStatus;
-    @OneToOne(mappedBy = "booking")
-    private Payment payment;
+//    @OneToOne(mappedBy = "booking")
+//    private Payment payment;
 
     @OneToMany(mappedBy = "booking")
+    @JsonIgnore
+    @ToString.Exclude
     private List<BookingDetail> bookingDetails;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+
 }

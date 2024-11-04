@@ -1,5 +1,6 @@
 package iuh.fit.dhktpm117ctt.group06.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,9 +22,13 @@ public class Option {
     private String name;
 
     @OneToMany(mappedBy = "option")
+    @JsonIgnore
+    @ToString.Exclude
     private List<ServiceInformation> serviceInformations;
 
     @OneToMany(mappedBy = "option")
+    @JsonIgnore
+    @ToString.Exclude
     private List<RoomItem> roomItems;
 
     @ManyToMany(mappedBy = "options")
