@@ -3,6 +3,8 @@ package iuh.fit.dhktpm117ctt.group06.jwt;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import iuh.fit.dhktpm117ctt.group06.exception.AppException;
+import iuh.fit.dhktpm117ctt.group06.exception.ErrorCode;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -34,7 +36,11 @@ public class JwtValidator extends OncePerRequestFilter {
                 Authentication authentication = new UsernamePasswordAuthenticationToken(email, null, auths);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             } catch (Exception e) {
-                throw new BadCredentialsException("invalid token... from jwt validator");
+                //throw new BadCredentialsException("invalid token... from jwt validator");
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setContentType("application/json");
+                response.getWriter().write("{\"code\": \"USER_NOT_AUTHORIZED\", \"message\": \"Invalid token\"}");
+                return;
             }
         }
         filterChain.doFilter(request, response);

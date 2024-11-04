@@ -32,6 +32,7 @@ public class SecurityConfig {
                         authorize.requestMatchers("/api/admin/**").hasAnyRole("ADMIN")
                         .requestMatchers("/api/user/**").authenticated().anyRequest().permitAll())
                 .addFilterBefore(new JwtValidator(), BasicAuthenticationFilter.class)
+
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(new CorsConfigurationSource() {
 
