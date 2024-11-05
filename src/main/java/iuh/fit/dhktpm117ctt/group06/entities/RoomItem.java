@@ -20,7 +20,6 @@ public class RoomItem {
     @JoinColumn(name = "room_id")
     private Room room;
 
-
     @ManyToOne
     @JoinColumn(name = "option_id")
     private Option option;
