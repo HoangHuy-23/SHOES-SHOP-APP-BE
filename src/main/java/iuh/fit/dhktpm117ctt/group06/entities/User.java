@@ -36,12 +36,6 @@ public class User {
     private CitizenCard citizenCard;
     @Embedded
     private Address address;
-//    @OneToOne(mappedBy = "user")
-//    @JsonIgnore
-//    private Account account;
-    @OneToOne(mappedBy = "user")
-    @JsonIgnore
-    private Cart cart;
     @OneToMany(mappedBy = "admin")
     @JsonIgnore
     private List<Hotel> hotels;
