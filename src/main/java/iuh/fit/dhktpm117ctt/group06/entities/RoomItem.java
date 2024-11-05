@@ -20,11 +20,11 @@ public class RoomItem {
     @JoinColumn(name = "room_id")
     private Room room;
 
-    @OneToOne(mappedBy = "roomItem")
-    private BookingDetail bookingDetail;
-
-    @OneToOne(mappedBy = "roomItem")
-    private CartDetail cartDetail;
+//    @OneToOne(mappedBy = "roomItem")
+//    private BookingDetail bookingDetail;
+//
+//    @OneToOne(mappedBy = "roomItem")
+//    private CartDetail cartDetail;
 
     @ManyToOne
     @JoinColumn(name = "option_id")

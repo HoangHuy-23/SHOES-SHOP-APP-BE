@@ -1,5 +1,6 @@
 package iuh.fit.dhktpm117ctt.group06.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -22,6 +23,7 @@ public class Room {
     @ElementCollection
     @CollectionTable(name = "room_detail_image", joinColumns = @JoinColumn(name = "room_id"))
     private List<String> listDetailImage;
+    @Column(columnDefinition = "longtext")
     private String additionInformation;
     private String avatar;
     private double rating;
@@ -37,6 +39,8 @@ public class Room {
     private Hotel hotel;
 
     @OneToMany(mappedBy = "room")
+    @JsonIgnore
+    @ToString.Exclude
     private List<RoomItem> roomItems;
 
     @ManyToOne
@@ -44,6 +48,8 @@ public class Room {
     private RoomType roomType;
 
     @OneToMany(mappedBy = "room")
+    @JsonIgnore
+    @ToString.Exclude
     private List<FeedBack> feedBacks;
 
 }
