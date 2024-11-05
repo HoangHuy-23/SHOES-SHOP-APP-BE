@@ -2,7 +2,7 @@ package iuh.fit.dhktpm117ctt.group06.service.impl;
 
 import iuh.fit.dhktpm117ctt.group06.entities.FeedBack;
 import iuh.fit.dhktpm117ctt.group06.repository.FeedBackRepository; // Giả sử bạn đã có repository này
-import iuh.fit.dhktpm117ctt.group06.services.FeedBackServices;
+import iuh.fit.dhktpm117ctt.group06.service.FeedBackServices;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

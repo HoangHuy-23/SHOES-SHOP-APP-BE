@@ -1,8 +1,6 @@
-package iuh.fit.dhktpm117ctt.group06.services;
+package iuh.fit.dhktpm117ctt.group06.service;
 
 import iuh.fit.dhktpm117ctt.group06.entities.Hotel;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;

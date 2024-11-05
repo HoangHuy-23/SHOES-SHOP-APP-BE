@@ -2,7 +2,7 @@ package iuh.fit.dhktpm117ctt.group06.service.impl;
 
 import iuh.fit.dhktpm117ctt.group06.entities.RoomItem;
 import iuh.fit.dhktpm117ctt.group06.repository.RoomItemRepository;
-import iuh.fit.dhktpm117ctt.group06.services.RoomItemService;
+import iuh.fit.dhktpm117ctt.group06.service.RoomItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

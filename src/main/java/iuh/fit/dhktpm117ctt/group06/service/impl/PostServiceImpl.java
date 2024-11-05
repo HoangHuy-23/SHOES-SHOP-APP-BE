@@ -2,7 +2,7 @@ package iuh.fit.dhktpm117ctt.group06.service.impl;
 
 import iuh.fit.dhktpm117ctt.group06.entities.Post;
 import iuh.fit.dhktpm117ctt.group06.repository.PostRepository;
-import iuh.fit.dhktpm117ctt.group06.services.PostService;
+import iuh.fit.dhktpm117ctt.group06.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

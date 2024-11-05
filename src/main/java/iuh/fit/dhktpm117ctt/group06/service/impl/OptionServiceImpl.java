@@ -2,7 +2,7 @@ package iuh.fit.dhktpm117ctt.group06.service.impl;
 
 import iuh.fit.dhktpm117ctt.group06.entities.Option;
 import iuh.fit.dhktpm117ctt.group06.repository.OptionRepository; // Giả sử bạn đã có repository này
-import iuh.fit.dhktpm117ctt.group06.services.OptionService;
+import iuh.fit.dhktpm117ctt.group06.service.OptionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

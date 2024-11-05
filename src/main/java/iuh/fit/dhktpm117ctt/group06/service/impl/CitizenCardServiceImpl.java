@@ -2,7 +2,7 @@ package iuh.fit.dhktpm117ctt.group06.service.impl;
 
 import iuh.fit.dhktpm117ctt.group06.entities.CitizenCard;
 import iuh.fit.dhktpm117ctt.group06.repository.CitizenCardRepository;
-import iuh.fit.dhktpm117ctt.group06.services.CitizenCardService;
+import iuh.fit.dhktpm117ctt.group06.service.CitizenCardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
