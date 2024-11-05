@@ -11,6 +11,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalTime;
 import java.util.List;
@@ -29,7 +30,8 @@ public class CreateHotelRequest {
     private LocalTime openTime;
     @CloseTimeConstraint()
     private LocalTime closeTime;
-    private String avatar;
-    private List<String> listDetailImages;
+    private MultipartFile avatar;
+    private List<MultipartFile> listDetailImages;
     private Address address;
+    private String adminId;
 }

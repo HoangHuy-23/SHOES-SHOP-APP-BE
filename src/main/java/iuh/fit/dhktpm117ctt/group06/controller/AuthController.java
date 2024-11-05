@@ -56,7 +56,7 @@ public class AuthController {
 
 
     @PostMapping("/signUp")
-    public ResponseEntity<User> createUserHandler(@RequestBody @Valid SignUpRequest signUpRequest) throws UserException {
+    public ResponseEntity<AuthResponse> createUserHandler(@RequestBody @Valid SignUpRequest signUpRequest, HttpSession session) throws UserException {
         String email = signUpRequest.getEmail();
         String password = signUpRequest.getPassword();
         String firstName = signUpRequest.getFirstName();
@@ -75,8 +75,19 @@ public class AuthController {
 
         createUser.setRole(UserRole.CUSTOMER);
         User savedUser = userRepository.save(createUser);
-        accountRepository.save(account);
-        return ResponseEntity.ok(savedUser);
+        Account savedAccount =  accountRepository.save(account);
+
+        Authentication authentication = authenticate(savedAccount.getEmail(), password);
+        if (authentication.isAuthenticated()) {
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            String accessToken = jwtProvider.generateToken(savedAccount.getEmail(),savedUser.getRole().toString());
+            String refreshToken = jwtProvider.generateRefreshToken(account.getEmail(),savedUser.getRole().toString());
+            session.setMaxInactiveInterval(60*60*24*7);
+            session.setAttribute("REFRESH_TOKEN", refreshToken);
+            return ResponseEntity.ok(new AuthResponse(accessToken));
+        } else {
+            throw new BadCredentialsException("Invalid User Request !");
+        }
     }
 
     @PostMapping("/login")
