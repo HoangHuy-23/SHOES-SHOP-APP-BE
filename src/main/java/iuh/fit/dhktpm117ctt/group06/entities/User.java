@@ -3,7 +3,6 @@ package iuh.fit.dhktpm117ctt.group06.entities;
 import iuh.fit.dhktpm117ctt.group06.entities.enums.Gender;
 import iuh.fit.dhktpm117ctt.group06.entities.enums.UserRole;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -32,19 +31,16 @@ public class User {
     private Gender gender;
     @Enumerated(EnumType.STRING)
     private UserRole role;
-    @Embedded
-    private CitizenCard citizenCard;
-    @Embedded
-    private Address address;
-    @OneToMany(mappedBy = "admin")
-    @JsonIgnore
-    private List<Hotel> hotels;
+
+    @OneToMany(mappedBy = "user")
+    private List<Address> address;
+
     @OneToMany(mappedBy = "user")
     @JsonIgnore
     private List<FeedBack> feedBacks;
 
     @OneToMany(mappedBy = "user")
     @JsonIgnore
-    private List<Booking> bookings;
+    private List<Order> orders;
 
 }

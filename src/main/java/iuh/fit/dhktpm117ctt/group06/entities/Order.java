@@ -1,6 +1,7 @@
 package iuh.fit.dhktpm117ctt.group06.entities;
 
-import iuh.fit.dhktpm117ctt.group06.entities.enums.BookingStatus;
+import iuh.fit.dhktpm117ctt.group06.entities.enums.OrderStatus;
+import iuh.fit.dhktpm117ctt.group06.entities.enums.PaymentMethod;
 import jakarta.persistence.*;
 import lombok.*;
 import net.minidev.json.annotate.JsonIgnore;
@@ -14,20 +15,23 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-@Table(name = "bookings")
-public class Booking {
+@Table(name = "orders")
+public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
     private double totalPrice;
-    private Date bookingDate;
+    private Date createdDate;
     @Enumerated(EnumType.STRING)
-    private BookingStatus bookingStatus;
+    private OrderStatus orderStatus;
 
-    @OneToMany(mappedBy = "booking")
+    @Enumerated(EnumType.STRING)
+    private PaymentMethod paymentMethod;
+
+    @OneToMany(mappedBy = "order")
     @JsonIgnore
     @ToString.Exclude
-    private List<BookingDetail> bookingDetails;
+    private List<OrderDetail> orderDetails;
 
     @ManyToOne
     @JoinColumn(name = "user_id")

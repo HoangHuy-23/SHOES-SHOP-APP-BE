@@ -15,16 +15,13 @@ import java.util.Date;
 public class CartDetail {
     @EmbeddedId
     private CartDetailPK cartDetailPK;
-    private Date checkInDate;
-    private Date checkOutDate;
-    private int numOfAdult;
-    private int numOfChildren;
+
     private int quantity;
 
     @OneToOne
-    @JoinColumn(name = "room_item_id")
-    @MapsId("roomItemId")
-    private RoomItem roomItem;
+    @JoinColumn(name = "product_item_id")
+    @MapsId("productItemId")
+    private ProductItem productItem;
 
     @ManyToOne
     @JoinColumn(name = "cart_id")

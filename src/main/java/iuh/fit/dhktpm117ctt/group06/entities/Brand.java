@@ -1,6 +1,5 @@
 package iuh.fit.dhktpm117ctt.group06.entities;
 
-
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,21 +8,18 @@ import lombok.ToString;
 
 @Entity
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @ToString
-@Table(name = "address")
-public class Address {
+@Table(name = "brands")
+public class Brand {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
-    private String homeNumber;
-    private String street;
-    private String ward;
-    private String district;
-    private String city;
+    private String brandName;
+    private String avatar;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+    @OneToOne
+    @JoinColumn(name = "post_id")
+    private Post post;
 }

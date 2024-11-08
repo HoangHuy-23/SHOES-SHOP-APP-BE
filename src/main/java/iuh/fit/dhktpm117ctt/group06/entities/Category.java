@@ -12,25 +12,16 @@ import java.util.List;
 @Setter
 @ToString
 @Entity
-@Table(name = "RoomType")
-public class RoomType {
+@Table(name = "categories")
+public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
     private String name;
     private String description;
 
-    @OneToMany(mappedBy = "roomType")
+    @OneToMany(mappedBy = "category")
     @JsonIgnore
     @ToString.Exclude
-    private List<Room> rooms;
-
-    @ManyToMany
-    @JoinTable(
-            name = "roomtype_option",
-            joinColumns = @JoinColumn(name = "roomtype_id"),
-            inverseJoinColumns = @JoinColumn(name = "option_id")
-    )
-    private List<Option> options;
-
+    private List<Product> products;
 }

@@ -5,7 +5,6 @@ import lombok.*;
 
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 @Entity
 @Getter
@@ -30,12 +29,12 @@ public class FeedBack {
     private List<String> listDetailImages;
     private Date createdDate;
     @ManyToOne
-    @JoinColumn(name = "booking_id")
-    private Booking booking;
+    @JoinColumn(name = "order_id")
+    private Order order;
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
     @ManyToOne
-    @JoinColumn(name = "room_id")
-    private Room room;
+    @JoinColumn(name = "product_id")
+    private Product product;
 }
