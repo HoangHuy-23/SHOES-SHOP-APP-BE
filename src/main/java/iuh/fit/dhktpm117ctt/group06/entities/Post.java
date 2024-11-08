@@ -9,7 +9,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-@Table(name = "post")
+@Table(name = "posts")
 public class Post {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -20,7 +20,4 @@ public class Post {
     private String author;
     private String avatar;
     private String createdDate;
-    @ManyToOne
-    @JoinColumn(name = "hotel_id")
-    private Hotel hotel;
 }

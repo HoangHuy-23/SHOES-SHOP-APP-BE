@@ -21,6 +21,6 @@ public class Payment {
     private String transactionId;
     private String content;
     @OneToOne
-    @JoinColumn(name = "booking_id")
-    private Booking booking;
+    @JoinColumn(name = "order_id")
+    private Order order;
 }

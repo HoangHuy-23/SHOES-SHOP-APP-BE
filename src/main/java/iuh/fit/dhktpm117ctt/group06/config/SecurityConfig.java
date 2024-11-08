@@ -43,6 +43,7 @@ public class SecurityConfig {
                                 "http://localhost:2003",
                                 "http://localhost:3000",
                                 "http://localhost:8080"
+
                         ));
                         cfg.setAllowedMethods(Collections.singletonList("*"));
                         cfg.setAllowCredentials(true);

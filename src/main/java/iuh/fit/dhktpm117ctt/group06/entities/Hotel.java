@@ -14,7 +14,6 @@ import java.util.List;
 @AllArgsConstructor
 @ToString
 @Table(name = "hotels")
-@Builder
 public class Hotel {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

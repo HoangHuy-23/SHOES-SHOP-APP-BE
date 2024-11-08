@@ -108,7 +108,10 @@ public class AuthController {
 
     @PostMapping("/refreshToken")
     public ResponseEntity<AuthResponse> refreshToken(HttpSession session) {
-        if (((String) session.getAttribute("REFRESH_TOKEN"))==null) {
+        if (session.getAttribute("REFRESH_TOKEN")==null
+                || session.getAttribute("REFRESH_TOKEN").equals("")
+        ) {
+            System.out.println("Refresh token is null");
            return ResponseEntity.badRequest().build();
         }
         String refreshToken = (String) session.getAttribute("REFRESH_TOKEN");

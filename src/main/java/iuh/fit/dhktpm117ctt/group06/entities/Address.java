@@ -1,17 +1,14 @@
 package iuh.fit.dhktpm117ctt.group06.entities;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 public class Address {
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
     @NotNull(message = "HOME_NUMBER_INVALID")
     @NotBlank(message = "HOME_NUMBER_INVALID")
     private String homeNumber;
@@ -27,4 +24,8 @@ public class Address {
     @NotNull(message = "CITY_INVALID")
     @NotBlank(message = "CITY_INVALID")
     private String city;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 }
