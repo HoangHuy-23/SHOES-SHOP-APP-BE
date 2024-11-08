@@ -11,7 +11,6 @@ import iuh.fit.dhktpm117ctt.group06.entities.User;
 import iuh.fit.dhktpm117ctt.group06.entities.enums.UserRole;
 import iuh.fit.dhktpm117ctt.group06.exception.AppException;
 import iuh.fit.dhktpm117ctt.group06.exception.ErrorCode;
-import iuh.fit.dhktpm117ctt.group06.exception.UserException;
 import iuh.fit.dhktpm117ctt.group06.jwt.JwtConstants;
 import iuh.fit.dhktpm117ctt.group06.jwt.JwtProvider;
 import iuh.fit.dhktpm117ctt.group06.repository.AccountRepository;
@@ -29,7 +28,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.crypto.SecretKey;
@@ -56,7 +54,7 @@ public class AuthController {
 
 
     @PostMapping("/signUp")
-    public ResponseEntity<AuthResponse> createUserHandler(@RequestBody @Valid SignUpRequest signUpRequest, HttpSession session) throws UserException {
+    public ResponseEntity<AuthResponse> createUserHandler(@RequestBody @Valid SignUpRequest signUpRequest, HttpSession session) {
         String email = signUpRequest.getEmail();
         String password = signUpRequest.getPassword();
         String firstName = signUpRequest.getFirstName();
