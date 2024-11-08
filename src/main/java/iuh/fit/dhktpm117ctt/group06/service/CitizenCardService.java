@@ -1,7 +1,5 @@
 package iuh.fit.dhktpm117ctt.group06.service;
 
-import iuh.fit.dhktpm117ctt.group06.entities.CitizenCard;
-
 import java.util.List;
 import java.util.Optional;
 

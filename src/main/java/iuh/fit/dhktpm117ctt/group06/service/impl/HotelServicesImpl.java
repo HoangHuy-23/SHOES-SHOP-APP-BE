@@ -1,6 +1,5 @@
 package iuh.fit.dhktpm117ctt.group06.service.impl;
 
-import iuh.fit.dhktpm117ctt.group06.entities.Hotel;
 import iuh.fit.dhktpm117ctt.group06.repository.HotelRepository; // Giả sử bạn đã có repository này
 import iuh.fit.dhktpm117ctt.group06.service.HotelServices;
 import org.springframework.beans.factory.annotation.Autowired;

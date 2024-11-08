@@ -1,7 +1,5 @@
 package iuh.fit.dhktpm117ctt.group06.repository;
 
-import iuh.fit.dhktpm117ctt.group06.entities.Option;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

@@ -1,6 +1,5 @@
 package iuh.fit.dhktpm117ctt.group06.service.impl;
 
-import iuh.fit.dhktpm117ctt.group06.entities.ServiceInformation;
 import iuh.fit.dhktpm117ctt.group06.repository.ServiceInformationRepository;
 import iuh.fit.dhktpm117ctt.group06.service.ServiceInformationService;
 import org.springframework.beans.factory.annotation.Autowired;

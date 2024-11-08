@@ -1,7 +1,5 @@
 package iuh.fit.dhktpm117ctt.group06.service;
 
-import iuh.fit.dhktpm117ctt.group06.entities.ServiceInformation;
-
 import java.util.List;
 
 public interface ServiceInformationService {
