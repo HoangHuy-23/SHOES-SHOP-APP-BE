@@ -1,8 +1,10 @@
 package iuh.fit.dhktpm117ctt.group06.service.impl;
 
+import iuh.fit.dhktpm117ctt.group06.entities.Account;
 import iuh.fit.dhktpm117ctt.group06.entities.Address;
 import iuh.fit.dhktpm117ctt.group06.entities.User;
 import iuh.fit.dhktpm117ctt.group06.jwt.JwtProvider;
+import iuh.fit.dhktpm117ctt.group06.repository.AccountRepository;
 import iuh.fit.dhktpm117ctt.group06.repository.UserRepository;
 import iuh.fit.dhktpm117ctt.group06.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,11 +17,13 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
     private JwtProvider jwtProvider;
+    private AccountRepository accountRepository;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, JwtProvider jwtProvider) {
+    public UserServiceImpl(UserRepository userRepository, JwtProvider jwtProvider, AccountRepository accountRepository) {
         this.userRepository = userRepository;
         this.jwtProvider = jwtProvider;
+        this.accountRepository = accountRepository;
     }
 
     @Override
@@ -29,11 +33,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User updateUserAddress(String token, Address address) {
-        User user = getUserByToken(token);
-        if (user != null) {
-            user.setAddress(address);
-            return userRepository.save(user);
-        }
+//        User user = getUserByToken(token);
+//        if (user != null) {
+//            user.setAddress(address);
+//            return userRepository.save(user);
+//        }
         return null;
     }
 
@@ -49,7 +53,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Optional<User> findByEmail(String email) {
-        return userRepository.findByAccount_Email(email);
+        Account account = accountRepository.findByEmail(email).orElse(null);
+        return userRepository.findById(account.getId());
     }
 
 
