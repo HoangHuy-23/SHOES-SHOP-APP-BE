@@ -5,9 +5,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-@Embeddable
-@Getter
-@ToString
 public enum Gender {
     MALE, FEMALE;
 }

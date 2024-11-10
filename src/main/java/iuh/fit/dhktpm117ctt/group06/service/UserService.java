@@ -1,32 +1,31 @@
 package iuh.fit.dhktpm117ctt.group06.service;
 
+import iuh.fit.dhktpm117ctt.group06.dto.request.UserRequest;
+import iuh.fit.dhktpm117ctt.group06.dto.response.UserResponse;
 import iuh.fit.dhktpm117ctt.group06.entities.Address;
 import iuh.fit.dhktpm117ctt.group06.entities.User;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface UserService {
-    List<User> findAll();
+    List<UserResponse> findAll();
 
-    User updateUserAddress(String token, Address address);
+    Optional<UserResponse> findById(String id);
 
-    Optional<User> findById(String id);
+    Optional<UserResponse> findUserByToken(String token);
 
-    User getUserByToken(String token);
+    Optional<UserResponse> findByEmail(String email);
 
-    Optional<User> findByEmail(String email);
-
-    Optional<User> findByPhone(String phone);
-
-    List<User> findByLastName(String lastName);
+    Optional<UserResponse> findByPhone(String phone);
 
     //add save
-    User save(User user);
-
-    void deleteMyAccount(String token);
+    Optional<UserResponse> save(UserRequest userRequest);
 
     void deleteById(String id);
 
-    User update(User user);
+    Optional<UserResponse> updateInfo(String id, UserRequest userRequest);
+
+    Optional<UserResponse> updateAvatar(String id, MultipartFile avatar);
 }

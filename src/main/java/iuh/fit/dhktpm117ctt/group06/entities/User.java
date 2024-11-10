@@ -3,10 +3,7 @@ package iuh.fit.dhktpm117ctt.group06.entities;
 import iuh.fit.dhktpm117ctt.group06.entities.enums.Gender;
 import iuh.fit.dhktpm117ctt.group06.entities.enums.UserRole;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import net.minidev.json.annotate.JsonIgnore;
 
 import java.util.List;
@@ -17,6 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
+@Builder
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
