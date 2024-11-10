@@ -1,20 +1,19 @@
 package iuh.fit.dhktpm117ctt.group06.entities;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.UniqueElements;
 
 @Entity
-@Getter
-@Setter
-@NoArgsConstructor
 @AllArgsConstructor
-@ToString
-public class Cart {
+@NoArgsConstructor
+@Table(name = "policies")
+public class Policy {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
-    @OneToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+    @UniqueElements(message = "Title must be unique")
+    private String title;
+    private String content;
 }

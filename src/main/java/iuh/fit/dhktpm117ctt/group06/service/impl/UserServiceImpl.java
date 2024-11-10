@@ -97,7 +97,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @PreAuthorize("hasRole('ROLE_CUSTOMER')")
+    @PreAuthorize("hasRole({'ROLE_CUSTOMER','ROLE_ADMIN'})")
     public Optional<UserResponse> updateInfo(String id, UserRequest userRequest) {
         User userUpdate = userRepository.getReferenceById(id);
         String avatar = userUpdate.getAvatar();

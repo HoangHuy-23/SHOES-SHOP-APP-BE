@@ -19,10 +19,7 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
     private String description;
-    private String warrantyInformation;
-    private String returnInformation;
     private String avatar;
-    private String shippingInformation;
     private double rating;
     private Date createdDate;
     

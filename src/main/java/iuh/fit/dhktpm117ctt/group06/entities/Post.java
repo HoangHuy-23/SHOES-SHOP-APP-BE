@@ -3,6 +3,8 @@ package iuh.fit.dhktpm117ctt.group06.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.Date;
+
 @Entity
 @Getter
 @Setter
@@ -17,7 +19,6 @@ public class Post {
     private String title;
     @Column(columnDefinition = "longtext")
     private String content;
-    private String author;
     private String avatar;
-    private String createdDate;
+    private Date createdDate;
 }
