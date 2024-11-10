@@ -1,26 +1,27 @@
 package iuh.fit.dhktpm117ctt.group06.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Setter
 @Getter
+@Setter
 @ToString
 @Entity
-@Table(name = "ServiceInformation")
-public class    ServiceInformation {
+@Table(name = "categories")
+public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
     private String name;
-    private double price;
     private String description;
-    private String avatar;
 
-    @ManyToOne
-    @JoinColumn(name = "option_id")
-    private Option option;
+    @OneToMany(mappedBy = "category")
+    @JsonIgnore
+    @ToString.Exclude
+    private List<Product> products;
 }

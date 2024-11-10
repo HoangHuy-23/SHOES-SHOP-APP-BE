@@ -11,5 +11,5 @@ import lombok.NoArgsConstructor;
 @Data
 public class CartDetailPK {
     private String cartId;
-    private String roomItemId;
+    private String productItemId;
 }

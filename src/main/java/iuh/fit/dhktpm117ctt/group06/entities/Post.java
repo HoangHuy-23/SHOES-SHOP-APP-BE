@@ -3,13 +3,15 @@ package iuh.fit.dhktpm117ctt.group06.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.Date;
+
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-@Table(name = "post")
+@Table(name = "posts")
 public class Post {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -17,10 +19,6 @@ public class Post {
     private String title;
     @Column(columnDefinition = "longtext")
     private String content;
-    private String author;
     private String avatar;
-    private String createdDate;
-    @ManyToOne
-    @JoinColumn(name = "hotel_id")
-    private Hotel hotel;
+    private Date createdDate;
 }

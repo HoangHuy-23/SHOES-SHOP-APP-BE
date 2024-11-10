@@ -2,6 +2,7 @@ package iuh.fit.dhktpm117ctt.group06.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.validator.constraints.UniqueElements;
 
 @Entity
 @Getter

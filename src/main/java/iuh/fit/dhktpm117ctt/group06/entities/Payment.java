@@ -3,6 +3,7 @@ package iuh.fit.dhktpm117ctt.group06.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -17,10 +18,10 @@ public class Payment {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
     private double amount;
-    private Date paymentDate;
+    private LocalDateTime paymentDate;
     private String transactionId;
     private String content;
     @OneToOne
-    @JoinColumn(name = "booking_id")
-    private Booking booking;
+    @JoinColumn(name = "order_id")
+    private Order order;
 }

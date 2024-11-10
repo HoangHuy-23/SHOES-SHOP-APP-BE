@@ -11,22 +11,19 @@ import java.util.Date;
 @Setter
 @ToString
 @Entity
-@Table(name = "BookingDetail")
-public class BookingDetail {
+@Table(name = "order_details")
+public class OrderDetail {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
-    private Date checkInDate;
-    private Date checkOutDate;
-    private int numOfAdult;
-    private int numOfChildren;
     private int quantity;
+    private double pricePerItem;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "room_item_id")
-    private RoomItem roomItem;
+    @JoinColumn(name = "product_item_id")
+    private ProductItem productItem;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "booking_id")
-    private Booking booking;
+    @JoinColumn(name = "order_id")
+    private Order order;
 }

@@ -17,6 +17,7 @@ import java.util.Objects;
 public class GlobalExceptionHandler {
 
     private static final String MIN_ATTRIBUTE = "min";
+    private static final String MAX_ATTRIBUTE = "max";
 
     @ExceptionHandler(value = Exception.class)
     ResponseEntity<ApiResponse> handlingRuntimeException(Exception e) {
@@ -67,7 +68,10 @@ public class GlobalExceptionHandler {
     }
 
     private String mapAttribute(String message, Map<String, Object> attributes) {
-        String minValue = attributes.get(MIN_ATTRIBUTE).toString();
-        return message.replace("{" + MIN_ATTRIBUTE + "}", minValue);
+        String minValue = attributes.containsKey(MIN_ATTRIBUTE) ? attributes.get(MIN_ATTRIBUTE).toString() : "";
+        String maxValue = attributes.containsKey(MAX_ATTRIBUTE) ? attributes.get(MAX_ATTRIBUTE).toString() : "";
+        message =  message.replace("{" + MIN_ATTRIBUTE + "}", minValue);
+        message =  message.replace("{" + MAX_ATTRIBUTE + "}", maxValue);
+        return message;
     }
 }

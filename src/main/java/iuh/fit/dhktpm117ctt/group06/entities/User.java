@@ -3,11 +3,7 @@ package iuh.fit.dhktpm117ctt.group06.entities;
 import iuh.fit.dhktpm117ctt.group06.entities.enums.Gender;
 import iuh.fit.dhktpm117ctt.group06.entities.enums.UserRole;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import net.minidev.json.annotate.JsonIgnore;
 
 import java.util.List;
@@ -18,6 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
+@Builder
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -32,25 +29,16 @@ public class User {
     private Gender gender;
     @Enumerated(EnumType.STRING)
     private UserRole role;
-    @Embedded
-    private CitizenCard citizenCard;
-    @Embedded
-    private Address address;
-//    @OneToOne(mappedBy = "user")
-//    @JsonIgnore
-//    private Account account;
-    @OneToOne(mappedBy = "user")
-    @JsonIgnore
-    private Cart cart;
-    @OneToMany(mappedBy = "admin")
-    @JsonIgnore
-    private List<Hotel> hotels;
+
+    @OneToMany(mappedBy = "user")
+    private List<Address> address;
+
     @OneToMany(mappedBy = "user")
     @JsonIgnore
     private List<FeedBack> feedBacks;
 
     @OneToMany(mappedBy = "user")
     @JsonIgnore
-    private List<Booking> bookings;
+    private List<Order> orders;
 
 }
