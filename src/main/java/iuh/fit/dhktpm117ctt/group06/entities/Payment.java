@@ -3,7 +3,6 @@ package iuh.fit.dhktpm117ctt.group06.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -18,7 +17,7 @@ public class Payment {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
     private double amount;
-    private LocalDateTime paymentDate;
+    private Date paymentDate;
     private String transactionId;
     private String content;
     @OneToOne
