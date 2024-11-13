@@ -7,7 +7,7 @@ import iuh.fit.dhktpm117ctt.group06.entities.Post;
 import java.util.Optional;
 
 public interface PostService {
-    Optional<PostResponse> findByBrand(String id);
+    Optional<PostResponse> findById(String id);
     Optional<PostResponse> save(PostRequest postRequest);
     void deleteById(String id);
     Optional<PostResponse> update(String id, PostRequest postRequest);

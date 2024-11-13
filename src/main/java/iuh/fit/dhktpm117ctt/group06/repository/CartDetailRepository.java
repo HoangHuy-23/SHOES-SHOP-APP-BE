@@ -1,15 +1,16 @@
 package iuh.fit.dhktpm117ctt.group06.repository;
 
-import iuh.fit.dhktpm117ctt.group06.entities.Cart;
 import iuh.fit.dhktpm117ctt.group06.entities.CartDetail;
 import iuh.fit.dhktpm117ctt.group06.entities.CartDetailPK;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface CarDetailRepository extends JpaRepository<CartDetail, String> {
+@Repository
+public interface CartDetailRepository extends JpaRepository<CartDetail, String> {
     // Tìm tất cả CartDetail theo cartId
     @Query("SELECT cd FROM CartDetail cd WHERE cd.cart.id = ?1")
     List<CartDetail> findAllByCartId(String cartId);

@@ -42,7 +42,7 @@ public class SecurityConfig {
                         cfg.setAllowedOrigins(Arrays.asList(
                                 "http://localhost:2003",
                                 "http://localhost:3000",
-                                "http://localhost:8080"
+                                "http://localhost:8080/**"
 
                         ));
                         cfg.setAllowedMethods(Collections.singletonList("*"));

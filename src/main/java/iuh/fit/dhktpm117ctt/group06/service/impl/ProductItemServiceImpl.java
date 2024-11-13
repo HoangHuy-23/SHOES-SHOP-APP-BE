@@ -1,109 +1,129 @@
 package iuh.fit.dhktpm117ctt.group06.service.impl;
 
+import iuh.fit.dhktpm117ctt.group06.cloudinary.CloudinaryProvider;
+import iuh.fit.dhktpm117ctt.group06.dto.request.ProductItemRequest;
+import iuh.fit.dhktpm117ctt.group06.dto.response.ProductItemResponse;
 import iuh.fit.dhktpm117ctt.group06.entities.ProductItem;
+import iuh.fit.dhktpm117ctt.group06.entities.enums.ProductColor;
+import iuh.fit.dhktpm117ctt.group06.exception.AppException;
+import iuh.fit.dhktpm117ctt.group06.exception.ErrorCode;
+import iuh.fit.dhktpm117ctt.group06.repository.ProductItemRepository;
 import iuh.fit.dhktpm117ctt.group06.service.ProductItemService;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
+@Service
 public class ProductItemServiceImpl implements ProductItemService {
 
-    private List<ProductItem> productItems = new ArrayList<>();
+    @Autowired
+    private ProductItemRepository productItemRepository;
+    @Autowired
+    private CloudinaryProvider cloudinaryProvider;
+    private ModelMapper modelMapper = new ModelMapper();
 
-    @Override
-    public ProductItem add(ProductItem productItem) {
-        productItems.add(productItem);
-        return productItem;
+    private ProductItemResponse mapToProductItemResponse(ProductItem productItem) {
+        return modelMapper.map(productItem, ProductItemResponse.class);
+    }
+
+    private ProductItem mapToProductItem(ProductItemRequest productItemRequest) {
+        return modelMapper.map(productItemRequest, ProductItem.class);
     }
 
     @Override
-    public ProductItem update(ProductItem productItem) {
-        Optional<ProductItem> existingItem = productItems.stream()
-                .filter(item -> item.getId().equals(productItem.getId()))
-                .findFirst();
-
-        if (existingItem.isPresent()) {
-            productItems.remove(existingItem.get());
-            productItems.add(productItem);
-            return productItem;
-        }
-        return null;
-    }
-
-    @Override
-    public void remove(String productItemId) {
-        productItems.removeIf(item -> item.getId().equals(productItemId));
-    }
-
-    @Override
-    public ProductItem updateDetailImage(String productItemId, List<String> newDetailImages) {
-        for (ProductItem item : productItems) {
-            if (item.getId().equals(productItemId)) {
-                item.setListDetailImages(newDetailImages);
-                return item;
+    public Optional<ProductItemResponse> save(ProductItemRequest productItemRequest) {
+        ProductItem productItem = mapToProductItem(productItemRequest);
+        if (productItemRequest.getListDetailImages() != null) {
+            try {
+                List<Map> uploadResult = cloudinaryProvider.uploadFiles(productItemRequest.getListDetailImages(), "Product-Item", productItem.getId());
+                List<String> listDetailImages = new ArrayList<>();
+                for (Map map : uploadResult) {
+                    listDetailImages.add(map.get("url").toString());
+                }
+                productItem.setListDetailImages(listDetailImages);
+                //return Optional.of(mapToProductItemResponse(productItemRepository.save(productItem)));
+            } catch (Exception e) {
+                throw new AppException(ErrorCode.AVATAR_INVALID);
             }
         }
-        return null;
+        return Optional.of(mapToProductItemResponse(productItemRepository.save(productItem)));
     }
 
     @Override
-    public ProductItem updateQuantity(String productItemId, int qty) {
-        for (ProductItem item : productItems) {
-            if (item.getId().equals(productItemId)) {
-                item.setQuantity(qty);
-                return item;
+    public Optional<ProductItemResponse> update(String id, ProductItemRequest productItemRequest) {
+        Optional<ProductItem> optionalProductItem = productItemRepository.findById(id);
+        if (optionalProductItem.isPresent()) {
+            ProductItem productItem = optionalProductItem.get();
+            productItem.setPrice(productItemRequest.getPrice());
+            productItem.setQuantity(productItemRequest.getQuantity());
+            productItem.setColor(ProductColor.valueOf(productItemRequest.getColor()));
+            productItem.setSize(productItemRequest.getSize());
+            if (productItemRequest.getListDetailImages() != null) {
+                try {
+                    List<Map> uploadResult = cloudinaryProvider.uploadFiles(productItemRequest.getListDetailImages(), "Product-Item", productItem.getId());
+                    List<String> listDetailImages = new ArrayList<>();
+                    for (Map map : uploadResult) {
+                        listDetailImages.add(map.get("url").toString());
+                    }
+                    productItem.setListDetailImages(listDetailImages);
+                    return Optional.of(mapToProductItemResponse(productItemRepository.save(productItem)));
+                } catch (Exception e) {
+                    throw new AppException(ErrorCode.AVATAR_INVALID);
+                }
             }
+            return Optional.of(mapToProductItemResponse(productItemRepository.save(productItem)));
         }
-        return null;
+        return Optional.empty();
     }
 
     @Override
-    public ProductItem decreaseQuantity(String productItemId, int qty) {
-        for (ProductItem item : productItems) {
-            if (item.getId().equals(productItemId)) {
-                item.setQuantity(item.getQuantity() - qty);
-                return item;
-            }
-        }
-        return null; // Hoặc ném ra ngoại lệ nếu không tìm thấy
+    public void deleteById(String productItemId) {
+        productItemRepository.deleteById(productItemId);
     }
 
     @Override
-    public List<ProductItem> findByProduct(String productId) {
-        List<ProductItem> result = new ArrayList<>();
-        for (ProductItem item : productItems) {
-            if (item.getProduct().equals(productId)) {
-                result.add(item);
-            }
-        }
-        return result;
+    public Optional<ProductItemResponse> updateDetailImage(String productItemId, MultipartFile[] newDetailImages) {
+        return Optional.empty();
     }
 
     @Override
-    public List<String> findListColor() {
-        // Giả sử bạn có một phương thức để lấy màu từ ProductItem
+    public Optional<ProductItemResponse> updateQuantity(String productItemId, int qty) {
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<ProductItemResponse> decreaseQuantity(String productItemId, int qty) {
+        return Optional.empty();
+    }
+
+    @Override
+    public List<ProductItemResponse> findByProduct(String productId) {
+        List<ProductItem> productItems = productItemRepository.findByProduct(productId);
         return productItems.stream()
-                .map(ProductItem::getColor)
-                .distinct()
+                .map(this::mapToProductItemResponse)
                 .toList();
     }
 
+
     @Override
-    public List<String> findListSize() {
-        // Giả sử bạn có một phương thức để lấy kích thước từ ProductItem
-        return productItems.stream()
-                .map(ProductItem::getSize)
-                .distinct()
-                .toList();
+    public Optional<ProductItemResponse> findByColorAndSize(String color, String size, String productId) {
+        return productItemRepository.findByColorAndSizeAndProductId(color, size, productId)
+                .map(this::mapToProductItemResponse);
     }
 
     @Override
-    public ProductItem findByColorAndSize(String color, String size, String productId) {
-        for (ProductItem item : productItems) {
-            if (item.getColor().equals(color) && item.getSize().equals(size) && item.getProduct().equals(productId)) {
-                return item;
-            }
-        }
-        return null;
+    public List<ProductColor> findDistinctColorsByProductId(String productId) {
+        return productItemRepository.findDistinctColorsByProductId(productId);
+    }
+
+    @Override
+    public List<String> findDistinctSizesByProductId(String productId) {
+        return productItemRepository.findDistinctSizesByProductId(productId);
     }
 }

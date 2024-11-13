@@ -9,10 +9,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface BrandService {
-    public Optional<BrandRepository> findById(String id);
+    public Optional<BrandResponse> findById(String id);
     public Optional<BrandResponse> save(BrandRequest brandRequest);
     public Optional<BrandResponse> update(String id,BrandRequest brandRequest);
     public void deleteById(String id);
-
     public List<BrandResponse> findAll();
 }

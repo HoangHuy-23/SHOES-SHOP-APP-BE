@@ -13,6 +13,7 @@ import java.util.Date;
 public class ProductRequest {
     @NotNull(message = "PRODUCT_NAME_INVALID")
     @NotBlank(message = "PRODUCT_NAME_INVALID")
+    private String name;
     private String description;
     private MultipartFile avatar;
     private Date createdDate;

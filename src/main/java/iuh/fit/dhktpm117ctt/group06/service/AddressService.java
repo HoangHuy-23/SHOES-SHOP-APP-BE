@@ -10,7 +10,7 @@ import java.util.Optional;
 public interface AddressService {
     List<AddressResponse> findAllByUser(String userId);
     Optional<AddressResponse> findById(String id);
-//    Address update(Address address);
     void deleteById(String id);
-    Address addNewAddress(String userId, AddressRequest addressRequest);
+    Optional<AddressResponse> save(String userId, AddressRequest addressRequest);
+    Optional<AddressResponse> update(String id, AddressRequest addressRequest);
 }

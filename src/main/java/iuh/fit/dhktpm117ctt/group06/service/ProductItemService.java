@@ -1,37 +1,23 @@
 package iuh.fit.dhktpm117ctt.group06.service;
 
+import iuh.fit.dhktpm117ctt.group06.dto.request.ProductItemRequest;
+import iuh.fit.dhktpm117ctt.group06.dto.response.ProductItemResponse;
 import iuh.fit.dhktpm117ctt.group06.entities.ProductItem;
+import iuh.fit.dhktpm117ctt.group06.entities.enums.ProductColor;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ProductItemService {
-    // Thêm một ProductItem mới
-    ProductItem add(ProductItem productItem);
-
-    // Cập nhật một ProductItem
-    ProductItem update(ProductItem productItem);
-
-    // Xóa một ProductItem
-    void remove(String productItemId);
-
-    // Cập nhật hình ảnh chi tiết
-    ProductItem updateDetailImage(String productItemId, List<String> newDetailImages);
-
-    // Cập nhật số lượng
-    ProductItem updateQuantity(String productItemId, int qty);
-
-    // Giảm số lượng
-    ProductItem decreaseQuantity(String productItemId, int qty);
-
-    // Tìm ProductItem theo productId
-    List<ProductItem> findByProduct(String productId);
-
-    // Lấy danh sách màu
-    List<String> findListColor();
-
-    // Lấy danh sách kích thước
-    List<String> findListSize();
-
-    // Tìm ProductItem theo màu và kích thước
-    ProductItem findByColorAndSize(String color, String size, String productId);
+    Optional<ProductItemResponse> save(ProductItemRequest productItemRequest);
+    Optional<ProductItemResponse> update(String id, ProductItemRequest productItem);
+    void deleteById(String productItemId);
+    Optional<ProductItemResponse> updateDetailImage(String productItemId, MultipartFile[] newDetailImages);
+    Optional<ProductItemResponse> updateQuantity(String productItemId, int qty);
+    Optional<ProductItemResponse> decreaseQuantity(String productItemId, int qty);
+    List<ProductItemResponse> findByProduct(String productId);
+    Optional<ProductItemResponse> findByColorAndSize(String color, String size, String productId);
+    List<ProductColor> findDistinctColorsByProductId(String productId);
+    List<String> findDistinctSizesByProductId(String productId);
 }

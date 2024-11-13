@@ -31,10 +31,11 @@ public class BrandServiceImpl implements BrandService {
     public BrandResponse mapToBrandResponse(Brand brand) {
         return modelMapper.map(brand, BrandResponse.class);
     }
+
     @Override
-    public Optional<BrandRepository> findById(String id) {
+    public Optional<BrandResponse> findById(String id) {
         Brand brand = brandRepository.findById(id).orElse(null);
-        return Optional.of((BrandRepository) mapToBrandResponse(brand));
+        return Optional.ofNullable(brand).map(this::mapToBrandResponse);
     }
 
     @Override

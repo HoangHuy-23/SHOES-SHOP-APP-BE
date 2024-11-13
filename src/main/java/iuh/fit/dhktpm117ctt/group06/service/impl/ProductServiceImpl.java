@@ -1,15 +1,22 @@
 package iuh.fit.dhktpm117ctt.group06.service.impl;
 
+import iuh.fit.dhktpm117ctt.group06.cloudinary.CloudinaryProvider;
+import iuh.fit.dhktpm117ctt.group06.dto.request.ProductRequest;
+import iuh.fit.dhktpm117ctt.group06.dto.response.ProductResponse;
 import iuh.fit.dhktpm117ctt.group06.entities.Product;
+import iuh.fit.dhktpm117ctt.group06.entities.enums.ProductColor;
 import iuh.fit.dhktpm117ctt.group06.exception.AppException;
 import iuh.fit.dhktpm117ctt.group06.exception.ErrorCode;
 import iuh.fit.dhktpm117ctt.group06.repository.ProductRepository;
 import iuh.fit.dhktpm117ctt.group06.service.ProductService;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -17,53 +24,85 @@ public class ProductServiceImpl implements ProductService {
 
     @Autowired
     private ProductRepository productRepository;
+    private ModelMapper modelMapper = new ModelMapper();
+    @Autowired
+    private CloudinaryProvider cloudinaryProvider;
+
+    private ProductResponse mapToProductResponse(Product product) {
+        return modelMapper.map(product, ProductResponse.class);
+    }
+
+    private Product mapToProduct(ProductRequest productRequest) {
+        return modelMapper.map(productRequest, Product.class);
+    }
+
 
     @Override
-    public Product addProduct(Product product) {
-        // Save the product to the database
-        return productRepository.save(product);
+    public Optional<ProductResponse> addProduct(ProductRequest productRequest) {
+        Product product = mapToProduct(productRequest);
+        return Optional.of(mapToProductResponse(productRepository.save(product)));
     }
 
     @Override
-    public Product updateProduct(Product product) {
-        // Check if the product exists before updating
-        Optional<Product> existingProduct = productRepository.findById(product.getId());
-        existingProduct.get().setDescription(product.getDescription());
-        existingProduct.get().setRating(product.getRating());
-        existingProduct.get().setAvatar(product.getAvatar());
-        existingProduct.get().setCreatedDate(product.getCreatedDate());
-        return productRepository.save(existingProduct.get());
+    public Optional<ProductResponse> updateProduct(String productId, ProductRequest productRequest) {
+        Optional<Product> product = productRepository.findById(productId);
+        if (product.isPresent()) {
+            product.get().setName(productRequest.getName());
+            product.get().setDescription(productRequest.getDescription());
+            if (productRequest.getAvatar() != null) {
+                try {
+                    Map uploadResult = cloudinaryProvider.upload(productRequest.getAvatar(), "Product", product.get().getId());
+                    product.get().setAvatar(uploadResult.get("url").toString());
+                    return Optional.of(mapToProductResponse(productRepository.save(product.get())));
+                } catch (Exception e) {
+                    throw new AppException(ErrorCode.AVATAR_INVALID);
+                }
+            }
+        }
+        return Optional.empty();
     }
 
     @Override
-    public void removeProduct(String productId) {
-        // Check if the product exists before deleting
+    public void deleteById(String productId) {
         productRepository.deleteById(productId);
     }
 
     @Override
-    public void updateProductAvatar(String productId, String newAvatarUrl) {
-        Optional<Product> productOptional = productRepository.findById(productId);
-        Product product = productOptional.get();
-        // Cập nhật avatar URL mới
-        product.setAvatar(newAvatarUrl);
-        // Lưu lại thay đổi
-        productRepository.save(product);
-
+    public Optional<ProductResponse> updateProductAvatar(String productId, MultipartFile avatar) {
+        Optional<Product> product = productRepository.findById(productId);
+        if (product.isPresent()) {
+            if (avatar == null) {
+                return Optional.of(mapToProductResponse(product.get()));
+            } else {
+                try {
+                    Map uploadResult = cloudinaryProvider.upload(avatar, "Product", product.get().getId());
+                    product.get().setAvatar(uploadResult.get("url").toString());
+                    return Optional.of(mapToProductResponse(productRepository.save(product.get())));
+                } catch (Exception e) {
+                    throw new AppException(ErrorCode.AVATAR_INVALID);
+                }
+            }
+        }
+        return Optional.empty();
     }
 
     @Override
-    public List<Product> searchProducts(String keyword) {
-        return List.of(); // Replace with actual implementation based on search criteria
+    public List<ProductResponse> searchProducts(String keyword) {
+        return List.of();
     }
 
     @Override
-    public Product getProductById(String productId) {
-        return productRepository.findById(productId).orElse(null);
+    public ProductResponse getProductById(String productId) {
+        return null;
     }
 
     @Override
-    public List<Product> getAllProducts() {
-        return productRepository.findAll();
+    public List<ProductResponse> getAllProducts() {
+        return List.of();
+    }
+
+    @Override
+    public List<ProductColor> getProductColors(String productId) {
+        return List.of();
     }
 }

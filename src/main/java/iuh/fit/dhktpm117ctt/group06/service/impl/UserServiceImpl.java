@@ -53,6 +53,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @PreAuthorize("hasRole('ROLE_CUSTOMER')")
     public Optional<UserResponse> findById(String id) {
         User user = userRepository.findById(id).orElse(null);
         return Optional.of(mapToUserResponse(user));

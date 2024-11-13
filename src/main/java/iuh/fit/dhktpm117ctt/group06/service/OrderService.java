@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface OrderService {
-
     Optional<OrderResponse> findById(String id);
     List<OrderResponse> findByUser(String userId);
     Optional<OrderResponse> updateStatus(String id, OrderRequest orderRequest);

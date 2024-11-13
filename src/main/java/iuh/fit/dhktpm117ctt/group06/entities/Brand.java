@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import java.util.List;
+
 @Entity
 @Data
 @NoArgsConstructor
@@ -22,4 +24,7 @@ public class Brand {
     @OneToOne
     @JoinColumn(name = "post_id")
     private Post post;
+
+    @OneToMany(mappedBy = "brand", fetch = FetchType.LAZY)
+    private List<ProductCollection> productCollections;
 }

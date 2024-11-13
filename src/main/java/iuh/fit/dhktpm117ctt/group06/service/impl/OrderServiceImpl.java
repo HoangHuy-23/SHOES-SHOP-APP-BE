@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-@Service  // Thêm annotation này để Spring nhận diện lớp này là một Bean
+@Service
 public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;

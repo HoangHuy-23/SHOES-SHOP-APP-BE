@@ -20,6 +20,7 @@ import iuh.fit.dhktpm117ctt.group06.service.impl.AuthServiceImpl;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import org.springframework.security.authentication.BadCredentialsException;
@@ -34,7 +35,7 @@ import javax.crypto.SecretKey;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 public class AuthController {
 
     @Autowired
@@ -127,14 +128,16 @@ public class AuthController {
         return ResponseEntity.ok("Logout successfully");
     }
 
-    @GetMapping("/test")
-    public ResponseEntity<User> test(@RequestHeader String Authorization) {
-        String jwt = Authorization.substring(7);
-        SecretKey key = Keys.hmacShaKeyFor(JwtConstants.SECRET_KEY.getBytes());
-        Claims claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(jwt).getBody();
-        String email = String.valueOf(claims.get("email"));
-        return ResponseEntity.ok(userRepository.findById(accountRepository.findByEmail(email).get().getUser().getId()).get());
+    @GetMapping("/my-info")
+    public ResponseEntity<User> getMyInfo(@RequestHeader("Authorization") String token) {
+        if (token == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+        String email = jwtProvider.getEmailFromToken(token); // Strip "Bearer "
+        Account account = accountRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
+        return ResponseEntity.ok(account.getUser());
     }
+
 
     private Authentication authenticate(String username, String password) {
         UserDetails userDetails = authService.loadUserByUsername(username);

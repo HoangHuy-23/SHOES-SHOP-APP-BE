@@ -16,7 +16,7 @@ public class JwtProvider {
         return Jwts.builder()
                 .setSubject(email)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(new Date().getTime() + 30*1000)) // Token expires in 1 day
+                .setExpiration(new Date(new Date().getTime() + 60*60*1000)) // Token expires in 1 day
                 .claim("email", email)
                 .claim("authorities", role)
                 .signWith(key) // Sử dụng HS256 với SecretKey

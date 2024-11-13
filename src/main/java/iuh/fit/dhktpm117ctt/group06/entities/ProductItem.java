@@ -1,5 +1,6 @@
 package iuh.fit.dhktpm117ctt.group06.entities;
 
+import iuh.fit.dhktpm117ctt.group06.entities.enums.ProductColor;
 import iuh.fit.dhktpm117ctt.group06.entities.enums.ProductStatus;
 import jakarta.persistence.*;
 import lombok.*;
@@ -25,7 +26,8 @@ public class ProductItem {
             joinColumns = @JoinColumn(name = "product_item_id")
     )
     private List<String> listDetailImages;
-    private String color;
+    @Enumerated(EnumType.STRING)
+    private ProductColor color;
     private String size;
     @ManyToOne
     @JoinColumn(name = "product_id")

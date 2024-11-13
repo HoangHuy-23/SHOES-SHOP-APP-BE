@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface OrderDetailService {
-
     List<OrderDetailResponse> findByOrder(String orderId);
     Optional<OrderDetailResponse> addToOrder(String orderId,OrderDetailRequest orderDetailRequest);
 }

@@ -30,8 +30,8 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public Optional<PostResponse> findByBrand(String id) {
-        Post post = postRepository.findByBrand(id).orElse(null);
+    public Optional<PostResponse> findById(String id) {
+        Post post = postRepository.findById(id).orElse(null);
         return Optional.of(mapToPostResponse(post));
     }
 

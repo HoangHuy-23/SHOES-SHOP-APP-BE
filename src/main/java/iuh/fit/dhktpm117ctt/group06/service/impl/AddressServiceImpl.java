@@ -50,14 +50,29 @@ public class AddressServiceImpl implements AddressService {
     }
 
     @Override
-    public Address addNewAddress(String userId, AddressRequest addressRequest) {
+    public Optional<AddressResponse> save(String userId, AddressRequest addressRequest) {
         Address newAddress = mapToAddress(addressRequest);
         User user = userRepository.findById(userId).orElse(null);
         if(user != null){
             newAddress.setUser(user);
-            return addressRepository.save(newAddress);
+            Address savedAddress = addressRepository.save(newAddress);
+            return Optional.of(mapToAddResponse(savedAddress));
         }
-        return null;
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<AddressResponse> update(String id, AddressRequest addressRequest) {
+        Address address = addressRepository.findById(id).orElse(null);
+        if(address != null){
+            address.setCity(addressRequest.getCity());
+            address.setDistrict(addressRequest.getDistrict());
+            address.setWard(addressRequest.getWard());
+            address.setStreet(addressRequest.getStreet());
+            Address updatedAddress = addressRepository.save(address);
+            return Optional.of(mapToAddResponse(updatedAddress));
+        }
+        return Optional.empty();
     }
 }
 

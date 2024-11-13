@@ -1,6 +1,7 @@
 package iuh.fit.dhktpm117ctt.group06.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import iuh.fit.dhktpm117ctt.group06.entities.enums.ProductGender;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -18,6 +19,7 @@ public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
+    private String name;
     private String description;
     private String warrantyInformation;
     private String returnInformation;
@@ -25,15 +27,22 @@ public class Product {
     private String shippingInformation;
     private double rating;
     private Date createdDate;
-    
-    @ManyToOne
-    @JoinColumn(name = "brand_id")
-    private Brand brand;
+
+    @Enumerated(EnumType.STRING)
+    private ProductGender gender;
 
     @OneToMany(mappedBy = "product")
     @JsonIgnore
     @ToString.Exclude
     private List<ProductItem> productItems;
+
+    @ManyToOne
+    @JoinColumn(name = "collection_id")
+    private ProductCollection collection;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "brand_id", referencedColumnName = "id")
+    private Brand brand;
 
     @ManyToOne
     @JoinColumn(name = "category_id")

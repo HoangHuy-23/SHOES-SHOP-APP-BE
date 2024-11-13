@@ -43,18 +43,15 @@ public class OrderDetailServiceImpl implements OrderDetailService {
     public Optional<OrderDetailResponse> addToOrder(String orderId, OrderDetailRequest orderDetailRequest) {
         Optional<Order> optionalOrder = orderRepository.findById(orderId);
         if (optionalOrder.isEmpty()) {
-            return Optional.empty(); // Nếu không tìm thấy đơn hàng
+            return Optional.empty();
         }
         Order order = optionalOrder.get();
 
-        // Sử dụng mapToOrderDetail để chuyển đổi OrderDetailRequest thành OrderDetail
         OrderDetail orderDetail = mapToOrderDetail(orderDetailRequest);
-        orderDetail.setOrder(order); // Gán đơn hàng liên kết cho OrderDetail
+        orderDetail.setOrder(order);
 
-        // Lưu OrderDetail mới
         OrderDetail savedOrderDetail = orderDetailRepository.save(orderDetail);
 
-        // Chuyển đổi OrderDetail đã lưu thành OrderDetailResponse bằng mapToOrderDetailResponse
         return Optional.of(mapToOrderDetailResponse(savedOrderDetail));
     }
 }
