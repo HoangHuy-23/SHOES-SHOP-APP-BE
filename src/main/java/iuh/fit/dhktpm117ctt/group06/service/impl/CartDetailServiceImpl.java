@@ -41,8 +41,8 @@ public class CartDetailServiceImpl implements CartDetailService {
     }
 
     @Override
-    public Optional<CartDetailResponse> updateQuantity(String cartDetailId, int newQuantity) {
-        Optional<CartDetail> cartDetail = cartDetailRepository.findById(cartDetailId);
+    public Optional<CartDetailResponse> updateQuantity(CartDetailPK cartDetailPK, int newQuantity) {
+        Optional<CartDetail> cartDetail = cartDetailRepository.findById(cartDetailPK);
         if (cartDetail.isPresent()) {
             cartDetail.get().setQuantity(newQuantity);
             return Optional.of(mapToCartDetailResponse(cartDetailRepository.save(cartDetail.get())));

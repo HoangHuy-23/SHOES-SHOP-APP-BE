@@ -11,6 +11,6 @@ import java.util.Optional;
 public interface CartDetailService {
     List<CartDetailResponse> findAllCartDetailByCart(String cartId);
     Optional<CartDetailResponse> addToCart(CartDetailRequest cartDetailRequest);
-    Optional<CartDetailResponse> updateQuantity(String cartDetailId, int newQuantity);
     void deleteById(CartDetailPK cartDetailPK);
+	Optional<CartDetailResponse> updateQuantity(CartDetailPK cartDetailPK, int newQuantity);
 }
