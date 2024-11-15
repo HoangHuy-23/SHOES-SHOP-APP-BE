@@ -20,4 +20,6 @@ public interface ProductItemService {
     Optional<ProductItemResponse> findByColorAndSize(String color, String size, String productId);
     List<ProductColor> findDistinctColorsByProductId(String productId);
     List<String> findDistinctSizesByProductId(String productId);
+	Optional<ProductItem> findById(String id);
+	List<ProductItem> findAll();
 }

@@ -1,23 +1,23 @@
 package iuh.fit.dhktpm117ctt.group06.dto.request;
 
+import iuh.fit.dhktpm117ctt.group06.entities.Product;
 import iuh.fit.dhktpm117ctt.group06.entities.enums.ProductStatus;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import org.springframework.web.multipart.MultipartFile;
 
+@NoArgsConstructor
 @Data
-@Builder
 public class ProductItemRequest {
     @Min(value = 0, message = "PRICE_INVALID")
     @NotNull(message = "PRICE_INVALID")
-    @NotBlank(message = "PRICE_INVALID")
-    private double price;
+    private Double price;
     @Min(value = 0, message = "QUANTITY_INVALID")
     @NotNull(message = "QUANTITY_INVALID")
-    @NotBlank(message = "QUANTITY_INVALID")
     private int quantity;
     private MultipartFile[] listDetailImages;
     @NotNull(message = "COLOR_INVALID")
@@ -27,7 +27,7 @@ public class ProductItemRequest {
     @NotBlank(message = "SIZE_INVALID")
     private String size;
     @NotNull(message = "PRODUCT_ID_INVALID")
-    private String productId;
+    private Product product;
     @NotNull(message = "STATUS_INVALID")
     private ProductStatus status;
 }

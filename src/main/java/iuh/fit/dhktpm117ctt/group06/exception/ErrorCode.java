@@ -33,8 +33,16 @@ public enum ErrorCode {
     //Product
     PRODUCT_NOT_FOUND(4404, "Product not found!", HttpStatus.NOT_FOUND),
     PRODUCT_EXISTED(4405, "Product existed!", HttpStatus.BAD_REQUEST),
-    PRODUCT_INVALID(4406, "Product invalid!", HttpStatus.BAD_REQUEST)
+    PRODUCT_INVALID(4406, "Product invalid!", HttpStatus.BAD_REQUEST),
+    
+    //ProductItem
+    PRODUCT_ITEM_NOT_FOUND(4504, "Product item not found!", HttpStatus.NOT_FOUND),
+    PRODUCT_ITEM_EXISTED(4505, "Product item existed!", HttpStatus.BAD_REQUEST),
+    PRODUCT_ITEM_INVALID(4506, "Product item invalid!", HttpStatus.BAD_REQUEST),
+    PRODUCT_ITEM_EXISTED_IN_ORDER_DETAILS(4507, "Product item existed in order details!", HttpStatus.BAD_REQUEST)
     ;
+	
+
     private int code;
     private String message;
     private HttpStatusCode httpStatusCode;
