@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ProductService {
-    Optional<ProductResponse> addProduct(ProductRequest productRequest);
+	Optional<ProductResponse> addProduct(ProductRequest productRequest);
     Optional<ProductResponse> updateProduct(String productId, ProductRequest productRequest);
     void deleteById(String productId);
     Optional<ProductResponse> updateProductAvatar(String productId, MultipartFile avatar);

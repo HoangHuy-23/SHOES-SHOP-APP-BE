@@ -29,7 +29,11 @@ public enum ErrorCode {
     CITY_INVALID(2105, "City contains only letters and spaces, {min}-{max} characters long", HttpStatus.BAD_REQUEST),
     // Room
     ROOM_NAME_INVALID(3001, "Room name contains only letters and spaces, {min}-{max} characters long", HttpStatus.BAD_REQUEST),
-
+    
+    //Product
+    PRODUCT_NOT_FOUND(4404, "Product not found!", HttpStatus.NOT_FOUND),
+    PRODUCT_EXISTED(4405, "Product existed!", HttpStatus.BAD_REQUEST),
+    PRODUCT_INVALID(4406, "Product invalid!", HttpStatus.BAD_REQUEST)
     ;
     private int code;
     private String message;
