@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import iuh.fit.dhktpm117ctt.group06.dto.request.UserRequest;
 import iuh.fit.dhktpm117ctt.group06.dto.response.UserResponse;
 import iuh.fit.dhktpm117ctt.group06.entities.User;
+import iuh.fit.dhktpm117ctt.group06.service.MailSenderService;
 import iuh.fit.dhktpm117ctt.group06.service.UserService;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.validation.Valid;
@@ -21,6 +22,15 @@ import org.springframework.web.multipart.MultipartFile;
 public class UserController {
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private MailSenderService mailSenderService;
+
+    @GetMapping("/send-mail")
+    public ResponseEntity<?> sendMail() {
+        mailSenderService.sendMail("ng.hoang.huy23@gmail.com", "Hello", "Test");
+        return ResponseEntity.ok().build();
+    }
 
     @PostMapping()
     public ResponseEntity<?> findAll() {
