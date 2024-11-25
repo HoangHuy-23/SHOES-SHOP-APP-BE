@@ -27,4 +27,6 @@ public interface UserService {
     Optional<UserResponse> updateInfo(String id, UserRequest userRequest);
 
     Optional<UserResponse> updateAvatar(String id, MultipartFile avatar);
+
+	Optional<User> getUserById(String id);
 }

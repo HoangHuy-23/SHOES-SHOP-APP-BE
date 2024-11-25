@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import net.minidev.json.annotate.JsonIgnore;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -21,7 +22,7 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
     private double totalPrice;
-    private Date createdDate;
+    private LocalDateTime createdDate;
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;
 
@@ -36,6 +37,8 @@ public class Order {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
+    
+    
 
 
 }

@@ -3,7 +3,10 @@ package iuh.fit.dhktpm117ctt.group06.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.io.Serializable;
 import java.util.Date;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Getter
@@ -12,19 +15,25 @@ import java.util.Date;
 @AllArgsConstructor
 @ToString
 @Table(name = "cart_details")
-public class CartDetail {
-    @EmbeddedId
-    private CartDetailPK cartDetailPK;
+public class CartDetail implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
-    private int quantity;
+	@EmbeddedId
+	private CartDetailPK cartDetailPK;
 
-    @OneToOne
-    @JoinColumn(name = "product_item_id")
-    @MapsId("productItemId")
-    private ProductItem productItem;
+	private int quantity;
 
-    @ManyToOne
-    @JoinColumn(name = "cart_id")
-    @MapsId("cartId")
-    private Cart cart;
+	@OneToOne
+	@JoinColumn(name = "product_item_id")
+	@MapsId("productItemId")
+	private ProductItem productItem;
+
+	@ManyToOne
+	@JoinColumn(name = "cart_id")
+	@MapsId("cartId")
+	@JsonIgnore
+	private Cart cart;
 }

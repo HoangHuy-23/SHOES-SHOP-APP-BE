@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface CartDetailRepository extends JpaRepository<CartDetail, String> {
+public interface CartDetailRepository extends JpaRepository<CartDetail, CartDetailPK> {
     // Tìm tất cả CartDetail theo cartId
     @Query("SELECT cd FROM CartDetail cd WHERE cd.cart.id = ?1")
     List<CartDetail> findAllByCartId(String cartId);

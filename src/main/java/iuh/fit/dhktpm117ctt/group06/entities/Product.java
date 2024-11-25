@@ -31,7 +31,7 @@ public class Product {
     @Enumerated(EnumType.STRING)
     private ProductGender gender;
 
-    @OneToMany(mappedBy = "product")
+    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
     @JsonIgnore
     @ToString.Exclude
     private List<ProductItem> productItems;

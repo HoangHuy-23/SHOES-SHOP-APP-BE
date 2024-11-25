@@ -29,8 +29,22 @@ public enum ErrorCode {
     CITY_INVALID(2105, "City contains only letters and spaces, {min}-{max} characters long", HttpStatus.BAD_REQUEST),
     // Room
     ROOM_NAME_INVALID(3001, "Room name contains only letters and spaces, {min}-{max} characters long", HttpStatus.BAD_REQUEST),
-
+    
+    //Product
+    PRODUCT_NOT_FOUND(4404, "Product not found!", HttpStatus.NOT_FOUND),
+    PRODUCT_EXISTED(4405, "Product existed!", HttpStatus.BAD_REQUEST),
+    PRODUCT_INVALID(4406, "Product invalid!", HttpStatus.BAD_REQUEST),
+    
+    //ProductItem
+    PRODUCT_ITEM_NOT_FOUND(4504, "Product item not found!", HttpStatus.NOT_FOUND),
+    PRODUCT_ITEM_EXISTED(4505, "Product item existed!", HttpStatus.BAD_REQUEST),
+    PRODUCT_ITEM_INVALID(4506, "Product item invalid!", HttpStatus.BAD_REQUEST),
+    PRODUCT_ITEM_EXISTED_IN_ORDER_DETAILS(4507, "Product item existed in order details!", HttpStatus.BAD_REQUEST),
+    PRODUCT_ITEM_NOT_ENOUGH(4508, "Product item not enough!", HttpStatus.BAD_REQUEST),
+    QTY_INVALID(4509, "Product item quantity invalid!", HttpStatus.BAD_REQUEST),
     ;
+	
+
     private int code;
     private String message;
     private HttpStatusCode httpStatusCode;

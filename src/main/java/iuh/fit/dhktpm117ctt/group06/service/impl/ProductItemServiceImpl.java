@@ -12,6 +12,7 @@ import iuh.fit.dhktpm117ctt.group06.service.ProductItemService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
@@ -22,108 +23,155 @@ import java.util.Optional;
 @Service
 public class ProductItemServiceImpl implements ProductItemService {
 
-    @Autowired
-    private ProductItemRepository productItemRepository;
-    @Autowired
-    private CloudinaryProvider cloudinaryProvider;
-    private ModelMapper modelMapper = new ModelMapper();
+	@Autowired
+	private ProductItemRepository productItemRepository;
+	@Autowired
+	private CloudinaryProvider cloudinaryProvider;
+	private ModelMapper modelMapper = new ModelMapper();
 
-    private ProductItemResponse mapToProductItemResponse(ProductItem productItem) {
-        return modelMapper.map(productItem, ProductItemResponse.class);
-    }
+	private ProductItemResponse mapToProductItemResponse(ProductItem productItem) {
+		return modelMapper.map(productItem, ProductItemResponse.class);
+	}
 
-    private ProductItem mapToProductItem(ProductItemRequest productItemRequest) {
-        return modelMapper.map(productItemRequest, ProductItem.class);
-    }
+	private ProductItem mapToProductItem(ProductItemRequest productItemRequest) {
+		return modelMapper.map(productItemRequest, ProductItem.class);
+	}
 
-    @Override
-    public Optional<ProductItemResponse> save(ProductItemRequest productItemRequest) {
-        ProductItem productItem = mapToProductItem(productItemRequest);
-        if (productItemRequest.getListDetailImages() != null) {
-            try {
-                List<Map> uploadResult = cloudinaryProvider.uploadFiles(productItemRequest.getListDetailImages(), "Product-Item", productItem.getId());
-                List<String> listDetailImages = new ArrayList<>();
-                for (Map map : uploadResult) {
-                    listDetailImages.add(map.get("url").toString());
-                }
-                productItem.setListDetailImages(listDetailImages);
-                //return Optional.of(mapToProductItemResponse(productItemRepository.save(productItem)));
-            } catch (Exception e) {
-                throw new AppException(ErrorCode.AVATAR_INVALID);
-            }
-        }
-        return Optional.of(mapToProductItemResponse(productItemRepository.save(productItem)));
-    }
+	@Transactional
+	@Override
+	public Optional<ProductItemResponse> save(ProductItemRequest productItemRequest) {
+		ProductItem productItem = mapToProductItem(productItemRequest);
+		if (productItemRequest.getListDetailImages() != null) {
+			try {
+				List<Map> uploadResult = cloudinaryProvider.uploadFiles(productItemRequest.getListDetailImages(),
+						"Product-Item", productItem.getId());
+				List<String> listDetailImages = new ArrayList<>();
+				for (Map map : uploadResult) {
+					listDetailImages.add(map.get("url").toString());
+				}
+				productItem.setListDetailImages(listDetailImages);
+				// return
+				// Optional.of(mapToProductItemResponse(productItemRepository.save(productItem)));
+			} catch (Exception e) {
+				throw new AppException(ErrorCode.AVATAR_INVALID);
+			}
+		}
+		return Optional.of(mapToProductItemResponse(productItemRepository.save(productItem)));
+	}
 
-    @Override
-    public Optional<ProductItemResponse> update(String id, ProductItemRequest productItemRequest) {
-        Optional<ProductItem> optionalProductItem = productItemRepository.findById(id);
-        if (optionalProductItem.isPresent()) {
-            ProductItem productItem = optionalProductItem.get();
-            productItem.setPrice(productItemRequest.getPrice());
-            productItem.setQuantity(productItemRequest.getQuantity());
-            productItem.setColor(ProductColor.valueOf(productItemRequest.getColor()));
-            productItem.setSize(productItemRequest.getSize());
-            if (productItemRequest.getListDetailImages() != null) {
-                try {
-                    List<Map> uploadResult = cloudinaryProvider.uploadFiles(productItemRequest.getListDetailImages(), "Product-Item", productItem.getId());
-                    List<String> listDetailImages = new ArrayList<>();
-                    for (Map map : uploadResult) {
-                        listDetailImages.add(map.get("url").toString());
-                    }
-                    productItem.setListDetailImages(listDetailImages);
-                    return Optional.of(mapToProductItemResponse(productItemRepository.save(productItem)));
-                } catch (Exception e) {
-                    throw new AppException(ErrorCode.AVATAR_INVALID);
-                }
-            }
-            return Optional.of(mapToProductItemResponse(productItemRepository.save(productItem)));
-        }
-        return Optional.empty();
-    }
+	@Transactional
+	@Override
+	public Optional<ProductItemResponse> update(String id, ProductItemRequest productItemRequest) {
+		Optional<ProductItem> optionalProductItem = productItemRepository.findById(id);
+		if (optionalProductItem.isPresent()) {
+			ProductItem productItem = optionalProductItem.get();
+			productItem.setPrice(productItemRequest.getPrice());
+			productItem.setQuantity(productItemRequest.getQuantity());
+			productItem.setColor(ProductColor.valueOf(productItemRequest.getColor()));
+			productItem.setSize(productItemRequest.getSize());
 
-    @Override
-    public void deleteById(String productItemId) {
-        productItemRepository.deleteById(productItemId);
-    }
+			var files = productItemRequest.getListDetailImages();
 
-    @Override
-    public Optional<ProductItemResponse> updateDetailImage(String productItemId, MultipartFile[] newDetailImages) {
-        return Optional.empty();
-    }
+			if (files == null || files.length <= 0) {
+				productItem.setListDetailImages(productItem.getListDetailImages());
+			} else {
+				List<MultipartFile> nonEmptyFiles = new ArrayList<>();
+				for (MultipartFile file : files) {
+					if (!file.isEmpty()) {
+						nonEmptyFiles.add(file);
+					}
+				}
 
-    @Override
-    public Optional<ProductItemResponse> updateQuantity(String productItemId, int qty) {
-        return Optional.empty();
-    }
+				if (nonEmptyFiles.size() == 0) {
+					productItem.setListDetailImages(productItem.getListDetailImages());
+					return Optional.of(mapToProductItemResponse(productItemRepository.save(productItem)));
+				}
 
-    @Override
-    public Optional<ProductItemResponse> decreaseQuantity(String productItemId, int qty) {
-        return Optional.empty();
-    }
+				try {
+					List<Map> uploadResult = cloudinaryProvider.uploadFiles(nonEmptyFiles.toArray(new MultipartFile[0]),
+							"Product-Item", productItem.getId());
+					List<String> listDetailImages = new ArrayList<>();
+					for (Map map : uploadResult) {
+						listDetailImages.add(map.get("url").toString());
+					}
+					productItem.setListDetailImages(listDetailImages);
+					return Optional.of(mapToProductItemResponse(productItemRepository.save(productItem)));
+				} catch (Exception e) {
+					throw new AppException(ErrorCode.AVATAR_INVALID);
+				}
+			}
 
-    @Override
-    public List<ProductItemResponse> findByProduct(String productId) {
-        List<ProductItem> productItems = productItemRepository.findByProduct(productId);
-        return productItems.stream()
-                .map(this::mapToProductItemResponse)
-                .toList();
-    }
+			return Optional.of(mapToProductItemResponse(productItemRepository.save(productItem)));
+		}
+		return Optional.empty();
 
+	}
 
-    @Override
-    public Optional<ProductItemResponse> findByColorAndSize(String color, String size, String productId) {
-        return productItemRepository.findByColorAndSizeAndProductId(color, size, productId)
-                .map(this::mapToProductItemResponse);
-    }
+	@Override
+	@Transactional
+	public Optional<ProductItemResponse> updateQuantity(String id, int quantity) {
+		Optional<ProductItem> optionalProductItem = productItemRepository.findById(id);
+		if (optionalProductItem.isPresent()) {
+			ProductItem productItem = optionalProductItem.get();
+			int currentQuantity = productItem.getQuantity();
+			if (quantity >= 0 && quantity <= currentQuantity) {
+				productItem.setQuantity(quantity);
+				return Optional.of(mapToProductItemResponse(productItemRepository.save(productItem)));
+			} else {
+				throw new AppException(ErrorCode.QTY_INVALID);
+			}
 
-    @Override
-    public List<ProductColor> findDistinctColorsByProductId(String productId) {
-        return productItemRepository.findDistinctColorsByProductId(productId);
-    }
+		}
+		return Optional.empty();
+	}
 
-    @Override
-    public List<String> findDistinctSizesByProductId(String productId) {
-        return productItemRepository.findDistinctSizesByProductId(productId);
-    }
+	@Transactional
+	@Override
+	public void deleteById(String productItemId) {
+
+		if (productItemRepository.exexistedByOrders(productItemId).size() > 0) {
+			throw new AppException(ErrorCode.PRODUCT_ITEM_EXISTED_IN_ORDER_DETAILS);
+		}
+
+		productItemRepository.deleteById(productItemId);
+	}
+
+	@Override
+	public Optional<ProductItemResponse> updateDetailImage(String productItemId, MultipartFile[] newDetailImages) {
+		return Optional.empty();
+	}
+
+	@Override
+	public List<ProductItemResponse> findByProduct(String productId) {
+		List<ProductItem> productItems = productItemRepository.findByProduct(productId);
+		return productItems.stream().map(this::mapToProductItemResponse).toList();
+	}
+
+	@Override
+	public Optional<ProductItemResponse> findByColorAndSize(String color, String size, String productId) {
+		return productItemRepository.findByColorAndSizeAndProductId(color, size, productId)
+				.map(this::mapToProductItemResponse);
+	}
+
+	@Override
+	public List<ProductColor> findDistinctColorsByProductId(String productId) {
+		return productItemRepository.findDistinctColorsByProductId(productId);
+	}
+
+	@Override
+	public List<String> findDistinctSizesByProductId(String productId) {
+		return productItemRepository.findDistinctSizesByProductId(productId);
+	}
+
+	@Override
+	public List<ProductItem> findAll() {
+		return productItemRepository.findAll();
+	}
+
+	@Override
+	@Transactional
+	public Optional<ProductItem> findById(String id) {
+		return productItemRepository.findById(id);
+	}
+
 }
