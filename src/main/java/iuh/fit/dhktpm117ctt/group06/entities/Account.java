@@ -1,5 +1,7 @@
 package iuh.fit.dhktpm117ctt.group06.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -18,5 +20,6 @@ public class Account {
     private String password;
     @OneToOne
     @JoinColumn(name = "user_id")
+    @JsonBackReference
     private User user;
 }

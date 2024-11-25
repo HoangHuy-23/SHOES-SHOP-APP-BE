@@ -38,4 +38,11 @@ public class CartServiceImpl implements CartService {
         // Logic lấy ProductItem từ session (thay thế bằng cách xử lý thực tế)
         return List.of(); // Trả về danh sách item từ session
     }
+
+	@Override
+	public <S extends Cart> S save(S entity) {
+		return cartRepository.save(entity);
+	}
+    
+    
 }

@@ -1,6 +1,8 @@
 package iuh.fit.dhktpm117ctt.group06.entities;
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -35,7 +37,7 @@ public class Address {
     @NotBlank(message = "CITY_INVALID")
     private String city;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 }

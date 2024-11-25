@@ -159,7 +159,9 @@ public class ProductItemServiceImpl implements ProductItemService {
 		return productItemRepository.findAll();
 	}
 
+	
 	@Override
+	@Transactional
 	public Optional<ProductItem> findById(String id) {
 		return productItemRepository.findById(id);
 	}
