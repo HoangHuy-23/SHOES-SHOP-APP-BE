@@ -1,6 +1,9 @@
 package iuh.fit.dhktpm117ctt.group06.entities;
 
+import java.io.Serializable;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import iuh.fit.dhktpm117ctt.group06.entities.enums.Gender;
 import iuh.fit.dhktpm117ctt.group06.entities.enums.UserRole;
@@ -18,7 +21,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import net.minidev.json.annotate.JsonIgnore;
 
 @Entity
 @Table(name = "users")
@@ -27,8 +29,13 @@ import net.minidev.json.annotate.JsonIgnore;
 @NoArgsConstructor
 @ToString
 @Builder
-public class User {
-    @Id
+public class User implements Serializable{
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	@Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 

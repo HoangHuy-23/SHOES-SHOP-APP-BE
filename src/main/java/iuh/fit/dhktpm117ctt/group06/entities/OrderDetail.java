@@ -19,7 +19,7 @@ public class OrderDetail {
     private int quantity;
     private double pricePerItem;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_item_id")
     private ProductItem productItem;
 

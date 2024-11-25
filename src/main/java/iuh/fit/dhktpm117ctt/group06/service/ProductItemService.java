@@ -4,6 +4,8 @@ import iuh.fit.dhktpm117ctt.group06.dto.request.ProductItemRequest;
 import iuh.fit.dhktpm117ctt.group06.dto.response.ProductItemResponse;
 import iuh.fit.dhktpm117ctt.group06.entities.ProductItem;
 import iuh.fit.dhktpm117ctt.group06.entities.enums.ProductColor;
+
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -15,7 +17,6 @@ public interface ProductItemService {
     void deleteById(String productItemId);
     Optional<ProductItemResponse> updateDetailImage(String productItemId, MultipartFile[] newDetailImages);
     Optional<ProductItemResponse> updateQuantity(String productItemId, int qty);
-    Optional<ProductItemResponse> decreaseQuantity(String productItemId, int qty);
     List<ProductItemResponse> findByProduct(String productId);
     Optional<ProductItemResponse> findByColorAndSize(String color, String size, String productId);
     List<ProductColor> findDistinctColorsByProductId(String productId);

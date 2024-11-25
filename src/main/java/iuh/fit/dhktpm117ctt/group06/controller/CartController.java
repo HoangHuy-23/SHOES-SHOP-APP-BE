@@ -71,9 +71,8 @@ public class CartController {
 		return ResponseEntity.ok(response);
 	}
 
-	@PutMapping("/updateQuantity/{productId}")
-	public ResponseEntity<?> updateQuantity(HttpSession session, @PathVariable String productId,
-			@RequestBody CartDetailRequest cartDetailRequest) {
+	@PutMapping("/updateQuantity")
+	public ResponseEntity<?> updateQuantity(HttpSession session, @RequestBody CartDetailRequest cartDetailRequest) {
 		Map<String, Object> response = new LinkedHashMap();
 		List<CartDetail> cartDetails = (List<CartDetail>) session.getAttribute("cart");
 
@@ -83,19 +82,32 @@ public class CartController {
 			return ResponseEntity.badRequest().body(response);
 		}
 
-		CartDetail cartDetailEntity = null;
+//		CartDetail cartDetailEntity = null;
+
+		Optional<ProductItem> productItemOptional = productItemService.findById(cartDetailRequest.getProductId());
+
+		if (productItemOptional.isEmpty()) {
+			response.put("status", HttpStatus.BAD_REQUEST.value());
+			response.put("data", "Error in update quantity!");
+			return ResponseEntity.badRequest().body(response);
+		}
+
+		ProductItem item = productItemOptional.get();
 
 		for (CartDetail cartDetail : cartDetails) {
-			if (cartDetail.getProductItem().getId().equals(productId)) {
-				cartDetailEntity = cartDetail;
+			if (cartDetail.getProductItem().getId().equals(cartDetailRequest.getProductId())) {
+//				int currentQty = cartDetail.getQuantity() + cartDetailRequest.getQuantity();
+				if (cartDetailRequest.getQuantity() > item.getQuantity()) {
+					response.put("status", HttpStatus.BAD_REQUEST.value());
+					response.put("data", "Quantity must be less than current quantity");
+					return ResponseEntity.badRequest().body(response);
+				}
 				cartDetail.setQuantity(cartDetailRequest.getQuantity());
-				session.setAttribute("cart", cartDetails);
-
-				response.put("status", HttpStatus.OK.value());
-				response.put("data", "Update quantity successfully");
-				return ResponseEntity.ok(response);
+				break;
 			}
 		}
+		
+		session.setAttribute("cart", cartDetails);
 
 		// check user login
 		var context = SecurityContextHolder.getContext();
@@ -104,7 +116,7 @@ public class CartController {
 			Cart cart = cartService.findCartByUser(userService.findByEmail(emailString).get().getId());
 
 			// update cart detail in database
-			CartDetailPK cartDetailPK = new CartDetailPK(cart.getId(), productId);
+			CartDetailPK cartDetailPK = new CartDetailPK(cart.getId(), cartDetailRequest.getProductId());
 			if (cartDetailService.findById(cartDetailPK).isPresent()) {
 				cartDetailService.updateQuantity(cartDetailPK, cartDetailRequest.getQuantity());
 			}
@@ -118,9 +130,19 @@ public class CartController {
 	@PutMapping("/delete/{productId}")
 	public ResponseEntity<?> deleteCartDetail(HttpSession session, @PathVariable String productId) {
 		Map<String, Object> response = new LinkedHashMap();
+		
+		Optional<ProductItem> optionalProductItem = productItemService.findById(productId);
+		
+		
+		if(optionalProductItem.isEmpty()) {
+			response.put("status", HttpStatus.BAD_REQUEST.value());
+			response.put("data", "Product not found");
+			return ResponseEntity.badRequest().body(response);
+		}
+		
 		List<CartDetail> cartDetails = (List<CartDetail>) session.getAttribute("cart");
 
-		if (cartDetails == null) {
+		if (cartDetails == null || cartDetails.isEmpty()) {
 			response.put("status", HttpStatus.BAD_REQUEST.value());
 			response.put("data", "Cart is empty");
 			return ResponseEntity.badRequest().body(response);
@@ -129,13 +151,11 @@ public class CartController {
 		for (CartDetail cartDetail : cartDetails) {
 			if (cartDetail.getProductItem().getId().equals(productId)) {
 				cartDetails.remove(cartDetail);
-				session.setAttribute("cart", cartDetails);
-
-				response.put("status", HttpStatus.OK.value());
-				response.put("data", "Delete cart detail successfully");
-				return ResponseEntity.ok(response);
+                break;
 			}
 		}
+		
+		session.setAttribute("cart", cartDetails);
 
 		// check user login
 		var context = SecurityContextHolder.getContext();
@@ -163,6 +183,8 @@ public class CartController {
 			return ResponseEntity.ok(response);
 		}
 		
+		
+
 		try {
 			syncCartWithDatabase(cartDetails);
 		} catch (Exception e) {
@@ -227,11 +249,9 @@ public class CartController {
 
 	private void syncCartWithDatabase(List<CartDetail> cartDetails) throws IllegalArgumentException {
 		String email = SecurityContextHolder.getContext().getAuthentication().getName();
-		
+
 		if (email == null)
 			return;
-		
-		System.out.println("Email: " + email);
 
 		Optional<UserResponse> userOpt = userService.findByEmail(email);
 		if (userOpt.isEmpty())

@@ -1,5 +1,7 @@
 package iuh.fit.dhktpm117ctt.group06.entities;
 
+import java.io.Serializable;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -9,11 +11,15 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class Cart {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
-    @OneToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+public class Cart implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	@Id
+	@GeneratedValue(strategy = GenerationType.UUID)
+	private String id;
+	@OneToOne
+	@JoinColumn(name = "user_id")
+	private User user;
 }

@@ -4,7 +4,9 @@ import iuh.fit.dhktpm117ctt.group06.dto.request.CartDetailRequest;
 import iuh.fit.dhktpm117ctt.group06.dto.response.CartDetailResponse;
 import iuh.fit.dhktpm117ctt.group06.entities.CartDetail;
 import iuh.fit.dhktpm117ctt.group06.entities.CartDetailPK;
+import iuh.fit.dhktpm117ctt.group06.entities.ProductItem;
 import iuh.fit.dhktpm117ctt.group06.repository.CartDetailRepository;
+import iuh.fit.dhktpm117ctt.group06.repository.ProductItemRepository;
 import iuh.fit.dhktpm117ctt.group06.service.CartDetailService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +21,10 @@ public class CartDetailServiceImpl implements CartDetailService {
 
 	@Autowired
 	private CartDetailRepository cartDetailRepository;
+
+	@Autowired
+	private ProductItemRepository productItemRepository;
+
 	private ModelMapper modelMapper = new ModelMapper();
 
 	private CartDetail mapToCartDetail(CartDetailRequest cartDetailRequest) {
@@ -45,8 +51,20 @@ public class CartDetailServiceImpl implements CartDetailService {
 	@Transactional
 	public Optional<CartDetailResponse> updateQuantity(CartDetailPK cartDetailPK, int newQuantity) {
 		Optional<CartDetail> cartDetail = cartDetailRepository.findById(cartDetailPK);
+
+		Optional<ProductItem> productItemOptional = productItemRepository.findById(cartDetailPK.getProductItemId());
+		if (productItemOptional.isEmpty()) {
+			return Optional.empty();
+		}
+
+		ProductItem productItem = productItemOptional.get();
+
 		if (cartDetail.isPresent()) {
-			cartDetail.get().setQuantity(newQuantity);
+			int currentQty = cartDetail.get().getQuantity() + newQuantity;
+			if (currentQty > productItem.getQuantity()) {
+				throw new IllegalArgumentException("Not enough quantity in stock");
+			}
+			cartDetail.get().setQuantity(currentQty);
 			return Optional.of(mapToCartDetailResponse(cartDetailRepository.save(cartDetail.get())));
 		}
 		return Optional.empty();
@@ -69,7 +87,5 @@ public class CartDetailServiceImpl implements CartDetailService {
 	public Optional<CartDetail> findById(CartDetailPK id) {
 		return cartDetailRepository.findById(id);
 	}
-	
-	
 
 }

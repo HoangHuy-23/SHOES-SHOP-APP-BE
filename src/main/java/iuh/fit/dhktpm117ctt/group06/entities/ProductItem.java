@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.apache.logging.log4j.util.Lazy;
 
+import java.io.Serializable;
 import java.util.List;
 
 @AllArgsConstructor
@@ -16,8 +17,12 @@ import java.util.List;
 @ToString
 @Entity
 @Table(name = "product_items")
-public class ProductItem {
-    @Id
+public class ProductItem implements Serializable{
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	@Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
     private double price;

@@ -76,34 +76,53 @@ public class ProductItemServiceImpl implements ProductItemService {
 				productItem.setListDetailImages(productItem.getListDetailImages());
 			} else {
 				List<MultipartFile> nonEmptyFiles = new ArrayList<>();
-	            for (MultipartFile file : files) {
-	                if (!file.isEmpty()) {
-	                    nonEmptyFiles.add(file);
-	                }
-	            }
-	            
-	            if(nonEmptyFiles.size() == 0) {
-	            	productItem.setListDetailImages(productItem.getListDetailImages());
-	            	 return Optional.of(mapToProductItemResponse(productItemRepository.save(productItem)));
-	            }
-	            
-	            try {
-	                List<Map> uploadResult = cloudinaryProvider.uploadFiles(nonEmptyFiles.toArray(new MultipartFile[0]), "Product-Item", productItem.getId());
-	                List<String> listDetailImages = new ArrayList<>();
-	                for (Map map : uploadResult) {
-	                    listDetailImages.add(map.get("url").toString());
-	                }
-	                productItem.setListDetailImages(listDetailImages);
-	                return Optional.of(mapToProductItemResponse(productItemRepository.save(productItem)));
-	            } catch (Exception e) {
-	                throw new AppException(ErrorCode.AVATAR_INVALID);
-	            }
+				for (MultipartFile file : files) {
+					if (!file.isEmpty()) {
+						nonEmptyFiles.add(file);
+					}
+				}
+
+				if (nonEmptyFiles.size() == 0) {
+					productItem.setListDetailImages(productItem.getListDetailImages());
+					return Optional.of(mapToProductItemResponse(productItemRepository.save(productItem)));
+				}
+
+				try {
+					List<Map> uploadResult = cloudinaryProvider.uploadFiles(nonEmptyFiles.toArray(new MultipartFile[0]),
+							"Product-Item", productItem.getId());
+					List<String> listDetailImages = new ArrayList<>();
+					for (Map map : uploadResult) {
+						listDetailImages.add(map.get("url").toString());
+					}
+					productItem.setListDetailImages(listDetailImages);
+					return Optional.of(mapToProductItemResponse(productItemRepository.save(productItem)));
+				} catch (Exception e) {
+					throw new AppException(ErrorCode.AVATAR_INVALID);
+				}
 			}
 
 			return Optional.of(mapToProductItemResponse(productItemRepository.save(productItem)));
 		}
 		return Optional.empty();
 
+	}
+
+	@Override
+	@Transactional
+	public Optional<ProductItemResponse> updateQuantity(String id, int quantity) {
+		Optional<ProductItem> optionalProductItem = productItemRepository.findById(id);
+		if (optionalProductItem.isPresent()) {
+			ProductItem productItem = optionalProductItem.get();
+			int currentQuantity = productItem.getQuantity();
+			if (quantity >= 0 && quantity <= currentQuantity) {
+				productItem.setQuantity(quantity);
+				return Optional.of(mapToProductItemResponse(productItemRepository.save(productItem)));
+			} else {
+				throw new AppException(ErrorCode.QTY_INVALID);
+			}
+
+		}
+		return Optional.empty();
 	}
 
 	@Transactional
@@ -119,16 +138,6 @@ public class ProductItemServiceImpl implements ProductItemService {
 
 	@Override
 	public Optional<ProductItemResponse> updateDetailImage(String productItemId, MultipartFile[] newDetailImages) {
-		return Optional.empty();
-	}
-
-	@Override
-	public Optional<ProductItemResponse> updateQuantity(String productItemId, int qty) {
-		return Optional.empty();
-	}
-
-	@Override
-	public Optional<ProductItemResponse> decreaseQuantity(String productItemId, int qty) {
 		return Optional.empty();
 	}
 
@@ -159,7 +168,6 @@ public class ProductItemServiceImpl implements ProductItemService {
 		return productItemRepository.findAll();
 	}
 
-	
 	@Override
 	@Transactional
 	public Optional<ProductItem> findById(String id) {
