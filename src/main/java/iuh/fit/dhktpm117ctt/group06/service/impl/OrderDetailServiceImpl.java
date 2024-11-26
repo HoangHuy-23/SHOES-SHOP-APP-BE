@@ -86,13 +86,16 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 	}
 
 	@Override
-	public OrderDetailResponse updateQuantity(String id, OrderDetailRequest orderDetailRequest) {
-		OrderDetail orderDetail = orderDetailRepository.findById(id).orElseThrow();
+	public OrderDetailResponse updateQuantity(String id, OrderDetailRequest orderDetailRequest) throws AppException{
+		OrderDetail orderDetail = orderDetailRepository.findById(orderDetailRequest.getId())
+				.orElseThrow(() -> new AppException(ErrorCode.ORDER_DETAIL_NOT_FOUND));
 
-		ProductItem optional = productItemRepository.findById(orderDetail.getProductItem().getId())
+		int orderDetailQuantity = orderDetail.getQuantity();
+
+		ProductItem productItemOptional = productItemRepository.findById(orderDetailRequest.getProductItemId())
 				.orElseThrow(() -> new AppException(ErrorCode.PRODUCT_ITEM_NOT_FOUND));
 
-		if (orderDetailRequest.getQuantity() > optional.getQuantity()) {
+		if (orderDetailRequest.getQuantity() < 0 || orderDetailRequest.getQuantity() > productItemOptional.getQuantity()) {
 			throw new AppException(ErrorCode.PRODUCT_ITEM_NOT_ENOUGH);
 		}
 
@@ -100,13 +103,16 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 
 		orderDetailRepository.save(orderDetail);
 
-		int currentQuantity = optional.getQuantity();
-
-		if (orderDetailRequest.getQuantity() >= 0 && orderDetailRequest.getQuantity() <= currentQuantity) {
-			currentQuantity -= orderDetailRequest.getQuantity();
+		if (orderDetailQuantity < orderDetailRequest.getQuantity()) {
+			int currentQuantity = productItemOptional.getQuantity();
+			currentQuantity -= orderDetailRequest.getQuantity() - orderDetailQuantity;
+			productItemService.updateQuantity(productItemOptional.getId(), currentQuantity);
+		} else {
+			int currentQuantity = productItemOptional.getQuantity();
+			currentQuantity += orderDetailQuantity - orderDetailRequest.getQuantity();
+			productItemService.updateQuantity(productItemOptional.getId(), currentQuantity);
 		}
 
-		productItemService.updateQuantity(optional.getId(), currentQuantity);
 		return mapToOrderDetailResponse(orderDetail);
 	}
 }

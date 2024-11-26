@@ -42,6 +42,7 @@ public enum ErrorCode {
     PRODUCT_ITEM_EXISTED_IN_ORDER_DETAILS(4507, "Product item existed in order details!", HttpStatus.BAD_REQUEST),
     PRODUCT_ITEM_NOT_ENOUGH(4508, "Product item not enough!", HttpStatus.BAD_REQUEST),
     QTY_INVALID(4509, "Product item quantity invalid!", HttpStatus.BAD_REQUEST),
+    ORDER_DETAIL_NOT_FOUND(4510, "Order detail not found!", HttpStatus.NOT_FOUND),
     ;
 	
 

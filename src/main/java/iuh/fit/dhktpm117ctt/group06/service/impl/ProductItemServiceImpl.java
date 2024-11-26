@@ -113,8 +113,8 @@ public class ProductItemServiceImpl implements ProductItemService {
 		Optional<ProductItem> optionalProductItem = productItemRepository.findById(id);
 		if (optionalProductItem.isPresent()) {
 			ProductItem productItem = optionalProductItem.get();
-			int currentQuantity = productItem.getQuantity();
-			if (quantity >= 0 && quantity <= currentQuantity) {
+			if (quantity != 0) {
+				System.out.println("Quantity: " + quantity);
 				productItem.setQuantity(quantity);
 				return Optional.of(mapToProductItemResponse(productItemRepository.save(productItem)));
 			} else {
