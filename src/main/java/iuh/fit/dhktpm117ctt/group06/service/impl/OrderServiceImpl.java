@@ -78,9 +78,8 @@ public class OrderServiceImpl implements OrderService {
 		return Optional.of(mapToOrderResponse(updatedOrder));
 	}
 
-	
 	@Override
-	public Optional<OrderResponse> updateQuantity(String id, OrderDetailRequest orderRequest) {
+	public Optional<OrderResponse> updateQuantity(String id, OrderDetailRequest orderDetailRequest) {
 		Optional<Order> optionalOrder = orderRepository.findById(id);
 		if (optionalOrder.isEmpty()) {
 			return Optional.empty();
@@ -88,14 +87,20 @@ public class OrderServiceImpl implements OrderService {
 
 		Order order = optionalOrder.get();
 
-		List<OrderDetailResponse> orderResponses = orderDetailService.findByOrder(id);
-
-		for (OrderDetailResponse orderDetailResponse : orderResponses) {
-			if (orderDetailResponse.getId().equals(orderRequest.getId())) {
-				orderDetailService.updateQuantity(orderDetailResponse.getId(), orderRequest);
-				break;
-			}
+		try {
+			orderDetailService.updateQuantity(orderDetailRequest.getId(), orderDetailRequest);
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			return Optional.empty();
 		}
+
+		List<OrderDetailResponse> orderResponses = orderDetailService.findByOrder(id);
+		double totalPrice = 0;
+		for (OrderDetailResponse orderDetailResponse : orderResponses) {
+			totalPrice += orderDetailResponse.getPricePerItem() * orderDetailResponse.getQuantity();
+		}
+		order.setTotalPrice(totalPrice);
 
 		Order updatedOrder = orderRepository.save(order);
 		return Optional.of(mapToOrderResponse(updatedOrder));
@@ -131,7 +136,7 @@ public class OrderServiceImpl implements OrderService {
 
 		return Optional.of(mapToOrderResponse(savedOrder));
 	}
-	
+
 	private double calculateTotalPrice(List<OrderDetailRequest> orderDetails) {
 		double totalPrice = 0;
 		for (OrderDetailRequest orderDetail : orderDetails) {
