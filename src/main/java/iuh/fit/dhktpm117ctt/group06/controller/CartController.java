@@ -1,6 +1,7 @@
 package iuh.fit.dhktpm117ctt.group06.controller;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,11 +26,13 @@ import iuh.fit.dhktpm117ctt.group06.dto.response.UserResponse;
 import iuh.fit.dhktpm117ctt.group06.entities.Cart;
 import iuh.fit.dhktpm117ctt.group06.entities.CartDetail;
 import iuh.fit.dhktpm117ctt.group06.entities.CartDetailPK;
+import iuh.fit.dhktpm117ctt.group06.entities.Product;
 import iuh.fit.dhktpm117ctt.group06.entities.ProductItem;
 import iuh.fit.dhktpm117ctt.group06.entities.User;
 import iuh.fit.dhktpm117ctt.group06.service.CartDetailService;
 import iuh.fit.dhktpm117ctt.group06.service.CartService;
 import iuh.fit.dhktpm117ctt.group06.service.ProductItemService;
+import iuh.fit.dhktpm117ctt.group06.service.ProductService;
 import iuh.fit.dhktpm117ctt.group06.service.UserService;
 import jakarta.servlet.http.HttpSession;
 
@@ -47,6 +50,9 @@ public class CartController {
 
 	@Autowired
 	private UserService userService;
+	
+	@Autowired
+	private ProductService productService;
 
 	@PostMapping("/addToCart")
 	public ResponseEntity<?> addToCart(HttpSession httpSession, @RequestBody CartDetailRequest cartDetail) {
@@ -106,7 +112,7 @@ public class CartController {
 				break;
 			}
 		}
-		
+
 		session.setAttribute("cart", cartDetails);
 
 		// check user login
@@ -130,16 +136,15 @@ public class CartController {
 	@PutMapping("/delete/{productId}")
 	public ResponseEntity<?> deleteCartDetail(HttpSession session, @PathVariable String productId) {
 		Map<String, Object> response = new LinkedHashMap();
-		
+
 		Optional<ProductItem> optionalProductItem = productItemService.findById(productId);
-		
-		
-		if(optionalProductItem.isEmpty()) {
+
+		if (optionalProductItem.isEmpty()) {
 			response.put("status", HttpStatus.BAD_REQUEST.value());
 			response.put("data", "Product not found");
 			return ResponseEntity.badRequest().body(response);
 		}
-		
+
 		List<CartDetail> cartDetails = (List<CartDetail>) session.getAttribute("cart");
 
 		if (cartDetails == null || cartDetails.isEmpty()) {
@@ -151,10 +156,10 @@ public class CartController {
 		for (CartDetail cartDetail : cartDetails) {
 			if (cartDetail.getProductItem().getId().equals(productId)) {
 				cartDetails.remove(cartDetail);
-                break;
+				break;
 			}
 		}
-		
+
 		session.setAttribute("cart", cartDetails);
 
 		// check user login
@@ -182,8 +187,6 @@ public class CartController {
 			response.put("data", "Cart is empty");
 			return ResponseEntity.ok(response);
 		}
-		
-		
 
 		try {
 			syncCartWithDatabase(cartDetails);
@@ -192,8 +195,17 @@ public class CartController {
 			e.printStackTrace();
 		}
 
+		List<CartDetailResponse> cartDetailResponses = new ArrayList<>();
+
+		for (CartDetail cartDetail : cartDetails) {
+			Product product = productService.findById(cartDetail.getProductItem().getProduct().getId()).get();
+			cartDetailResponses.add(CartDetailResponse.builder().cartDetailPK(cartDetail.getCartDetailPK())
+					.productItem(cartDetail.getProductItem()).quantity(cartDetail.getQuantity())
+					.product(product).build());
+		}
+
 		response.put("status", HttpStatus.OK.value());
-		response.put("data", cartDetails);
+		response.put("data", cartDetailResponses);
 		return ResponseEntity.ok(response);
 	}
 

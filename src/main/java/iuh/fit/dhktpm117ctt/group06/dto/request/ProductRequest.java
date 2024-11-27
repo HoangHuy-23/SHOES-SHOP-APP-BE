@@ -23,8 +23,8 @@ public class ProductRequest {
     private String description;
     @DateTimeFormat(pattern = "dd-MM-yyyy")
     private Date createdDate;
-    @NotNull(message = "BRAND_ID_INVALID")
-    private Brand brand;
+//    @NotNull(message = "BRAND_ID_INVALID")
+//    private Brand brand;
     @NotNull(message = "CATEGORY_ID_INVALID")
     private Category category;
 }

@@ -8,6 +8,8 @@ import lombok.ToString;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Data
 @NoArgsConstructor
@@ -26,5 +28,6 @@ public class Brand {
     private Post post;
 
     @OneToMany(mappedBy = "brand", fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<ProductCollection> productCollections;
 }

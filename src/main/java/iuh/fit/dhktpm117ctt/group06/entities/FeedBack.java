@@ -19,7 +19,7 @@ public class FeedBack {
     private String id;
     private String content;
     private float rating;
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
             name = "feedback_list_detail_images",
             joinColumns = {

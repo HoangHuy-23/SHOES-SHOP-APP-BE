@@ -3,6 +3,7 @@ package iuh.fit.dhktpm117ctt.group06.service;
 import iuh.fit.dhktpm117ctt.group06.dto.request.ProductRequest;
 import iuh.fit.dhktpm117ctt.group06.dto.response.ProductResponse;
 import iuh.fit.dhktpm117ctt.group06.entities.Product;
+import iuh.fit.dhktpm117ctt.group06.entities.ProductItem;
 import iuh.fit.dhktpm117ctt.group06.entities.enums.ProductColor;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -18,4 +19,5 @@ public interface ProductService {
     ProductResponse getProductById(String productId);
     List<ProductResponse> getAllProducts();
     List<ProductColor>  getProductColors(String productId);
+	Optional<Product> findById(String id);
 }
