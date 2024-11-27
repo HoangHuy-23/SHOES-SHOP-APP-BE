@@ -1,6 +1,7 @@
 package iuh.fit.dhktpm117ctt.group06.controller;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -19,10 +20,12 @@ import org.springframework.web.bind.annotation.RestController;
 import iuh.fit.dhktpm117ctt.group06.dto.request.OrderDetailRequest;
 import iuh.fit.dhktpm117ctt.group06.dto.request.OrderRequest;
 import iuh.fit.dhktpm117ctt.group06.dto.response.OrderResponse;
+import iuh.fit.dhktpm117ctt.group06.entities.CartDetail;
 import iuh.fit.dhktpm117ctt.group06.service.OrderDetailService;
 import iuh.fit.dhktpm117ctt.group06.service.OrderService;
 import iuh.fit.dhktpm117ctt.group06.service.ProductItemService;
 import iuh.fit.dhktpm117ctt.group06.service.UserService;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
 @RestController
@@ -47,7 +50,8 @@ public class OrderController {
 	}
 
 	@PostMapping
-	public ResponseEntity<?> saveOrder(@Valid @RequestBody OrderRequest orderRequest, BindingResult bindingResult) {
+	public ResponseEntity<?> saveOrder(@Valid @RequestBody OrderRequest orderRequest, BindingResult bindingResult,
+			HttpSession httpSession) {
 		Map<String, Object> response = new LinkedHashMap();
 
 		if (bindingResult.hasErrors()) {
@@ -68,6 +72,19 @@ public class OrderController {
 			response.put("status", HttpStatus.BAD_REQUEST);
 			response.put("data", "Cannot save order");
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+		}
+
+//	    handle remove cart item ordered
+		List<CartDetail> cartDetails = (List<CartDetail>) httpSession.getAttribute("cart");
+
+		if (cartDetails != null) {
+
+			orderRequest.getOrderDetails().forEach(orderDetail -> {
+				String productItemId = orderDetail.getProductItemId();
+				cartDetails.removeIf(cartDetail -> cartDetail.getProductItem().getId().equals(productItemId));
+			});
+
+			httpSession.setAttribute("cart", cartDetails);
 		}
 
 		response.put("status", HttpStatus.OK);
@@ -92,7 +109,7 @@ public class OrderController {
 		response.put("data", resOptional.get());
 		return ResponseEntity.ok(response);
 	}
-	
+
 	@PutMapping("/update/{id}")
 	public ResponseEntity<?> updateOrder(@PathVariable String id, @Valid @RequestBody OrderDetailRequest orderRequest,
 			BindingResult bindingResult) {
@@ -122,6 +139,5 @@ public class OrderController {
 		response.put("data", orderResponse.get());
 		return ResponseEntity.ok(response);
 	}
-	
 
 }
