@@ -4,6 +4,7 @@ import iuh.fit.dhktpm117ctt.group06.cloudinary.CloudinaryProvider;
 import iuh.fit.dhktpm117ctt.group06.dto.request.ProductRequest;
 import iuh.fit.dhktpm117ctt.group06.dto.response.ProductResponse;
 import iuh.fit.dhktpm117ctt.group06.entities.Product;
+import iuh.fit.dhktpm117ctt.group06.entities.ProductItem;
 import iuh.fit.dhktpm117ctt.group06.entities.enums.ProductColor;
 import iuh.fit.dhktpm117ctt.group06.exception.AppException;
 import iuh.fit.dhktpm117ctt.group06.exception.ErrorCode;
@@ -123,4 +124,10 @@ public class ProductServiceImpl implements ProductService {
     public List<ProductColor> getProductColors(String productId) {
         return List.of();
     }
+
+	@Override
+	public Optional<Product> findById(String id) {
+		// TODO Auto-generated method stub
+		return productRepository.findById(id);
+	}
 }

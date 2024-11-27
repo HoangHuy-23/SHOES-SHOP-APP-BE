@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,6 +35,8 @@ public class CartDetailServiceImpl implements CartDetailService {
 	private CartDetailResponse mapToCartDetailResponse(CartDetail cartDetail) {
 		return modelMapper.map(cartDetail, CartDetailResponse.class);
 	}
+
+	
 
 	@Override
 	public List<CartDetailResponse> findAllCartDetailByCart(String cartId) {
@@ -71,7 +74,6 @@ public class CartDetailServiceImpl implements CartDetailService {
 	}
 
 	@Override
-	@Transactional
 	public void deleteById(CartDetailPK cartDetailPK) {
 		cartDetailRepository.deleteByCartDetailPK(cartDetailPK);
 	}
@@ -83,9 +85,7 @@ public class CartDetailServiceImpl implements CartDetailService {
 	}
 
 	@Override
-	@Transactional
 	public Optional<CartDetail> findById(CartDetailPK id) {
 		return cartDetailRepository.findById(id);
 	}
-
 }

@@ -1,14 +1,29 @@
 package iuh.fit.dhktpm117ctt.group06.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import iuh.fit.dhktpm117ctt.group06.entities.enums.ProductColor;
-import iuh.fit.dhktpm117ctt.group06.entities.enums.ProductStatus;
-import jakarta.persistence.*;
-import lombok.*;
-import org.apache.logging.log4j.util.Lazy;
-
 import java.io.Serializable;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import iuh.fit.dhktpm117ctt.group06.entities.enums.ProductColor;
+import iuh.fit.dhktpm117ctt.group06.entities.enums.ProductStatus;
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -36,6 +51,7 @@ public class ProductItem implements Serializable{
     @Enumerated(EnumType.STRING)
     private ProductColor color;
     private String size;
+    
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
     @JsonIgnore

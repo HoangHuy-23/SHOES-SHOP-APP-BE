@@ -1,12 +1,26 @@
 package iuh.fit.dhktpm117ctt.group06.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import iuh.fit.dhktpm117ctt.group06.entities.enums.ProductGender;
-import jakarta.persistence.*;
-import lombok.*;
-
 import java.util.Date;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import iuh.fit.dhktpm117ctt.group06.entities.enums.ProductGender;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 @Entity
 @AllArgsConstructor
@@ -31,7 +45,7 @@ public class Product {
     @Enumerated(EnumType.STRING)
     private ProductGender gender;
 
-    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "product")
     @JsonIgnore
     @ToString.Exclude
     private List<ProductItem> productItems;
@@ -39,10 +53,6 @@ public class Product {
     @ManyToOne
     @JoinColumn(name = "collection_id")
     private ProductCollection collection;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "brand_id", referencedColumnName = "id")
-    private Brand brand;
 
     @ManyToOne
     @JoinColumn(name = "category_id")

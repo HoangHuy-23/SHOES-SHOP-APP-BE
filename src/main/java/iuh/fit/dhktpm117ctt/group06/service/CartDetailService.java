@@ -15,4 +15,5 @@ public interface CartDetailService {
 	Optional<CartDetailResponse> updateQuantity(CartDetailPK cartDetailPK, int newQuantity);
 	<S extends CartDetail> S save(S entity);
 	Optional<CartDetail> findById(CartDetailPK id);
+	
 }
