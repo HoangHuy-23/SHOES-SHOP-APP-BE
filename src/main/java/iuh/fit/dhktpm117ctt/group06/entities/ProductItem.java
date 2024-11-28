@@ -52,7 +52,7 @@ public class ProductItem implements Serializable{
     private ProductColor color;
     private String size;
     
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "product_id")
     @JsonIgnore
     private Product product;

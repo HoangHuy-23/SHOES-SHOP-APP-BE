@@ -3,6 +3,7 @@ package iuh.fit.dhktpm117ctt.group06.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.io.Serializable;
 import java.util.Date;
 
 @Entity
@@ -12,8 +13,12 @@ import java.util.Date;
 @AllArgsConstructor
 @ToString
 @Table(name = "payment")
-public class Payment {
-    @Id
+public class Payment implements Serializable{
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	@Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
     private double amount;

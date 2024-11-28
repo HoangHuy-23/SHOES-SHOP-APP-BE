@@ -1,5 +1,7 @@
 package iuh.fit.dhktpm117ctt.group06.entities;
 
+import java.io.Serializable;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -10,8 +12,12 @@ import lombok.*;
 @AllArgsConstructor
 @ToString
 @Table(name = "posts")
-public class Post {
-    @Id
+public class Post implements Serializable{
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	@Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
     private String title;
