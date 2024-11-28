@@ -3,6 +3,7 @@ package iuh.fit.dhktpm117ctt.group06.dto.response;
 import java.util.Date;
 import java.util.List;
 
+import iuh.fit.dhktpm117ctt.group06.entities.enums.ProductColor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,4 +20,6 @@ public class ProductResponse {
     private List<String> listDetailImages;
 //    private BrandResponse brand;
     private CategoryResponse category;
+    private List<ProductColor> colors;
+    private List<String> sizes;
 }

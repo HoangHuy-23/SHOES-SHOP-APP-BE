@@ -4,6 +4,7 @@ import java.util.*;
 
 import iuh.fit.dhktpm117ctt.group06.entities.Product;
 import iuh.fit.dhktpm117ctt.group06.entities.ProductItem;
+import iuh.fit.dhktpm117ctt.group06.entities.enums.ProductColor;
 import jakarta.servlet.http.HttpSession;
 
 import org.hibernate.Hibernate;
@@ -29,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 import iuh.fit.dhktpm117ctt.group06.dto.request.ProductItemRequest;
 import iuh.fit.dhktpm117ctt.group06.dto.response.ListProductItemsPagegination;
 import iuh.fit.dhktpm117ctt.group06.dto.response.ProductItemResponse;
+import iuh.fit.dhktpm117ctt.group06.dto.response.ProductResponse;
 import iuh.fit.dhktpm117ctt.group06.exception.ErrorCode;
 import iuh.fit.dhktpm117ctt.group06.service.ProductItemService;
 import iuh.fit.dhktpm117ctt.group06.service.ProductService;
@@ -68,10 +70,21 @@ public class ProductItemController {
 		saveProductToSession(httpSession, productItem);
 
 		// Build the response DTO
+		
+		Product product = productItem.getProduct();
+		
+		List<ProductColor> colors = productService.getListColors(product.getId());
+		List<String> sizes = productService.getListSizes(product.getId());
+		
+		ProductResponse productResponse = productService.getProductById(product.getId());
+		
+		productResponse.setColors(colors);
+		productResponse.setSizes(sizes);
+		
 		ProductItemResponse itemResponse = ProductItemResponse.builder().id(productItem.getId())
 				.price(productItem.getPrice()).quantity(productItem.getQuantity())
 				.listDetailImages(productItem.getListDetailImages()).color(productItem.getColor().toString())
-				.size(productItem.getSize()).product(productService.findById(productItem.getProduct().getId()).get()) 
+				.size(productItem.getSize()).product(productResponse) 
 				.status(productItem.getStatus().name()).build();
 
 		response.put("status", HttpStatus.OK.value());
@@ -164,10 +177,23 @@ public class ProductItemController {
 		List<ProductItemResponse> productItemResponses = new ArrayList<>();
 
 		for (ProductItem productItem : products) {
-			productItemResponses.add(ProductItemResponse.builder().id(productItem.getId()).price(productItem.getPrice())
-					.quantity(productItem.getQuantity()).listDetailImages(productItem.getListDetailImages())
-					.color(productItem.getColor().toString()).size(productItem.getSize())
-					.product(productItem.getProduct()).status(productItem.getStatus().name()).build());
+			Product product = productItem.getProduct();
+			
+			List<ProductColor> colors = productService.getListColors(product.getId());
+			List<String> sizes = productService.getListSizes(product.getId());
+			
+			ProductResponse productResponse = productService.getProductById(product.getId());
+			
+			productResponse.setColors(colors);
+			productResponse.setSizes(sizes);
+			
+			ProductItemResponse itemResponse = ProductItemResponse.builder().id(productItem.getId())
+					.price(productItem.getPrice()).quantity(productItem.getQuantity())
+					.listDetailImages(productItem.getListDetailImages()).color(productItem.getColor().toString())
+					.size(productItem.getSize()).product(productResponse) 
+					.status(productItem.getStatus().name()).build();
+			
+			productItemResponses.add(itemResponse);
 		}
 
 		response.put("status", HttpStatus.OK.value());
@@ -181,12 +207,27 @@ public class ProductItemController {
 		Pageable pageable = PageRequest.of(page, size);
 		Page<ProductItem> pageObject = productItemService.listTopSaleProductItems(pageable);
 		List<ProductItem> productItems = pageObject.getContent();
+		
 		List<ProductItemResponse> productItemResponses = new ArrayList<>();
+
 		for (ProductItem productItem : productItems) {
-			productItemResponses.add(ProductItemResponse.builder().id(productItem.getId()).price(productItem.getPrice())
-					.quantity(productItem.getQuantity()).listDetailImages(productItem.getListDetailImages())
-					.color(productItem.getColor().toString()).size(productItem.getSize())
-					.product(productItem.getProduct()).status(productItem.getStatus().name()).build());
+			Product product = productItem.getProduct();
+			
+			List<ProductColor> colors = productService.getListColors(product.getId());
+			List<String> sizes = productService.getListSizes(product.getId());
+			
+			ProductResponse productResponse = productService.getProductById(product.getId());
+			
+			productResponse.setColors(colors);
+			productResponse.setSizes(sizes);
+			
+			ProductItemResponse itemResponse = ProductItemResponse.builder().id(productItem.getId())
+					.price(productItem.getPrice()).quantity(productItem.getQuantity())
+					.listDetailImages(productItem.getListDetailImages()).color(productItem.getColor().toString())
+					.size(productItem.getSize()).product(productResponse) 
+					.status(productItem.getStatus().name()).build();
+			
+			productItemResponses.add(itemResponse);
 		}
 		
 		ListProductItemsPagegination listProductItemsPagegination = ListProductItemsPagegination.builder()
@@ -207,12 +248,27 @@ public class ProductItemController {
 		Pageable pageable = PageRequest.of(page, size);
 		Page<ProductItem> pageObject = productItemService.listNewProductItems(pageable);
 		List<ProductItem> productItems = pageObject.getContent();
+		
 		List<ProductItemResponse> productItemResponses = new ArrayList<>();
+
 		for (ProductItem productItem : productItems) {
-			productItemResponses.add(ProductItemResponse.builder().id(productItem.getId()).price(productItem.getPrice())
-					.quantity(productItem.getQuantity()).listDetailImages(productItem.getListDetailImages())
-					.color(productItem.getColor().toString()).size(productItem.getSize())
-					.product(productItem.getProduct()).status(productItem.getStatus().name()).build());
+			Product product = productItem.getProduct();
+			
+			List<ProductColor> colors = productService.getListColors(product.getId());
+			List<String> sizes = productService.getListSizes(product.getId());
+			
+			ProductResponse productResponse = productService.getProductById(product.getId());
+			
+			productResponse.setColors(colors);
+			productResponse.setSizes(sizes);
+			
+			ProductItemResponse itemResponse = ProductItemResponse.builder().id(productItem.getId())
+					.price(productItem.getPrice()).quantity(productItem.getQuantity())
+					.listDetailImages(productItem.getListDetailImages()).color(productItem.getColor().toString())
+					.size(productItem.getSize()).product(productResponse) 
+					.status(productItem.getStatus().name()).build();
+			
+			productItemResponses.add(itemResponse);
 		}
 		
 		ListProductItemsPagegination listProductItemsPagegination = ListProductItemsPagegination.builder()

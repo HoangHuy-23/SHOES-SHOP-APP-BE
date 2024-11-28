@@ -132,6 +132,18 @@ public class ProductServiceImpl implements ProductService {
 		// TODO Auto-generated method stub
 		return productRepository.findById(id);
 	}
+
+	@Override
+	public List<String> getListSizes(String productId) {
+		return productRepository.getListSizes(productId);
+	}
+
+	@Override
+	public List<ProductColor> getListColors(String productId) {
+		return productRepository.getListColors(productId);
+	}
+	
+	
 	
 	
 }

@@ -2,7 +2,6 @@ package iuh.fit.dhktpm117ctt.group06.dto.response;
 
 import iuh.fit.dhktpm117ctt.group06.entities.Product;
 import iuh.fit.dhktpm117ctt.group06.entities.enums.ProductStatus;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,8 +10,6 @@ import java.util.List;
 
 @Builder
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 public class ProductItemResponse {
     private String id;
     private double price;
@@ -20,6 +17,6 @@ public class ProductItemResponse {
     private List<String> listDetailImages;
     private String color;
     private String size;
-    private Product product;
+    private ProductResponse product;
     private String status;
 }
