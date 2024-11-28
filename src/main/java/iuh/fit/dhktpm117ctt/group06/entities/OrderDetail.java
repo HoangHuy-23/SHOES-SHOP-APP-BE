@@ -3,6 +3,7 @@ package iuh.fit.dhktpm117ctt.group06.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.io.Serializable;
 import java.util.Date;
 
 @NoArgsConstructor
@@ -12,8 +13,12 @@ import java.util.Date;
 @ToString
 @Entity
 @Table(name = "order_details")
-public class OrderDetail {
-    @Id
+public class OrderDetail implements Serializable{
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	@Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
     private int quantity;

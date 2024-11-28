@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import java.io.Serializable;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -16,8 +17,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @AllArgsConstructor
 @ToString
 @Table(name = "brands")
-public class Brand {
-    @Id
+public class Brand implements Serializable{
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	@Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
     private String brandName;

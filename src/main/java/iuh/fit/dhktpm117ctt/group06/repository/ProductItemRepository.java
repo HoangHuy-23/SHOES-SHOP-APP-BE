@@ -1,16 +1,19 @@
 package iuh.fit.dhktpm117ctt.group06.repository;
 
-import iuh.fit.dhktpm117ctt.group06.entities.ProductItem;
-import iuh.fit.dhktpm117ctt.group06.entities.OrderDetail;
-import iuh.fit.dhktpm117ctt.group06.entities.Product;
-import iuh.fit.dhktpm117ctt.group06.entities.enums.ProductColor;
-import iuh.fit.dhktpm117ctt.group06.entities.enums.ProductStatus;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.Optional;
+import iuh.fit.dhktpm117ctt.group06.entities.OrderDetail;
+import iuh.fit.dhktpm117ctt.group06.entities.ProductItem;
+import iuh.fit.dhktpm117ctt.group06.entities.enums.ProductColor;
+import iuh.fit.dhktpm117ctt.group06.entities.enums.ProductStatus;
 
 @Repository
 public interface ProductItemRepository extends JpaRepository<ProductItem, String> {
@@ -26,4 +29,10 @@ public interface ProductItemRepository extends JpaRepository<ProductItem, String
     
     @Query("select o from OrderDetail o where o.productItem.id = ?1")
     List<OrderDetail> exexistedByOrders(String productItemId);
+    
+    @Query("select p from ProductItem p join OrderDetail o on p.id = o.productItem.id group by p.id order by sum(o.quantity) desc")
+    Page<ProductItem> listTopSaleProductItems(Pageable pageable);
+    
+    @Query("SELECT p FROM ProductItem p JOIN p.product pu ORDER BY pu.createdDate DESC")
+    Page<ProductItem> listNewProductItems(Pageable pageable);
 }

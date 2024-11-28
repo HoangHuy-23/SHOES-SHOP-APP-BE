@@ -11,6 +11,8 @@ import iuh.fit.dhktpm117ctt.group06.repository.ProductItemRepository;
 import iuh.fit.dhktpm117ctt.group06.service.ProductItemService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -172,6 +174,16 @@ public class ProductItemServiceImpl implements ProductItemService {
 	@Transactional
 	public Optional<ProductItem> findById(String id) {
 		return productItemRepository.findById(id);
+	}
+	
+	@Override
+	public Page<ProductItem> listTopSaleProductItems(Pageable pageable){
+		return productItemRepository.listTopSaleProductItems(pageable);
+	}
+	
+	@Override
+	public Page<ProductItem> listNewProductItems(Pageable pageable) {
+		return productItemRepository.listNewProductItems(pageable);
 	}
 
 }

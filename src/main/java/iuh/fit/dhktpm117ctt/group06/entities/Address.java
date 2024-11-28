@@ -1,6 +1,8 @@
 package iuh.fit.dhktpm117ctt.group06.entities;
 
 
+import java.io.Serializable;
+
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import jakarta.persistence.*;
@@ -17,8 +19,12 @@ import lombok.NoArgsConstructor;
 @Builder
 @Entity
 @Table(name = "address")
-public class Address {
-    @Id
+public class Address implements Serializable{
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	@Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
     @NotNull(message = "HOME_NUMBER_INVALID")

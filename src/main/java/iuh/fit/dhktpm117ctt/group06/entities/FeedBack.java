@@ -3,6 +3,7 @@ package iuh.fit.dhktpm117ctt.group06.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
@@ -13,8 +14,12 @@ import java.util.List;
 @AllArgsConstructor
 @ToString
 @Table(name = "feedbacks")
-public class FeedBack {
-    @Id
+public class FeedBack implements Serializable{
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	@Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
     private String content;

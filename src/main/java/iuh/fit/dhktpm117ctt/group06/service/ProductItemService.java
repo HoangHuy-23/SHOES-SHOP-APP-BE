@@ -5,6 +5,8 @@ import iuh.fit.dhktpm117ctt.group06.dto.response.ProductItemResponse;
 import iuh.fit.dhktpm117ctt.group06.entities.ProductItem;
 import iuh.fit.dhktpm117ctt.group06.entities.enums.ProductColor;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -23,4 +25,6 @@ public interface ProductItemService {
     List<String> findDistinctSizesByProductId(String productId);
 	Optional<ProductItem> findById(String id);
 	List<ProductItem> findAll();
+	Page<ProductItem> listNewProductItems(Pageable pageable);
+	Page<ProductItem> listTopSaleProductItems(Pageable pageable);
 }

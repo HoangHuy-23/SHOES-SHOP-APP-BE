@@ -1,7 +1,6 @@
 package iuh.fit.dhktpm117ctt.group06.controller;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,14 +20,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import iuh.fit.dhktpm117ctt.group06.dto.request.CartDetailRequest;
 import iuh.fit.dhktpm117ctt.group06.dto.response.CartDetailResponse;
-import iuh.fit.dhktpm117ctt.group06.dto.response.ProductItemResponse;
 import iuh.fit.dhktpm117ctt.group06.dto.response.UserResponse;
 import iuh.fit.dhktpm117ctt.group06.entities.Cart;
 import iuh.fit.dhktpm117ctt.group06.entities.CartDetail;
 import iuh.fit.dhktpm117ctt.group06.entities.CartDetailPK;
 import iuh.fit.dhktpm117ctt.group06.entities.Product;
 import iuh.fit.dhktpm117ctt.group06.entities.ProductItem;
-import iuh.fit.dhktpm117ctt.group06.entities.User;
 import iuh.fit.dhktpm117ctt.group06.service.CartDetailService;
 import iuh.fit.dhktpm117ctt.group06.service.CartService;
 import iuh.fit.dhktpm117ctt.group06.service.ProductItemService;
