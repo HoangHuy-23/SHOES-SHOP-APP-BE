@@ -2,6 +2,8 @@ package iuh.fit.dhktpm117ctt.group06.repository;
 
 import iuh.fit.dhktpm117ctt.group06.entities.Product;
 import iuh.fit.dhktpm117ctt.group06.entities.User;
+import iuh.fit.dhktpm117ctt.group06.entities.enums.ProductColor;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -25,4 +27,10 @@ public interface ProductRepository extends JpaRepository<Product, String> {
 		       "OR p.category.name LIKE %?1% " +
 		       "OR pc.name LIKE %?1%")
 	List<Product> search(String keyword);
+	
+	@Query("select pi.size from ProductItem pi where pi.product.id = ?1")
+	List<String> getListSizes(String productId);
+	
+	@Query("select pi.color from ProductItem pi where pi.product.id = ?1")
+	List<ProductColor> getListColors(String productId);
 }
