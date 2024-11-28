@@ -14,4 +14,5 @@ public interface BrandService {
     public Optional<BrandResponse> update(String id,BrandRequest brandRequest);
     public void deleteById(String id);
     public List<BrandResponse> findAll();
+    public List<BrandResponse> search(String keyword);
 }

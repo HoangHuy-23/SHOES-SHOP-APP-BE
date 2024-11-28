@@ -25,4 +25,6 @@ public interface ProductRepository extends JpaRepository<Product, String> {
 		       "OR p.category.name LIKE %?1% " +
 		       "OR pc.name LIKE %?1%")
 	List<Product> search(String keyword);
+
+
 }

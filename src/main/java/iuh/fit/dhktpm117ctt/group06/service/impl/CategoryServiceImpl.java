@@ -62,4 +62,9 @@ public class CategoryServiceImpl implements CategoryService {
         List<Category> categories = categoryRepository.findAll();
         return categories.stream().map(this::mapToCategoryResponse).toList();
     }
+
+    @Override
+    public List<CategoryResponse> search(String keyword) {
+        return categoryRepository.search(keyword).stream().map(this::mapToCategoryResponse).toList();
+    }
 }

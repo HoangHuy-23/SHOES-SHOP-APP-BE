@@ -2,7 +2,9 @@ package iuh.fit.dhktpm117ctt.group06.service.impl;
 
 import iuh.fit.dhktpm117ctt.group06.dto.request.ProductCollectionRequest;
 import iuh.fit.dhktpm117ctt.group06.dto.response.ProductCollectionResponse;
+import iuh.fit.dhktpm117ctt.group06.entities.Brand;
 import iuh.fit.dhktpm117ctt.group06.entities.ProductCollection;
+import iuh.fit.dhktpm117ctt.group06.repository.BrandRepository;
 import iuh.fit.dhktpm117ctt.group06.repository.ProductCollectionRepository;
 import iuh.fit.dhktpm117ctt.group06.service.ProductCollectionService;
 import org.modelmapper.ModelMapper;
@@ -18,6 +20,9 @@ public class ProductCollectionServiceImpl implements ProductCollectionService {
     @Autowired
     private ProductCollectionRepository productCollectionRepository;
 
+    @Autowired
+    private BrandRepository brandRepository;
+
     private ModelMapper modelMapper = new ModelMapper();
 
     private ProductCollectionResponse mapToProductCollectionResponse(ProductCollection productCollection) {
@@ -30,7 +35,10 @@ public class ProductCollectionServiceImpl implements ProductCollectionService {
 
     @Override
     public Optional<ProductCollectionResponse> save(ProductCollectionRequest request) {
-        ProductCollection productCollection = mapToProductCollection(request);
+        ProductCollection productCollection = new ProductCollection();
+        productCollection.setName(request.getName());
+        Brand brand = brandRepository.findById(request.getBrandId()).orElse(null);
+        productCollection.setBrand(brand);
         return Optional.of(mapToProductCollectionResponse(productCollectionRepository.save(productCollection)));
     }
 
@@ -63,5 +71,10 @@ public class ProductCollectionServiceImpl implements ProductCollectionService {
     @Override
     public List<ProductCollectionResponse> findByBrand(String brandId) {
         return List.of(productCollectionRepository.findByBrand(brandId).stream().map(this::mapToProductCollectionResponse).toArray(ProductCollectionResponse[]::new));
+    }
+
+    @Override
+    public List<ProductCollectionResponse> search(String keyword, String brandId) {
+        return List.of(productCollectionRepository.search(keyword, brandId).stream().map(this::mapToProductCollectionResponse).toArray(ProductCollectionResponse[]::new));
     }
 }
