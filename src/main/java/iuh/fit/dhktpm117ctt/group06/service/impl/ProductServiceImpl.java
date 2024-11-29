@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -45,15 +46,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Optional<ProductResponse> addProduct(ProductRequest productRequest) {
         Product product = mapToProduct(productRequest);
-        if (productRequest.getAvatar() != null) {
-            try {
-                Map uploadResult = cloudinaryProvider.upload(productRequest.getAvatar(), "Product", product.getName());
-                product.setAvatar(uploadResult.get("url").toString());
-                return Optional.of(mapToProductResponse(productRepository.save(product)));
-            } catch (Exception e) {
-                throw new AppException(ErrorCode.AVATAR_INVALID);
-            }
-        }
+        product.setCreatedDate(LocalDateTime.now());
         return Optional.of(mapToProductResponse(productRepository.save(product)));
     }
 
@@ -64,18 +57,6 @@ public class ProductServiceImpl implements ProductService {
         if (product.isPresent()) {
             product.get().setName(productRequest.getName());
             product.get().setDescription(productRequest.getDescription());
-            if (productRequest.getAvatar() != null && !productRequest.getAvatar().isEmpty()) {
-                try {
-                    Map uploadResult = cloudinaryProvider.upload(productRequest.getAvatar(), "Product", product.get().getName());
-                    product.get().setAvatar(uploadResult.get("url").toString());
-                    return Optional.of(mapToProductResponse(productRepository.save(product.get())));
-                } catch (Exception e) {
-                    throw new AppException(ErrorCode.AVATAR_INVALID);
-                }
-            }
-            
-            String imageUrl = product.get().getAvatar();
-            product.get().setAvatar(imageUrl);
             return Optional.of(mapToProductResponse(productRepository.save(product.get())));
         }
         return Optional.empty();
@@ -91,19 +72,6 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Optional<ProductResponse> updateProductAvatar(String productId, MultipartFile avatar) {
         Optional<Product> product = productRepository.findById(productId);
-        if (product.isPresent()) {
-            if (avatar == null) {
-                return Optional.of(mapToProductResponse(product.get()));
-            } else {
-                try {
-                    Map uploadResult = cloudinaryProvider.upload(avatar, "Product", product.get().getId());
-                    product.get().setAvatar(uploadResult.get("url").toString());
-                    return Optional.of(mapToProductResponse(productRepository.save(product.get())));
-                } catch (Exception e) {
-                    throw new AppException(ErrorCode.AVATAR_INVALID);
-                }
-            }
-        }
         return Optional.empty();
     }
 

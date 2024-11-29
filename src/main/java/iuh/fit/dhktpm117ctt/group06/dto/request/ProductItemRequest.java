@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @NoArgsConstructor
 @Data
 public class ProductItemRequest {
@@ -30,4 +32,5 @@ public class ProductItemRequest {
     private Product product;
     @NotNull(message = "STATUS_INVALID")
     private ProductStatus status;
+    private List<Integer> listImagesDelete;
 }

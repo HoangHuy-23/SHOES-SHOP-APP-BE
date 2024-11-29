@@ -46,7 +46,19 @@ public class OrderController {
 
 	@GetMapping
 	public ResponseEntity<?> getAllOrders() {
-		return null;
+		Map<String, Object> response = new LinkedHashMap<>();
+
+		List<OrderResponse> orders = orderService.findAll();
+
+		if (orders.isEmpty()) {
+			response.put("status", HttpStatus.NOT_FOUND);
+			response.put("data", "Order not found");
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+		}
+
+		response.put("status", HttpStatus.OK);
+		response.put("data", orders);
+		return ResponseEntity.ok(response);
 	}
 
 	@PostMapping

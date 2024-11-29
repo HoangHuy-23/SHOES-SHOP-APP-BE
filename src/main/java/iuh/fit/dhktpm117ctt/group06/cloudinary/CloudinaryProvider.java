@@ -32,16 +32,22 @@ public class CloudinaryProvider {
     public List<Map> uploadFiles(MultipartFile[] files, String folder, String fileName) throws IOException {
         List<Map> uploadResults = new ArrayList<>();
         for (MultipartFile file : files) {
+            if (file.isEmpty()) continue;
             String uniqueSuffix = UUID.randomUUID().toString().substring(0, 8);
             String uniqueFileName = fileName + "_" + uniqueSuffix;
             Map uploadParams = ObjectUtils.asMap(
-                    "async", "auto",
                     "folder", "ShoesShopApp/" + folder,
                     "public_id", uniqueFileName
             );
-            Map uploadResult = cloudinary.uploader().upload(file.getBytes(), uploadParams);
-            uploadResults.add(uploadResult);
+            try {
+                Map uploadResult = cloudinary.uploader().upload(file.getBytes(), uploadParams);
+                uploadResults.add(uploadResult);
+                System.out.println("Uploaded URL: " + uploadResult.get("url"));
+            } catch (Exception e) {
+                System.err.println("Error uploading file: " + e.getMessage());
+            }
         }
         return uploadResults;
     }
+
 }

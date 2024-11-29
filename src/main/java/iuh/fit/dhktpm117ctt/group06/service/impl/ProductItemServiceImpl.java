@@ -46,7 +46,7 @@ public class ProductItemServiceImpl implements ProductItemService {
 		if (productItemRequest.getListDetailImages() != null) {
 			try {
 				List<Map> uploadResult = cloudinaryProvider.uploadFiles(productItemRequest.getListDetailImages(),
-						"Product-Item", productItem.getId());
+						"Product-Item", productItem.getProduct().getId());
 				List<String> listDetailImages = new ArrayList<>();
 				for (Map map : uploadResult) {
 					listDetailImages.add(map.get("url").toString());
@@ -115,8 +115,8 @@ public class ProductItemServiceImpl implements ProductItemService {
 		Optional<ProductItem> optionalProductItem = productItemRepository.findById(id);
 		if (optionalProductItem.isPresent()) {
 			ProductItem productItem = optionalProductItem.get();
-			if (quantity >= 0) {
-				
+			if (quantity != 0) {
+				System.out.println("Quantity: " + quantity);
 				productItem.setQuantity(quantity);
 				return Optional.of(productItemRepository.save(productItem));
 			} else {
@@ -180,17 +180,15 @@ public class ProductItemServiceImpl implements ProductItemService {
 	public Page<ProductItem> listTopSaleProductItems(Pageable pageable){
 		return productItemRepository.listTopSaleProductItems(pageable);
 	}
-	
-	@Override
-	public Page<ProductItem> listNewProductItems(Pageable pageable) {
-		return productItemRepository.listNewProductItems(pageable);
-	}
 
 	@Override
 	public Optional<ProductItem> findByProductAndSizeAndColor(String productId, String size, ProductColor color) {
 		return productItemRepository.findByProductAndSizeAndColor(productId, color, size);
 	}
-	
-	
+
+	@Override
+	public Page<ProductItem> listNewProductItems(Pageable pageable) {
+		return productItemRepository.listNewProductItems(pageable);
+	}
 
 }

@@ -142,7 +142,7 @@ public class ProductItemController {
 		}
 
 		response.put("status", HttpStatus.OK.value());
-		response.put("data", productItemService.update(id, productItemRequest));
+		response.put("data", productItemResponse.get());
 		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
 
