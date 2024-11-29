@@ -347,4 +347,45 @@ public class ProductItemController {
 		response.put("data", productItemService.findDistinctSizesByProductId(productId));
 		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
+	
+//	@GetMapping("/search")
+//	public ResponseEntity<?> search(@RequestParam String name, @RequestParam(defaultValue = "0") int page,
+//			@RequestParam(defaultValue = "9") int size) {
+//		Map<String, Object> response = new LinkedHashMap<>();
+//		Pageable pageable = PageRequest.of(page, size);
+//		Page<ProductItem> pageObject = productItemService.search(name, pageable);
+//		List<ProductItem> productItems = pageObject.getContent();
+//
+//		List<ProductItemResponse> productItemResponses = new ArrayList<>();
+//
+//		for (ProductItem productItem : productItems) {
+//			Product product = productItem.getProduct();
+//
+//			List<ProductColor> colors = productService.getListColors(product.getId());
+//			List<String> sizes = productService.getListSizes(product.getId());
+//
+//			ProductResponse productResponse = productService.getProductById(product.getId());
+//
+//			productResponse.setColors(colors);
+//			productResponse.setSizes(sizes);
+//
+//			ProductItemResponse itemResponse = ProductItemResponse.builder().id(productItem.getId())
+//					.price(productItem.getPrice()).quantity(productItem.getQuantity())
+//					.listDetailImages(productItem.getListDetailImages()).color(productItem.getColor().toString())
+//					.size(productItem.getSize()).product(productResponse).status(productItem.getStatus().name())
+//					.build();
+//
+//			productItemResponses.add(itemResponse);
+//		}
+//
+//		ListProductItemsPagegination listProductItemsPagegination = ListProductItemsPagegination.builder()
+//				.currentPage(pageObject.getPageable().getPageNumber()).totalPage(pageObject.getTotalPages())
+//				.totalItems(pageObject.getTotalElements()).pageSize(pageable.getPageSize()).data(productItemResponses)
+//				.build();
+//
+//		response.put("status", HttpStatus.OK.value());
+//		response.put("data", listProductItemsPagegination);
+//		return ResponseEntity.status(HttpStatus.OK).body(response);
+//		
+//	}
 }

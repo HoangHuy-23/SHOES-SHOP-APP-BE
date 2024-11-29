@@ -7,6 +7,7 @@ import iuh.fit.dhktpm117ctt.group06.entities.enums.ProductStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Builder
 @Data
