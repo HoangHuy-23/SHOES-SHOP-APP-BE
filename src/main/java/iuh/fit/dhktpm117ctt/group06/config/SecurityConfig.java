@@ -28,10 +28,10 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.sessionManagement(sessionManagement ->
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
-                .authorizeHttpRequests(authorize ->
-                        authorize.requestMatchers("/api/admin/**").hasAnyRole("ADMIN")
-                        .requestMatchers("/api/user/**").authenticated().anyRequest().permitAll())
-                .addFilterBefore(new JwtValidator(), BasicAuthenticationFilter.class)
+//                .authorizeHttpRequests(authorize ->
+//                        authorize.requestMatchers("/api/admin/**").hasAnyRole("ADMIN")
+//                        .requestMatchers("/api/user/**").authenticated().anyRequest().permitAll())
+//                .addFilterBefore(new JwtValidator(), BasicAuthenticationFilter.class)
 
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(new CorsConfigurationSource() {

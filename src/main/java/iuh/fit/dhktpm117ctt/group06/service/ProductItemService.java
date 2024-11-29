@@ -18,7 +18,7 @@ public interface ProductItemService {
     Optional<ProductItemResponse> update(String id, ProductItemRequest productItem);
     void deleteById(String productItemId);
     Optional<ProductItemResponse> updateDetailImage(String productItemId, MultipartFile[] newDetailImages);
-    Optional<ProductItemResponse> updateQuantity(String productItemId, int qty);
+    Optional<ProductItem> updateQuantity(String productItemId, int qty);
     List<ProductItemResponse> findByProduct(String productId);
     Optional<ProductItemResponse> findByColorAndSize(String color, String size, String productId);
     List<ProductColor> findDistinctColorsByProductId(String productId);
@@ -27,4 +27,5 @@ public interface ProductItemService {
 	List<ProductItem> findAll();
 	Page<ProductItem> listNewProductItems(Pageable pageable);
 	Page<ProductItem> listTopSaleProductItems(Pageable pageable);
+	Optional<ProductItem> findByProductAndSizeAndColor(String productId, String size, ProductColor color);
 }

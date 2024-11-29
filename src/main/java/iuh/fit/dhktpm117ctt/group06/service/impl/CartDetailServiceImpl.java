@@ -52,7 +52,7 @@ public class CartDetailServiceImpl implements CartDetailService {
 
 	@Override
 	@Transactional
-	public Optional<CartDetailResponse> updateQuantity(CartDetailPK cartDetailPK, int newQuantity) {
+	public Optional<CartDetail> updateQuantity(CartDetailPK cartDetailPK, int newQuantity) {
 		Optional<CartDetail> cartDetail = cartDetailRepository.findById(cartDetailPK);
 
 		Optional<ProductItem> productItemOptional = productItemRepository.findById(cartDetailPK.getProductItemId());
@@ -63,17 +63,17 @@ public class CartDetailServiceImpl implements CartDetailService {
 		ProductItem productItem = productItemOptional.get();
 
 		if (cartDetail.isPresent()) {
-			int currentQty = cartDetail.get().getQuantity() + newQuantity;
-			if (currentQty > productItem.getQuantity()) {
+			if (newQuantity > productItem.getQuantity()) {
 				throw new IllegalArgumentException("Not enough quantity in stock");
 			}
-			cartDetail.get().setQuantity(currentQty);
-			return Optional.of(mapToCartDetailResponse(cartDetailRepository.save(cartDetail.get())));
+			cartDetail.get().setQuantity(newQuantity);
+			return Optional.of(cartDetailRepository.save(cartDetail.get()));
 		}
 		return Optional.empty();
 	}
 
 	@Override
+	@Transactional
 	public void deleteById(CartDetailPK cartDetailPK) {
 		cartDetailRepository.deleteByCartDetailPK(cartDetailPK);
 	}

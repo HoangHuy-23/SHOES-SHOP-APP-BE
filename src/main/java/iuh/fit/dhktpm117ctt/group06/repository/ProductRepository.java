@@ -28,9 +28,9 @@ public interface ProductRepository extends JpaRepository<Product, String> {
 		       "OR pc.name LIKE %?1%")
 	List<Product> search(String keyword);
 	
-	@Query("select pi.size from ProductItem pi where pi.product.id = ?1")
+	@Query("select DISTINCT pi.size from ProductItem pi where pi.product.id = ?1")
 	List<String> getListSizes(String productId);
 	
-	@Query("select pi.color from ProductItem pi where pi.product.id = ?1")
+	@Query("select DISTINCT pi.color from ProductItem pi where pi.product.id = ?1")
 	List<ProductColor> getListColors(String productId);
 }

@@ -75,6 +75,8 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 				.orElseThrow(() -> new AppException(ErrorCode.PRODUCT_ITEM_NOT_FOUND));
 
 		int currentQuantity = optional.getQuantity();
+		
+		
 		if (orderDetailRequest.getQuantity() >= 0 && orderDetailRequest.getQuantity() <= currentQuantity) {
 			currentQuantity -= orderDetailRequest.getQuantity();
 			productItemService.updateQuantity(optional.getId(), currentQuantity);
