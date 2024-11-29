@@ -14,5 +14,5 @@ public class OrderDetailResponse {
     private int quantity;
     private double pricePerItem;
 //    private ProductItemResponse productItem;
-    private ProductItem productItem;
+    private ProductItemResponse productItem;
 }

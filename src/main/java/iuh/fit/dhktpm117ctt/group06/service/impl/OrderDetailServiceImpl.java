@@ -51,11 +51,17 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 		return modelMapper.map(orderDetailRequest, OrderDetail.class);
 	}
 
+	private OrderDetailResponse mapToOrderDetailResponse1(OrderDetail orderDetail) {
+		OrderDetailResponse orderDetailResponse = modelMapper.map(orderDetail, OrderDetailResponse.class);
+		ProductItemResponse productItemResponse = modelMapper.map(orderDetail.getProductItem(), ProductItemResponse.class);
+		orderDetailResponse.setProductItem(productItemResponse);
+		return orderDetailResponse;
+	}
+
 	@Override
 	public List<OrderDetailResponse> findByOrder(String orderId) {
 		List<OrderDetail> orderDetails = orderDetailRepository.findByOrderId(orderId);
-
-		return orderDetails.stream().map(this::mapToOrderDetailResponse).toList();
+		return orderDetails.stream().map(this::mapToOrderDetailResponse1).collect(Collectors.toList());
 	}
 
 	@Override

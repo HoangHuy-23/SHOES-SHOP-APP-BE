@@ -155,5 +155,10 @@ public class UserServiceImpl implements UserService {
 		return userRepository.findById(id);
 	}
 
+    @Override
+    public List<UserResponse> search(String keyword) {
+        return userRepository.search(keyword).stream().map(this::mapToUserResponse).toList();
+    }
+
 
 }

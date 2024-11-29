@@ -40,6 +40,11 @@ public class ProductController {
 		return ResponseEntity.ok(productService.getAllProducts());
 	}
 
+	@GetMapping("/searchByKeyword")
+	public ResponseEntity<?> searchByKeyword(@RequestParam String keyword) {
+		return ResponseEntity.ok(productService.searchProducts(keyword));
+	}
+
 	@GetMapping("/{id}")
 	public ResponseEntity<?> getProductById(@PathVariable String id) {
 		Map<String, Object> response = new LinkedHashMap<>();

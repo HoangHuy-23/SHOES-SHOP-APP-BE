@@ -9,13 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import iuh.fit.dhktpm117ctt.group06.dto.request.OrderDetailRequest;
 import iuh.fit.dhktpm117ctt.group06.dto.request.OrderRequest;
@@ -49,6 +43,23 @@ public class OrderController {
 		Map<String, Object> response = new LinkedHashMap<>();
 
 		List<OrderResponse> orders = orderService.findAll();
+
+		if (orders.isEmpty()) {
+			response.put("status", HttpStatus.NOT_FOUND);
+			response.put("data", "Order not found");
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+		}
+
+		response.put("status", HttpStatus.OK);
+		response.put("data", orders);
+		return ResponseEntity.ok(response);
+	}
+
+	@GetMapping("/search")
+	public ResponseEntity<?> searchOrder(@RequestParam String keyword) {
+		Map<String, Object> response = new LinkedHashMap<>();
+
+		List<OrderResponse> orders = orderService.searchOrders(keyword);
 
 		if (orders.isEmpty()) {
 			response.put("status", HttpStatus.NOT_FOUND);
