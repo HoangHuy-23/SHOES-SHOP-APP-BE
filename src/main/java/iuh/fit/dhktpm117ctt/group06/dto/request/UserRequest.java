@@ -36,7 +36,5 @@ public class UserRequest {
     private String phone;
     @NotNull(message = "GENDER_INVALID")
     private Gender gender;
-
-    private MultipartFile avatar;
-
+    private MultipartFile image;
 }

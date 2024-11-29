@@ -111,14 +111,14 @@ public class ProductItemServiceImpl implements ProductItemService {
 
 	@Override
 	@Transactional
-	public Optional<ProductItemResponse> updateQuantity(String id, int quantity) {
+	public Optional<ProductItem> updateQuantity(String id, int quantity) {
 		Optional<ProductItem> optionalProductItem = productItemRepository.findById(id);
 		if (optionalProductItem.isPresent()) {
 			ProductItem productItem = optionalProductItem.get();
 			if (quantity != 0) {
 				System.out.println("Quantity: " + quantity);
 				productItem.setQuantity(quantity);
-				return Optional.of(mapToProductItemResponse(productItemRepository.save(productItem)));
+				return Optional.of(productItemRepository.save(productItem));
 			} else {
 				throw new AppException(ErrorCode.QTY_INVALID);
 			}
@@ -180,7 +180,12 @@ public class ProductItemServiceImpl implements ProductItemService {
 	public Page<ProductItem> listTopSaleProductItems(Pageable pageable){
 		return productItemRepository.listTopSaleProductItems(pageable);
 	}
-	
+
+	@Override
+	public Optional<ProductItem> findByProductAndSizeAndColor(String productId, String size, ProductColor color) {
+		return productItemRepository.findByProductAndSizeAndColor(productId, color, size);
+	}
+
 	@Override
 	public Page<ProductItem> listNewProductItems(Pageable pageable) {
 		return productItemRepository.listNewProductItems(pageable);
