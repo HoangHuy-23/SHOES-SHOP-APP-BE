@@ -61,6 +61,11 @@ public class OrderServiceImpl implements OrderService {
 	}
 
 	@Override
+	public List<OrderResponse> findAll() {
+		return orderRepository.findAll().stream().map(this::mapToOrderResponse).collect(Collectors.toList());
+	}
+
+	@Override
 	public Optional<OrderResponse> findById(String id) {
 		return orderRepository.findById(id).map(this::mapToOrderResponse);
 	}
