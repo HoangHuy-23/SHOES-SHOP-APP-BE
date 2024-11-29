@@ -96,6 +96,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
 	@Override
+	@Transactional
 	public Optional<Product> findById(String id) {
 		// TODO Auto-generated method stub
 		return productRepository.findById(id);
