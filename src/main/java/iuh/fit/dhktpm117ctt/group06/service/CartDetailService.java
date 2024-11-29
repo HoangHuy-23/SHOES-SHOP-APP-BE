@@ -12,7 +12,7 @@ public interface CartDetailService {
     List<CartDetailResponse> findAllCartDetailByCart(String cartId);
     Optional<CartDetailResponse> addToCart(CartDetailRequest cartDetailRequest);
     void deleteById(CartDetailPK cartDetailPK);
-	Optional<CartDetailResponse> updateQuantity(CartDetailPK cartDetailPK, int newQuantity);
+	Optional<CartDetail> updateQuantity(CartDetailPK cartDetailPK, int newQuantity);
 	<S extends CartDetail> S save(S entity);
 	Optional<CartDetail> findById(CartDetailPK id);
 	

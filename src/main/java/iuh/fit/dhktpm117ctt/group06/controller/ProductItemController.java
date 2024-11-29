@@ -4,6 +4,7 @@ import java.util.*;
 
 import iuh.fit.dhktpm117ctt.group06.entities.Product;
 import iuh.fit.dhktpm117ctt.group06.entities.ProductItem;
+import iuh.fit.dhktpm117ctt.group06.entities.enums.ProductColor;
 import jakarta.servlet.http.HttpSession;
 
 import org.hibernate.Hibernate;
@@ -29,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 import iuh.fit.dhktpm117ctt.group06.dto.request.ProductItemRequest;
 import iuh.fit.dhktpm117ctt.group06.dto.response.ListProductItemsPagegination;
 import iuh.fit.dhktpm117ctt.group06.dto.response.ProductItemResponse;
+import iuh.fit.dhktpm117ctt.group06.dto.response.ProductResponse;
 import iuh.fit.dhktpm117ctt.group06.exception.ErrorCode;
 import iuh.fit.dhktpm117ctt.group06.service.ProductItemService;
 import iuh.fit.dhktpm117ctt.group06.service.ProductService;
@@ -63,16 +65,26 @@ public class ProductItemController {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
 		}
 
-		ProductItem productItem = productItemOptional.get(); 
+		ProductItem productItem = productItemOptional.get();
 
 		saveProductToSession(httpSession, productItem);
 
 		// Build the response DTO
+
+		Product product = productItem.getProduct();
+
+		List<ProductColor> colors = productService.getListColors(product.getId());
+		List<String> sizes = productService.getListSizes(product.getId());
+
+		ProductResponse productResponse = productService.getProductById(product.getId());
+
+		productResponse.setColors(colors);
+		productResponse.setSizes(sizes);
+
 		ProductItemResponse itemResponse = ProductItemResponse.builder().id(productItem.getId())
 				.price(productItem.getPrice()).quantity(productItem.getQuantity())
 				.listDetailImages(productItem.getListDetailImages()).color(productItem.getColor().toString())
-				.size(productItem.getSize()).product(productService.findById(productItem.getProduct().getId()).get()) 
-				.status(productItem.getStatus().name()).build();
+				.size(productItem.getSize()).product(productResponse).status(productItem.getStatus().name()).build();
 
 		response.put("status", HttpStatus.OK.value());
 		response.put("data", itemResponse);
@@ -164,66 +176,141 @@ public class ProductItemController {
 		List<ProductItemResponse> productItemResponses = new ArrayList<>();
 
 		for (ProductItem productItem : products) {
-			productItemResponses.add(ProductItemResponse.builder().id(productItem.getId()).price(productItem.getPrice())
-					.quantity(productItem.getQuantity()).listDetailImages(productItem.getListDetailImages())
-					.color(productItem.getColor().toString()).size(productItem.getSize())
-					.product(productItem.getProduct()).status(productItem.getStatus().name()).build());
+			Product product = productItem.getProduct();
+
+			List<ProductColor> colors = productService.getListColors(product.getId());
+			List<String> sizes = productService.getListSizes(product.getId());
+
+			ProductResponse productResponse = productService.getProductById(product.getId());
+
+			productResponse.setColors(colors);
+			productResponse.setSizes(sizes);
+
+			ProductItemResponse itemResponse = ProductItemResponse.builder().id(productItem.getId())
+					.price(productItem.getPrice()).quantity(productItem.getQuantity())
+					.listDetailImages(productItem.getListDetailImages()).color(productItem.getColor().toString())
+					.size(productItem.getSize()).product(productResponse).status(productItem.getStatus().name())
+					.build();
+
+			productItemResponses.add(itemResponse);
 		}
 
 		response.put("status", HttpStatus.OK.value());
 		response.put("data", productItemResponses);
 		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
-	
+
 	@GetMapping("/top-sale")
-	public ResponseEntity<?> getTopSaleProductItems(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "9") int size) {
+	public ResponseEntity<?> getTopSaleProductItems(@RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "9") int size) {
 		Map<String, Object> response = new LinkedHashMap<>();
 		Pageable pageable = PageRequest.of(page, size);
 		Page<ProductItem> pageObject = productItemService.listTopSaleProductItems(pageable);
 		List<ProductItem> productItems = pageObject.getContent();
+
 		List<ProductItemResponse> productItemResponses = new ArrayList<>();
+
 		for (ProductItem productItem : productItems) {
-			productItemResponses.add(ProductItemResponse.builder().id(productItem.getId()).price(productItem.getPrice())
-					.quantity(productItem.getQuantity()).listDetailImages(productItem.getListDetailImages())
-					.color(productItem.getColor().toString()).size(productItem.getSize())
-					.product(productItem.getProduct()).status(productItem.getStatus().name()).build());
+			Product product = productItem.getProduct();
+
+			List<ProductColor> colors = productService.getListColors(product.getId());
+			List<String> sizes = productService.getListSizes(product.getId());
+
+			ProductResponse productResponse = productService.getProductById(product.getId());
+
+			productResponse.setColors(colors);
+			productResponse.setSizes(sizes);
+
+			ProductItemResponse itemResponse = ProductItemResponse.builder().id(productItem.getId())
+					.price(productItem.getPrice()).quantity(productItem.getQuantity())
+					.listDetailImages(productItem.getListDetailImages()).color(productItem.getColor().toString())
+					.size(productItem.getSize()).product(productResponse).status(productItem.getStatus().name())
+					.build();
+
+			productItemResponses.add(itemResponse);
 		}
-		
+
 		ListProductItemsPagegination listProductItemsPagegination = ListProductItemsPagegination.builder()
-				.currentPage(pageObject.getPageable().getPageNumber())
-				.totalPage(pageObject.getTotalPages())
-				.totalItems(pageObject.getTotalElements())
-				.pageSize(pageable.getPageSize())
-				.data(productItemResponses).build();
-		
+				.currentPage(pageObject.getPageable().getPageNumber()).totalPage(pageObject.getTotalPages())
+				.totalItems(pageObject.getTotalElements()).pageSize(pageable.getPageSize()).data(productItemResponses)
+				.build();
+
 		response.put("status", HttpStatus.OK.value());
 		response.put("data", listProductItemsPagegination);
 		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
-	
+
 	@GetMapping("/new")
-	public ResponseEntity<?> getNewProductItems(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "9") int size) {
+	public ResponseEntity<?> getNewProductItems(@RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "9") int size) {
 		Map<String, Object> response = new LinkedHashMap<>();
 		Pageable pageable = PageRequest.of(page, size);
 		Page<ProductItem> pageObject = productItemService.listNewProductItems(pageable);
 		List<ProductItem> productItems = pageObject.getContent();
+
 		List<ProductItemResponse> productItemResponses = new ArrayList<>();
+
 		for (ProductItem productItem : productItems) {
-			productItemResponses.add(ProductItemResponse.builder().id(productItem.getId()).price(productItem.getPrice())
-					.quantity(productItem.getQuantity()).listDetailImages(productItem.getListDetailImages())
-					.color(productItem.getColor().toString()).size(productItem.getSize())
-					.product(productItem.getProduct()).status(productItem.getStatus().name()).build());
+			Product product = productItem.getProduct();
+
+			List<ProductColor> colors = productService.getListColors(product.getId());
+			List<String> sizes = productService.getListSizes(product.getId());
+
+			ProductResponse productResponse = productService.getProductById(product.getId());
+
+			productResponse.setColors(colors);
+			productResponse.setSizes(sizes);
+
+			ProductItemResponse itemResponse = ProductItemResponse.builder().id(productItem.getId())
+					.price(productItem.getPrice()).quantity(productItem.getQuantity())
+					.listDetailImages(productItem.getListDetailImages()).color(productItem.getColor().toString())
+					.size(productItem.getSize()).product(productResponse).status(productItem.getStatus().name())
+					.build();
+
+			productItemResponses.add(itemResponse);
 		}
-		
+
 		ListProductItemsPagegination listProductItemsPagegination = ListProductItemsPagegination.builder()
-				.currentPage(pageObject.getPageable().getPageNumber())
-				.totalPage(pageObject.getTotalPages())
-				.totalItems(pageObject.getTotalElements())
-				.pageSize(pageable.getPageSize())
-				.data(productItemResponses).build();
-		
+				.currentPage(pageObject.getPageable().getPageNumber()).totalPage(pageObject.getTotalPages())
+				.totalItems(pageObject.getTotalElements()).pageSize(pageable.getPageSize()).data(productItemResponses)
+				.build();
+
 		response.put("status", HttpStatus.OK.value());
 		response.put("data", listProductItemsPagegination);
+		return ResponseEntity.status(HttpStatus.OK).body(response);
+	}
+
+	@GetMapping("/get-by-color-and-size")
+	public ResponseEntity<?> getProductItemByColorAndSize(@RequestParam String productId, @RequestParam String color,
+			@RequestParam String size) {
+		Map<String, Object> response = new LinkedHashMap<>();
+
+		Optional<ProductItem> productItemOptional = productItemService.findByProductAndSizeAndColor(productId,
+				 size, ProductColor.valueOf(color));
+		if (productItemOptional.isEmpty()) {
+			response.put("status", HttpStatus.NOT_FOUND.value());
+			response.put("data", "Product item not found");
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+		}
+
+		ProductItem productItem = productItemOptional.get();
+		Product product = productItem.getProduct();
+
+		List<ProductColor> colors = productService.getListColors(product.getId());
+		List<String> sizes = productService.getListSizes(product.getId());
+
+		ProductResponse productResponse = productService.getProductById(product.getId());
+
+		productResponse.setColors(colors);
+		productResponse.setSizes(sizes);
+
+		ProductItemResponse itemResponse = ProductItemResponse.builder().id(productItem.getId())
+				.price(productItem.getPrice()).quantity(productItem.getQuantity())
+				.listDetailImages(productItem.getListDetailImages()).color(productItem.getColor().toString())
+				.size(productItem.getSize()).product(productResponse).status(productItem.getStatus().name()).build();
+
+		response.put("status", HttpStatus.OK.value());
+		response.put("data", itemResponse);
 		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
 

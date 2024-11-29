@@ -35,4 +35,7 @@ public interface ProductItemRepository extends JpaRepository<ProductItem, String
     
     @Query("SELECT p FROM ProductItem p JOIN p.product pu ORDER BY pu.createdDate DESC")
     Page<ProductItem> listNewProductItems(Pageable pageable);
+    
+    @Query("SELECT p FROM ProductItem p WHERE p.product.id = ?1 and p.color = ?2 and p.size = ?3")
+    Optional<ProductItem> findByProductAndSizeAndColor(String productId, ProductColor color, String size );
 }

@@ -20,4 +20,6 @@ public interface ProductService {
     List<ProductResponse> getAllProducts();
     List<ProductColor>  getProductColors(String productId);
 	Optional<Product> findById(String id);
+	List<ProductColor> getListColors(String productId);
+	List<String> getListSizes(String productId);
 }

@@ -1,5 +1,6 @@
 package iuh.fit.dhktpm117ctt.group06.dto.response;
 
+import iuh.fit.dhktpm117ctt.group06.entities.ProductItem;
 import jakarta.annotation.Nullable;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,5 +13,6 @@ public class OrderDetailResponse {
     private String orderId;
     private int quantity;
     private double pricePerItem;
-    private ProductItemResponse productItem;
+//    private ProductItemResponse productItem;
+    private ProductItem productItem;
 }

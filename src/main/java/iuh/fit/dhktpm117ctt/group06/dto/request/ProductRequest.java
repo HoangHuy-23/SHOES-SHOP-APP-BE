@@ -10,8 +10,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import iuh.fit.dhktpm117ctt.group06.entities.Brand;
 import iuh.fit.dhktpm117ctt.group06.entities.Category;
+import iuh.fit.dhktpm117ctt.group06.entities.enums.ProductColor;
+import iuh.fit.dhktpm117ctt.group06.entities.enums.ProductSize;
 
 import java.util.Date;
+import java.util.List;
 
 @NoArgsConstructor
 @Data
@@ -27,4 +30,5 @@ public class ProductRequest {
 //    private Brand brand;
     @NotNull(message = "CATEGORY_ID_INVALID")
     private Category category;
+    private double rating;
 }

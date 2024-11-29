@@ -4,11 +4,13 @@ import iuh.fit.dhktpm117ctt.group06.dto.request.OrderDetailRequest;
 import iuh.fit.dhktpm117ctt.group06.dto.request.OrderRequest;
 import iuh.fit.dhktpm117ctt.group06.dto.response.OrderDetailResponse;
 import iuh.fit.dhktpm117ctt.group06.dto.response.OrderResponse;
+import iuh.fit.dhktpm117ctt.group06.entities.Address;
 import iuh.fit.dhktpm117ctt.group06.entities.Order;
 import iuh.fit.dhktpm117ctt.group06.entities.User;
 import iuh.fit.dhktpm117ctt.group06.entities.enums.OrderStatus;
 import iuh.fit.dhktpm117ctt.group06.exception.AppException;
 import iuh.fit.dhktpm117ctt.group06.exception.ErrorCode;
+import iuh.fit.dhktpm117ctt.group06.repository.AddressRepository;
 import iuh.fit.dhktpm117ctt.group06.repository.OrderRepository;
 import iuh.fit.dhktpm117ctt.group06.repository.UserRepository;
 import iuh.fit.dhktpm117ctt.group06.service.OrderDetailService;
@@ -23,6 +25,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -38,6 +41,9 @@ public class OrderServiceImpl implements OrderService {
 
 	@Autowired
 	private OrderDetailService orderDetailService;
+	
+	@Autowired
+	private AddressRepository addressRepository;
 
 	private final ModelMapper modelMapper = new ModelMapper();
 
@@ -109,9 +115,14 @@ public class OrderServiceImpl implements OrderService {
 	@Override
 	public Optional<OrderResponse> saveOrder(OrderRequest orderRequest) {
 		Optional<User> user = userRepository.findById(orderRequest.getUserId());
+		Optional<Address> addresOptional = addressRepository.findById(orderRequest.getAddressId());
 
 		if (user.isEmpty()) {
 			throw new AppException(ErrorCode.USER_NOT_FOUND);
+		}
+		
+		if (addresOptional.isEmpty()) {
+			throw new AppException(ErrorCode.ADDRESS_NOT_FOUND);
 		}
 
 		User userEntity = user.get();
@@ -121,6 +132,7 @@ public class OrderServiceImpl implements OrderService {
 		BeanUtils.copyProperties(orderRequest, order);
 
 		order.setUser(user.get());
+		order.setAddress(addresOptional.get());
 		order.setOrderStatus(OrderStatus.PENDING);
 		order.setPaymentMethod(orderRequest.getPaymentMethod());
 		order.setCreatedDate(LocalDateTime.now());
@@ -129,12 +141,16 @@ public class OrderServiceImpl implements OrderService {
 		Order savedOrder = orderRepository.save(order);
 
 		List<OrderDetailRequest> detailRequests = orderRequest.getOrderDetails();
+		
+		List<OrderDetailResponse> orderDetailResponses = new ArrayList<>();
 
 		for (OrderDetailRequest orderDetailRequest : detailRequests) {
-			orderDetailService.addToOrder(savedOrder.getId(), orderDetailRequest);
+			orderDetailResponses.add(orderDetailService.addToOrder(savedOrder.getId(), orderDetailRequest).get());
 		}
+		
+		Optional<OrderResponse> orderResponseOptional = Optional.of(mapToOrderResponse(savedOrder));
 
-		return Optional.of(mapToOrderResponse(savedOrder));
+		return orderResponseOptional;
 	}
 
 	private double calculateTotalPrice(List<OrderDetailRequest> orderDetails) {
