@@ -4,6 +4,7 @@ import iuh.fit.dhktpm117ctt.group06.dto.request.BrandRequest;
 import iuh.fit.dhktpm117ctt.group06.service.BrandService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,7 +24,7 @@ public class BrandController {
         return ResponseEntity.ok(brandService.findById(id));
     }
 
-    @PostMapping(consumes = {"multipart/form-data"})
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> saveBrand(@Valid @ModelAttribute BrandRequest brandRequest) {
         return ResponseEntity.ok(brandService.save(brandRequest));
     }

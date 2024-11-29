@@ -54,7 +54,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @PreAuthorize("hasRole('ROLE_CUSTOMER')")
+//    @PreAuthorize("hasRole('ROLE_CUSTOMER')")
     public Optional<UserResponse> findById(String id) {
         User user = userRepository.findById(id).orElse(null);
         return Optional.of(mapToUserResponse(user));
@@ -99,10 +99,24 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @PreAuthorize("hasRole('ROLE_CUSTOMER')")
+//    @PreAuthorize("hasRole('ROLE_CUSTOMER')")
     public Optional<UserResponse> updateInfo(String id, UserRequest userRequest) {
-        User userUpdate = userRepository.getReferenceById(id);
+        User userUpdate = userRepository.findById(id).orElse(null);
+        if (userUpdate == null) {
+            return Optional.empty();
+        }
         String avatar = userUpdate.getAvatar();
+        if (userRequest.getAvatar() == null) {
+            avatar = userUpdate.getAvatar();
+        } else {
+           //upload avatar
+            try {
+                Map uploadResult = cloudinaryProvider.upload(userRequest.getAvatar(),"User", userUpdate.getId());
+                userUpdate.setAvatar(uploadResult.get("url").toString());
+            } catch (Exception e) {
+                throw new AppException(ErrorCode.AVATAR_INVALID);
+            }
+        }
         User user = mapToUser(userRequest);
         user.setId(id);
         user.setRole(userRepository.findById(id).get().getRole());
@@ -126,7 +140,6 @@ public class UserServiceImpl implements UserService {
                     throw new AppException(ErrorCode.AVATAR_INVALID);
                 }
             }
-
         }
         return Optional.empty();
     }

@@ -37,4 +37,6 @@ public class UserRequest {
     @NotNull(message = "GENDER_INVALID")
     private Gender gender;
 
+    private MultipartFile avatar;
+
 }
