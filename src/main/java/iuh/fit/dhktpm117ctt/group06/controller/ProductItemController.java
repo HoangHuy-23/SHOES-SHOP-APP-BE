@@ -331,4 +331,20 @@ public class ProductItemController {
 		httpSession.setAttribute("recentProducts", products);
 
 	}
+
+	@GetMapping("/colors")
+	public ResponseEntity<?> getDistinctColorsByProductId(@RequestParam String productId) {
+		Map<String, Object> response = new LinkedHashMap<>();
+		response.put("status", HttpStatus.OK.value());
+		response.put("data", productItemService.findDistinctColorsByProductId(productId));
+		return ResponseEntity.status(HttpStatus.OK).body(response);
+	}
+
+	@GetMapping("/sizes")
+	public ResponseEntity<?> getDistinctSizesByProductId(@RequestParam String productId) {
+		Map<String, Object> response = new LinkedHashMap<>();
+		response.put("status", HttpStatus.OK.value());
+		response.put("data", productItemService.findDistinctSizesByProductId(productId));
+		return ResponseEntity.status(HttpStatus.OK).body(response);
+	}
 }

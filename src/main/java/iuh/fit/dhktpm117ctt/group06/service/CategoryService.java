@@ -12,5 +12,5 @@ public interface CategoryService {
     Optional<CategoryResponse> findById(String id);
     void deleteById(String id);
     List<CategoryResponse> findAll();
-
+    List<CategoryResponse> search(String keyword);
 }

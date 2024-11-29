@@ -14,4 +14,5 @@ public interface ProductCollectionService {
     Optional<ProductCollectionResponse> update(String id, ProductCollectionRequest request);
     Optional<ProductCollectionResponse> findByName(String name);
     List<ProductCollectionResponse> findByBrand(String brandId);
+    List<ProductCollectionResponse> search(String keyword, String brandId);
 }
