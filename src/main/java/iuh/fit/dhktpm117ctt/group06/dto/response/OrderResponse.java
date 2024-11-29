@@ -18,4 +18,5 @@ public class OrderResponse {
     private PaymentMethod paymentMethod;
     private List<OrderDetailResponse> orderDetails;
     private UserResponse user;
+    private AddressResponse address;
 }

@@ -17,9 +17,9 @@ import org.springframework.format.annotation.DateTimeFormat;
 @Data
 @NoArgsConstructor
 public class OrderRequest {
+	@NotNull(message = "Total price must not be null")
     private double totalPrice;
-//    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    
+    @Nullable
     private LocalDateTime createdDate;
     @Nullable
     private OrderStatus orderStatus;
@@ -27,7 +27,9 @@ public class OrderRequest {
     private PaymentMethod paymentMethod;
     @NotNull(message = "Order details must not be null")
     private List<OrderDetailRequest> orderDetails;
-    @NotEmpty(message = "User id must not be null")
+    @NotNull(message = "User id must not be null")
     private String userId;
+    @NotNull(message = "Address id must not be null")
+    private String addressId;
     
 }

@@ -64,7 +64,6 @@ public class ProductItemServiceImpl implements ProductItemService {
 	@Transactional
 	@Override
 	public Optional<ProductItemResponse> update(String id, ProductItemRequest productItemRequest) {
-		System.out.println("API update được gọi lần đầu tiên: " + System.currentTimeMillis());
 		Optional<ProductItem> optionalProductItem = productItemRepository.findById(id);
 		if (optionalProductItem.isPresent()) {
 			ProductItem productItem = optionalProductItem.get();
@@ -73,31 +72,11 @@ public class ProductItemServiceImpl implements ProductItemService {
 			productItem.setColor(ProductColor.valueOf(productItemRequest.getColor()));
 			productItem.setSize(productItemRequest.getSize());
 
-			// Lấy danh sách hình ảnh cũ
-			List<String> oldImages = productItem.getListDetailImages();
-
-			// Xóa hình ảnh cũ nếu có
-			if (productItemRequest.getListImagesDelete() != null) {
-				productItemRequest.getListImagesDelete()
-						.stream()
-						.sorted((a, b) -> b - a) // Sắp xếp giảm dần
-						.forEach(index -> {
-							if (index >= 0 && index < oldImages.size()) {
-								try {
-									String imageToDelete = oldImages.get(index);
-									cloudinaryProvider.delete(extractPublicIdFromUrl(imageToDelete));
-									oldImages.remove(index.intValue());
-								} catch (Exception e) {
-									throw new AppException(ErrorCode.AVATAR_INVALID);
-								}
-							}
-						});
-			}
-
-
-			// Thêm hình ảnh mới
 			var files = productItemRequest.getListDetailImages();
-			if (files != null && files.length > 0) {
+
+			if (files == null || files.length <= 0) {
+				productItem.setListDetailImages(productItem.getListDetailImages());
+			} else {
 				List<MultipartFile> nonEmptyFiles = new ArrayList<>();
 				for (MultipartFile file : files) {
 					if (!file.isEmpty()) {
@@ -105,32 +84,30 @@ public class ProductItemServiceImpl implements ProductItemService {
 					}
 				}
 
-				if (!nonEmptyFiles.isEmpty()) {
-					try {
-						System.out.println("Non empty files: " + nonEmptyFiles.size());
-						List<Map> uploadResult = cloudinaryProvider.uploadFiles(nonEmptyFiles.toArray(new MultipartFile[0]),
-								"Product-Item", productItem.getProduct().getId());
-						for (Map map : uploadResult) {
-							String newImageUrl = map.get("url").toString();
-							// Chỉ thêm nếu không trùng lặp
-							if (!oldImages.contains(newImageUrl)) {
-								oldImages.add(newImageUrl);
-							}
-						}
-					} catch (Exception e) {
-						throw new AppException(ErrorCode.AVATAR_INVALID);
+				if (nonEmptyFiles.size() == 0) {
+					productItem.setListDetailImages(productItem.getListDetailImages());
+					return Optional.of(mapToProductItemResponse(productItemRepository.save(productItem)));
+				}
+
+				try {
+					List<Map> uploadResult = cloudinaryProvider.uploadFiles(nonEmptyFiles.toArray(new MultipartFile[0]),
+							"Product-Item", productItem.getId());
+					List<String> listDetailImages = new ArrayList<>();
+					for (Map map : uploadResult) {
+						listDetailImages.add(map.get("url").toString());
 					}
+					productItem.setListDetailImages(listDetailImages);
+					return Optional.of(mapToProductItemResponse(productItemRepository.save(productItem)));
+				} catch (Exception e) {
+					throw new AppException(ErrorCode.AVATAR_INVALID);
 				}
 			}
 
-			// Cập nhật danh sách hình ảnh và lưu sản phẩm
-			productItem.setListDetailImages(oldImages);
 			return Optional.of(mapToProductItemResponse(productItemRepository.save(productItem)));
 		}
-
 		return Optional.empty();
-	}
 
+	}
 
 	@Override
 	@Transactional
@@ -207,16 +184,6 @@ public class ProductItemServiceImpl implements ProductItemService {
 	@Override
 	public Page<ProductItem> listNewProductItems(Pageable pageable) {
 		return productItemRepository.listNewProductItems(pageable);
-	}
-
-	public String extractPublicIdFromUrl(String url) {
-		try {
-			String path = new java.net.URI(url).getPath();
-			// Extract publicId from path (after last "/" and before ".")
-			return path.substring(path.lastIndexOf("/") + 1, path.lastIndexOf("."));
-		} catch (Exception e) {
-			throw new AppException(ErrorCode.AVATAR_INVALID);
-		}
 	}
 
 }

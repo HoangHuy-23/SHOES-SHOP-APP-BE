@@ -83,7 +83,7 @@ public class AuthController {
             String refreshToken = jwtProvider.generateRefreshToken(account.getEmail(),savedUser.getRole().toString());
             session.setMaxInactiveInterval(60*60*24*7);
             session.setAttribute("REFRESH_TOKEN", refreshToken);
-            return ResponseEntity.ok(new AuthResponse(accessToken));
+            return ResponseEntity.ok(new AuthResponse(accessToken, savedUser.getId()));
         } else {
             throw new BadCredentialsException("Invalid User Request !");
         }
@@ -101,7 +101,7 @@ public class AuthController {
             String refreshToken = jwtProvider.generateRefreshToken(loginRequest.getEmail(),user.getRole().toString());
             session.setMaxInactiveInterval(60*60*24*7);
             session.setAttribute("REFRESH_TOKEN", refreshToken);
-            return ResponseEntity.ok(new AuthResponse(accessToken));
+            return ResponseEntity.ok(new AuthResponse(accessToken, user.getId()));
         } else {
             throw new RuntimeException("invalid user request !");
         }
@@ -120,7 +120,7 @@ public class AuthController {
         Optional<Account> account = accountRepository.findByEmail(jwtProvider.getEmailFromToken(refreshToken));
         User user = userRepository.getReferenceById(account.get().getUser().getId());
         String accessToken = jwtProvider.generateToken(account.get().getEmail(),user.getRole().name());
-        return ResponseEntity.ok(new AuthResponse(accessToken));
+        return ResponseEntity.ok(new AuthResponse(accessToken, user.getId()));
     }
 
     @PostMapping("/logout")

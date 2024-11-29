@@ -1,6 +1,7 @@
 package iuh.fit.dhktpm117ctt.group06.controller;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,12 +11,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import iuh.fit.dhktpm117ctt.group06.dto.request.CartDetailRequest;
@@ -26,6 +29,7 @@ import iuh.fit.dhktpm117ctt.group06.entities.CartDetail;
 import iuh.fit.dhktpm117ctt.group06.entities.CartDetailPK;
 import iuh.fit.dhktpm117ctt.group06.entities.Product;
 import iuh.fit.dhktpm117ctt.group06.entities.ProductItem;
+import iuh.fit.dhktpm117ctt.group06.entities.User;
 import iuh.fit.dhktpm117ctt.group06.service.CartDetailService;
 import iuh.fit.dhktpm117ctt.group06.service.CartService;
 import iuh.fit.dhktpm117ctt.group06.service.ProductItemService;
@@ -52,13 +56,13 @@ public class CartController {
 	private ProductService productService;
 
 	@PostMapping("/addToCart")
-	public ResponseEntity<?> addToCart(HttpSession httpSession, @RequestBody CartDetailRequest cartDetail) {
+	public ResponseEntity<?> addToCart(HttpSession httpSession, @RequestBody CartDetailRequest cartDetailRequest) {
 		Map<String, Object> response = new LinkedHashMap<>();
 
 		List<CartDetail> cartDetails = getCartFromSession(httpSession);
 
 		try {
-			handleCartDetail(cartDetails, cartDetail);
+			handleCartDetail(cartDetails, cartDetailRequest);
 		} catch (IllegalArgumentException e) {
 			// TODO: handle exception
 			response.put("status", HttpStatus.BAD_REQUEST.value());
@@ -68,14 +72,26 @@ public class CartController {
 		httpSession.setAttribute("cart", cartDetails);
 
 		syncCartWithDatabase(cartDetails);
+		
+		List<CartDetailResponse> cartDetailResponses = new ArrayList<>();
+
+		for (CartDetail cartDetail : cartDetails) {
+			Product product = productService.findById(cartDetail.getProductItem().getProduct().getId()).get();
+			cartDetailResponses.add(CartDetailResponse.builder().cartDetailPK(cartDetail.getCartDetailPK())
+					.productItem(cartDetail.getProductItem()).quantity(cartDetail.getQuantity())
+					.product(product).build());
+		}
 
 		response.put("status", HttpStatus.OK.value());
-		response.put("data", "Add to cart successfully");
+		response.put("data", cartDetailResponses);
 		return ResponseEntity.ok(response);
 	}
 
 	@PutMapping("/updateQuantity")
 	public ResponseEntity<?> updateQuantity(HttpSession session, @RequestBody CartDetailRequest cartDetailRequest) {
+		
+		System.out.println("updateQuantity: " + cartDetailRequest.toString());
+		
 		Map<String, Object> response = new LinkedHashMap();
 		List<CartDetail> cartDetails = (List<CartDetail>) session.getAttribute("cart");
 
@@ -85,7 +101,6 @@ public class CartController {
 			return ResponseEntity.badRequest().body(response);
 		}
 
-//		CartDetail cartDetailEntity = null;
 
 		Optional<ProductItem> productItemOptional = productItemService.findById(cartDetailRequest.getProductId());
 
@@ -99,7 +114,6 @@ public class CartController {
 
 		for (CartDetail cartDetail : cartDetails) {
 			if (cartDetail.getProductItem().getId().equals(cartDetailRequest.getProductId())) {
-//				int currentQty = cartDetail.getQuantity() + cartDetailRequest.getQuantity();
 				if (cartDetailRequest.getQuantity() > item.getQuantity()) {
 					response.put("status", HttpStatus.BAD_REQUEST.value());
 					response.put("data", "Quantity must be less than current quantity");
@@ -115,66 +129,108 @@ public class CartController {
 		// check user login
 		var context = SecurityContextHolder.getContext();
 		String emailString = context.getAuthentication().getName();
-		if (emailString != null) {
-			Cart cart = cartService.findCartByUser(userService.findByEmail(emailString).get().getId());
+		
+		
+		if (emailString != null || emailString.equalsIgnoreCase("anonymousUser") == false) {
+			
+			Optional<UserResponse> userOptional = userService.findByEmail(emailString);
+			
+			if (userOptional.isPresent()) {
+				Cart cart = cartService.findCartByUser(userOptional.get().getId());
 
-			// update cart detail in database
-			CartDetailPK cartDetailPK = new CartDetailPK(cart.getId(), cartDetailRequest.getProductId());
-			if (cartDetailService.findById(cartDetailPK).isPresent()) {
-				cartDetailService.updateQuantity(cartDetailPK, cartDetailRequest.getQuantity());
+				// update cart detail in database
+				CartDetailPK cartDetailPK = new CartDetailPK(cart.getId(), cartDetailRequest.getProductId());
+				if (cartDetailService.findById(cartDetailPK).isPresent()) {
+					cartDetailService.updateQuantity(cartDetailPK, cartDetailRequest.getQuantity());
+				}
 			}
+			
+			
 		}
-
-		response.put("status", HttpStatus.OK.value());
-		response.put("data", "Update quantity successfully");
-		return ResponseEntity.ok(response);
-	}
-
-	@PutMapping("/delete/{productId}")
-	public ResponseEntity<?> deleteCartDetail(HttpSession session, @PathVariable String productId) {
-		Map<String, Object> response = new LinkedHashMap();
-
-		Optional<ProductItem> optionalProductItem = productItemService.findById(productId);
-
-		if (optionalProductItem.isEmpty()) {
-			response.put("status", HttpStatus.BAD_REQUEST.value());
-			response.put("data", "Product not found");
-			return ResponseEntity.badRequest().body(response);
-		}
-
-		List<CartDetail> cartDetails = (List<CartDetail>) session.getAttribute("cart");
-
-		if (cartDetails == null || cartDetails.isEmpty()) {
-			response.put("status", HttpStatus.BAD_REQUEST.value());
-			response.put("data", "Cart is empty");
-			return ResponseEntity.badRequest().body(response);
-		}
+		
+		List<CartDetailResponse> cartDetailResponses = new ArrayList<>();
 
 		for (CartDetail cartDetail : cartDetails) {
-			if (cartDetail.getProductItem().getId().equals(productId)) {
-				cartDetails.remove(cartDetail);
-				break;
-			}
+			Product product = productService.findById(cartDetail.getProductItem().getProduct().getId()).get();
+			cartDetailResponses.add(CartDetailResponse.builder().cartDetailPK(cartDetail.getCartDetailPK())
+					.productItem(cartDetail.getProductItem()).quantity(cartDetail.getQuantity())
+					.product(product).build());
 		}
-
-		session.setAttribute("cart", cartDetails);
-
-		// check user login
-		var context = SecurityContextHolder.getContext();
-		String emailString = context.getAuthentication().getName();
-		if (emailString != null) {
-			Cart cart = cartService.findCartByUser(userService.findByEmail(emailString).get().getId());
-
-			// delete cart detail in database
-			CartDetailPK cartDetailPK = new CartDetailPK(cart.getId(), productId);
-			cartDetailService.deleteById(cartDetailPK);
-		}
+		
 
 		response.put("status", HttpStatus.OK.value());
-		response.put("data", "Delete cart detail successfully");
+		response.put("data", cartDetailResponses);
 		return ResponseEntity.ok(response);
 	}
 
+	@GetMapping("/delete")
+	public ResponseEntity<?> deleteCartDetail(@RequestParam String productId, HttpSession session) {
+	    Map<String, Object> response = new LinkedHashMap<>();
+
+	    Optional<ProductItem> optionalProductItem = productItemService.findById(productId);
+
+	    if (optionalProductItem.isEmpty()) {
+	        response.put("status", HttpStatus.BAD_REQUEST.value());
+	        response.put("data", "Product not found");
+	        return ResponseEntity.badRequest().body(response);
+	    }
+
+	    List<CartDetail> cartDetails = (List<CartDetail>) session.getAttribute("cart");
+
+	    if (cartDetails == null || cartDetails.isEmpty()) {
+	        response.put("status", HttpStatus.BAD_REQUEST.value());
+	        response.put("data", "Cart is empty");
+	        return ResponseEntity.badRequest().body(response);
+	    }
+
+	    
+	    Iterator<CartDetail> iterator = cartDetails.iterator();
+	    while (iterator.hasNext()) {
+	        CartDetail cartDetail = iterator.next();
+	        if (cartDetail.getProductItem().getId().equals(productId)) {
+	            iterator.remove();
+	            break;
+	        }
+	    }
+
+	   
+	    if (cartDetails.isEmpty()) {
+	        session.removeAttribute("cart"); 
+	    } else {
+	        session.setAttribute("cart", cartDetails);
+	    }
+
+	    
+	    var context = SecurityContextHolder.getContext();
+	    String emailString = context.getAuthentication().getName();
+	    if (emailString != null) {
+	        Optional<UserResponse> optionalUser = userService.findByEmail(emailString);
+	        if (optionalUser.isPresent()) {
+	            UserResponse user = optionalUser.get();
+	            Cart cart = cartService.findCartByUser(user.getId());
+
+	           
+	            CartDetailPK cartDetailPK = new CartDetailPK(cart.getId(), productId);
+	            cartDetailService.deleteById(cartDetailPK);
+	        }
+	    }
+
+	    
+	    List<CartDetailResponse> cartDetailResponses = new ArrayList<>();
+	    for (CartDetail cartDetail : cartDetails) {
+	        Product product = productService.findById(cartDetail.getProductItem().getProduct().getId()).get();
+	        cartDetailResponses.add(CartDetailResponse.builder()
+	                .cartDetailPK(cartDetail.getCartDetailPK())
+	                .productItem(cartDetail.getProductItem())
+	                .quantity(cartDetail.getQuantity())
+	                .product(product)
+	                .build());
+	    }
+
+	    response.put("status", HttpStatus.OK.value());
+	    response.put("data", cartDetailResponses);
+	    return ResponseEntity.ok(response);
+	}
 	@GetMapping
 	public ResponseEntity<?> viewCart(HttpSession session) {
 		Map<String, Object> response = new LinkedHashMap();
