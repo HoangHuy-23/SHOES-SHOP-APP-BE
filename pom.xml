@@ -118,6 +118,13 @@
 			<groupId>org.springframework.session</groupId>
 			<artifactId>spring-session-jdbc</artifactId>
 		</dependency>
+
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.5.12</version> <!-- Phiên bản mới nhất -->
+        </dependency>
+
     </dependencies>
 
     <build>

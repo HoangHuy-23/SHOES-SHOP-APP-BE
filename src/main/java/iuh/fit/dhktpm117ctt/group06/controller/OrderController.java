@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import iuh.fit.dhktpm117ctt.group06.dto.response.AccountResponse;
+import iuh.fit.dhktpm117ctt.group06.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,10 +17,6 @@ import iuh.fit.dhktpm117ctt.group06.dto.request.OrderDetailRequest;
 import iuh.fit.dhktpm117ctt.group06.dto.request.OrderRequest;
 import iuh.fit.dhktpm117ctt.group06.dto.response.OrderResponse;
 import iuh.fit.dhktpm117ctt.group06.entities.CartDetail;
-import iuh.fit.dhktpm117ctt.group06.service.OrderDetailService;
-import iuh.fit.dhktpm117ctt.group06.service.OrderService;
-import iuh.fit.dhktpm117ctt.group06.service.ProductItemService;
-import iuh.fit.dhktpm117ctt.group06.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
@@ -37,6 +35,12 @@ public class OrderController {
 
 	@Autowired
 	private UserService userService;
+
+	@Autowired
+	private MailSenderService mailSenderService;
+
+	@Autowired
+	private AccountService accountService;
 
 	@GetMapping
 	public ResponseEntity<?> getAllOrders() {
@@ -108,6 +112,12 @@ public class OrderController {
 			});
 
 			httpSession.setAttribute("cart", cartDetails);
+		}
+
+		// send mail
+		Optional<AccountResponse> accountResponse = accountService.findByUser(orderRequest.getUserId());
+		if (accountResponse.isPresent()) {
+			mailSenderService.sendMail(accountResponse.get().getEmail(), "Order confirmation", "Your order has been confirmed");
 		}
 
 		response.put("status", HttpStatus.OK);
