@@ -319,9 +319,11 @@ public class ProductItemController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<?> search(@RequestParam(defaultValue = "0.0") double minPrice,
-                                    @RequestParam(defaultValue = "0.0") String maxPrice, @RequestParam(defaultValue = "") String color,
-                                    @RequestParam(defaultValue = "") String size, @RequestParam(defaultValue = "") String productName) {
+    public ResponseEntity<?> search(@RequestParam(required = false, defaultValue = "") String color,
+                                    @RequestParam(required = false, defaultValue = "") String size,
+                                    @RequestParam(defaultValue = "0") double minPrice,
+                                    @RequestParam(defaultValue = "0.0") String maxPrice,
+                                    @RequestParam(required = false, defaultValue = "") String productName) {
         Map<String, Object> response = new LinkedHashMap<>();
         double maxPriceDouble = maxPrice.equals("0.0") ? Double.MAX_VALUE : Double.parseDouble(maxPrice);
         ProductColor colorEnum = color.isEmpty() ? null : ProductColor.valueOf(color);

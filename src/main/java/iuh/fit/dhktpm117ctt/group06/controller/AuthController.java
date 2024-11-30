@@ -16,6 +16,7 @@ import iuh.fit.dhktpm117ctt.group06.jwt.JwtProvider;
 import iuh.fit.dhktpm117ctt.group06.repository.AccountRepository;
 import iuh.fit.dhktpm117ctt.group06.repository.UserRepository;
 import iuh.fit.dhktpm117ctt.group06.dto.request.LoginRequest;
+import iuh.fit.dhktpm117ctt.group06.service.MailSenderService;
 import iuh.fit.dhktpm117ctt.group06.service.impl.AuthServiceImpl;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -48,6 +49,8 @@ public class AuthController {
     private AuthServiceImpl authService;
     @Autowired
     private AccountRepository accountRepository;
+    @Autowired
+    MailSenderService mailSenderService;
     
 
 
@@ -83,6 +86,7 @@ public class AuthController {
             String refreshToken = jwtProvider.generateRefreshToken(account.getEmail(),savedUser.getRole().toString());
             session.setMaxInactiveInterval(60*60*24*7);
             session.setAttribute("REFRESH_TOKEN", refreshToken);
+            mailSenderService.sendMail(savedAccount.getEmail(),"Welcome to our website","Thank you for signing up with us");
             return ResponseEntity.ok(new AuthResponse(accessToken, savedUser.getId()));
         } else {
             throw new BadCredentialsException("Invalid User Request !");

@@ -28,7 +28,7 @@ public class UserController {
 
     @GetMapping("/send-mail")
     public ResponseEntity<?> sendMail() {
-        mailSenderService.sendMail("ng.hoang.huy23@gmail.com", "Hello", "Test");
+        mailSenderService.sendMail("lethanhan20039@gmail.com", "Hello", "Test");
         return ResponseEntity.ok().build();
     }
 
