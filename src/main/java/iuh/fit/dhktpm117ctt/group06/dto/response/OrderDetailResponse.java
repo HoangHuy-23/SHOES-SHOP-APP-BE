@@ -2,6 +2,7 @@ package iuh.fit.dhktpm117ctt.group06.dto.response;
 
 import iuh.fit.dhktpm117ctt.group06.entities.ProductItem;
 import jakarta.annotation.Nullable;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
