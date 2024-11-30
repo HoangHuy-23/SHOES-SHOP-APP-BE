@@ -98,7 +98,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-//    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public void deleteById(String id) {
         if (!userRepository.checkUserNotOrder(id)) {
             throw new AppException(ErrorCode.USER_EXISTED_IN_ORDER);
@@ -111,7 +111,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @PreAuthorize("hasRole('ROLE_CUSTOMER')")
+    @PreAuthorize("hasRole('ROLE_CUSTOMER') or hasRole('ROLE_ADMIN')")
     public Optional<UserResponse> updateInfo(String id, UserRequest userRequest) {
         System.out.println("Update user info");
         User userUpdate = userRepository.findById(id).orElse(null);

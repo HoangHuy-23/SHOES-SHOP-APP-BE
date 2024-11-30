@@ -150,7 +150,7 @@ public class ProductItemController {
 	public ResponseEntity<?> deleteProductItem(@PathVariable String id) {
 		Map<String, Object> response = new LinkedHashMap<>();
 		try {
-			productItemService.findById(id);
+			productItemService.deleteById(id);
 		} catch (Exception e) {
 			// TODO: handle exception
 			response.put("status", HttpStatus.BAD_REQUEST.value());

@@ -5,6 +5,7 @@ import iuh.fit.dhktpm117ctt.group06.jwt.JwtValidator;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -41,8 +42,44 @@ public class SecurityConfig {
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .authorizeHttpRequests(authorize ->
                         authorize
-                                .requestMatchers("/api/**").permitAll()
-                        .requestMatchers("/api/admin/**").hasAnyRole("ADMIN"))
+
+                                .requestMatchers("/**").permitAll()
+                                .requestMatchers( "/api/auth/**").permitAll()
+                        .requestMatchers(HttpMethod.PUT,"/api/categories/**").hasAnyRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE,"/api/categories/**").hasAnyRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST,"/api/categories/**").hasAnyRole("ADMIN")
+//                        .requestMatchers(HttpMethod.GET,"/api/categories/**").permitAll()
+//                        .requestMatchers(HttpMethod.GET,"/api/products/**").permitAll()
+                        .requestMatchers(HttpMethod.POST,"/api/products/**").hasAnyRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT,"/api/products/**").hasAnyRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE,"/api/products/**").hasAnyRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET,"/api/users/**").hasAnyRole("ADMIN", "CUSTOMER")
+                        .requestMatchers(HttpMethod.POST,"/api/users/**").hasAnyRole("ADMIN", "CUSTOMER")
+                        .requestMatchers(HttpMethod.PUT,"/api/users/**").hasAnyRole("ADMIN", "CUSTOMER")
+                        .requestMatchers(HttpMethod.DELETE,"/api/users/**").hasAnyRole("ADMIN", "CUSTOMER")
+//                        .requestMatchers(HttpMethod.GET,"/api/posts/**").permitAll()
+                        .requestMatchers(HttpMethod.POST,"/api/posts/**").hasAnyRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT,"/api/posts/**").hasAnyRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE,"/api/posts/**").hasAnyRole("ADMIN")
+//                        .requestMatchers(HttpMethod.GET,"/api/collections/**").permitAll()
+                        .requestMatchers(HttpMethod.POST,"/api/collections/**").hasAnyRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT,"/api/collections/**").hasAnyRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE,"/api/collections/**").hasAnyRole("ADMIN")
+//                        .requestMatchers(HttpMethod.GET,"/api/orders/**").permitAll()
+                        .requestMatchers(HttpMethod.POST,"/api/orders/**").hasAnyRole("ADMIN", "CUSTOMER")
+                        .requestMatchers(HttpMethod.PUT,"/api/orders/**").hasAnyRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE,"/api/orders/**").hasAnyRole("ADMIN")
+//                        .requestMatchers(HttpMethod.GET,"/api/brands/**").permitAll()
+                        .requestMatchers(HttpMethod.POST,"/api/brands/**").hasAnyRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT,"/api/brands/**").hasAnyRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE,"/api/brands/**").hasAnyRole("ADMIN")
+//                                .requestMatchers(HttpMethod.GET,"/api/product-items/**").permitAll()
+                                .requestMatchers(HttpMethod.POST,"/api/product-items/**").hasAnyRole("ADMIN")
+                                .requestMatchers(HttpMethod.PUT,"/api/product-items/**").hasAnyRole("ADMIN")
+                                .requestMatchers(HttpMethod.DELETE,"/api/product-items/**").hasAnyRole("ADMIN")
+//                                .requestMatchers(HttpMethod.GET,"/api/cart/**").permitAll()
+                )
+
 //                        .requestMatchers("/api/user/**").authenticated().permitAll()
 
                 .addFilterBefore(new JwtValidator(), BasicAuthenticationFilter.class)

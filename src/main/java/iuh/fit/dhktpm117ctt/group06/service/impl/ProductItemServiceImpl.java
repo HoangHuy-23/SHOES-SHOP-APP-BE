@@ -42,7 +42,7 @@ public class ProductItemServiceImpl implements ProductItemService {
 
 	@Transactional
 	@Override
-	@PreAuthorize("hasRole('ADMIN')")
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public Optional<ProductItemResponse> save(ProductItemRequest productItemRequest) {
 		ProductItem productItem = mapToProductItem(productItemRequest);
 		if (productItemRequest.getListDetailImages() != null) {
@@ -65,7 +65,7 @@ public class ProductItemServiceImpl implements ProductItemService {
 
 	@Transactional
 	@Override
-	@PreAuthorize("hasRole('ADMIN')")
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public Optional<ProductItemResponse> update(String id, ProductItemRequest productItemRequest) {
 		Optional<ProductItem> optionalProductItem = productItemRepository.findById(id);
 		if (optionalProductItem.isPresent()) {
@@ -114,7 +114,7 @@ public class ProductItemServiceImpl implements ProductItemService {
 
 	@Override
 	@Transactional
-	@PreAuthorize("hasRole('ADMIN')")
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public Optional<ProductItem> updateQuantity(String id, int quantity) {
 		Optional<ProductItem> optionalProductItem = productItemRepository.findById(id);
 		if (optionalProductItem.isPresent()) {
@@ -133,10 +133,10 @@ public class ProductItemServiceImpl implements ProductItemService {
 
 	@Transactional
 	@Override
-	@PreAuthorize("hasRole('ADMIN')")
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public void deleteById(String productItemId) {
 
-		if (productItemRepository.exexistedByOrders(productItemId).size() > 0) {
+		if (!productItemRepository.exexistedByOrders(productItemId).isEmpty()) {
 			throw new AppException(ErrorCode.PRODUCT_ITEM_EXISTED_IN_ORDER_DETAILS);
 		}
 

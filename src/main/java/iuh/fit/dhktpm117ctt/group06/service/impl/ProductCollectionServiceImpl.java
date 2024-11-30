@@ -40,7 +40,7 @@ public class ProductCollectionServiceImpl implements ProductCollectionService {
     }
 
     @Override
-//    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public Optional<ProductCollectionResponse> save(ProductCollectionRequest request) {
         ProductCollection productCollection = new ProductCollection();
         productCollection.setName(request.getName());
@@ -55,7 +55,7 @@ public class ProductCollectionServiceImpl implements ProductCollectionService {
     }
 
     @Override
-//    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public void deleteById(String id) {
         if (!productRepository.checkCollectionNotProduct(id)) {
             throw new RuntimeException("Collection has product");
@@ -64,7 +64,7 @@ public class ProductCollectionServiceImpl implements ProductCollectionService {
     }
 
     @Override
-//    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public Optional<ProductCollectionResponse> update(String id, ProductCollectionRequest request) {
         Optional<ProductCollection> productCollection = productCollectionRepository.findById(id);
         if (productCollection.isPresent()) {

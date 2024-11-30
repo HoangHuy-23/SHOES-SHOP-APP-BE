@@ -35,13 +35,13 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-//    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public Optional<CategoryResponse> save(CategoryRequest categoryRequest) {
         return Optional.of(mapToCategoryResponse(categoryRepository.save(mapToCategory(categoryRequest))));
     }
 
     @Override
-//    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public Optional<CategoryResponse> update(String id, CategoryRequest categoryRequest) {
         Category category = categoryRepository.getReferenceById(id);
         Category updatedCategory = mapToCategory(categoryRequest);
@@ -56,7 +56,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-//    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public void deleteById(String id) {
         if  (!categoryRepository.checkCategoryNotProduct(id)) {
             throw new RuntimeException("Category has product");

@@ -22,6 +22,7 @@ public class Account implements Serializable{
 	@Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
+    @Column(unique = true)
     private String email;
     private String password;
     @OneToOne

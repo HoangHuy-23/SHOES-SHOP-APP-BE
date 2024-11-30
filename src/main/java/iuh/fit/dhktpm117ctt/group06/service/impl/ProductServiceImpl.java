@@ -8,6 +8,7 @@ import iuh.fit.dhktpm117ctt.group06.entities.ProductItem;
 import iuh.fit.dhktpm117ctt.group06.entities.enums.ProductColor;
 import iuh.fit.dhktpm117ctt.group06.exception.AppException;
 import iuh.fit.dhktpm117ctt.group06.exception.ErrorCode;
+import iuh.fit.dhktpm117ctt.group06.repository.ProductItemRepository;
 import iuh.fit.dhktpm117ctt.group06.repository.ProductRepository;
 import iuh.fit.dhktpm117ctt.group06.service.ProductService;
 import org.modelmapper.ModelMapper;
@@ -30,6 +31,8 @@ public class ProductServiceImpl implements ProductService {
 
 	@Autowired
     private ProductRepository productRepository;
+    @Autowired
+    private ProductItemRepository productItemRepository;
     private ModelMapper modelMapper = new ModelMapper();
     @Autowired
     private CloudinaryProvider cloudinaryProvider;
@@ -45,7 +48,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Transactional
     @Override
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public Optional<ProductResponse> addProduct(ProductRequest productRequest) {
         Product product = mapToProduct(productRequest);
         product.setCreatedDate(LocalDateTime.now());
@@ -54,7 +57,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Transactional
     @Override
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public Optional<ProductResponse> updateProduct(String productId, ProductRequest productRequest) {
         Optional<Product> product = productRepository.findById(productId);
         if (product.isPresent()) {
@@ -67,8 +70,11 @@ public class ProductServiceImpl implements ProductService {
 
     @Transactional
     @Override
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public void deleteById(String productId) {
+        if (!productItemRepository.checkProductNotItem(productId)) {
+            throw new RuntimeException("Product has item");
+        }
         productRepository.deleteById(productId);
     }
 

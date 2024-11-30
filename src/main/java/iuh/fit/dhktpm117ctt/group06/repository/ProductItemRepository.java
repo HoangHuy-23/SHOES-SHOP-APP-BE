@@ -38,4 +38,7 @@ public interface ProductItemRepository extends JpaRepository<ProductItem, String
     
     @Query("SELECT p FROM ProductItem p WHERE p.product.id = ?1 and p.color = ?2 and p.size = ?3")
     Optional<ProductItem> findByProductAndSizeAndColor(String productId, ProductColor color, String size );
+
+    @Query("SELECT CASE WHEN COUNT(p) = 0 THEN true ELSE false END FROM ProductItem p WHERE p.product.id = ?1")
+    Boolean checkProductNotItem(String id);
 }

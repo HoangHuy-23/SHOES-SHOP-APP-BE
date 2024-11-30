@@ -47,7 +47,7 @@ public class BrandServiceImpl implements BrandService {
     }
 
     @Override
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public Optional<BrandResponse> save(BrandRequest brandRequest) {
         if (brandRequest.getAvatar() == null) {
             return Optional.empty();
@@ -65,7 +65,7 @@ public class BrandServiceImpl implements BrandService {
     }
 
     @Override
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public Optional<BrandResponse> update(String id,BrandRequest brandRequest) {
         Optional<Brand> brand = brandRepository.findById(id);
 
@@ -98,7 +98,7 @@ public class BrandServiceImpl implements BrandService {
 
 
     @Override
-//    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public void deleteById(String id) {
         if (!brandRepository.checkBrandNotProduct(id)) {
             throw new AppException(ErrorCode.BRAND_HAS_PRODUCT);
