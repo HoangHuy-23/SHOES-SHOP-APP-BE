@@ -55,6 +55,11 @@ public class UserController {
         userService.deleteById(id);
         return ResponseEntity.ok().build();
     }
+    
+    @GetMapping("/search")
+    public ResponseEntity<?> search(@RequestParam String keyword) {
+        return ResponseEntity.ok(userService.search(keyword));
+    }
 
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> updateById(@PathVariable String id, @Valid @ModelAttribute UserRequest userRequest, BindingResult bindingResult) {
@@ -95,6 +100,8 @@ public class UserController {
             ),
             security = @SecurityRequirement(name = "bearer-jwt")
     )
+
+
     public ResponseEntity<?> updateAvatar(@PathVariable String id, @RequestParam("avatar") MultipartFile avatar) {
         if (avatar.isEmpty()) {
             return ResponseEntity.badRequest().body("No file uploaded");

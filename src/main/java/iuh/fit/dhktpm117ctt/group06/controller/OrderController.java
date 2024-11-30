@@ -5,26 +5,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import iuh.fit.dhktpm117ctt.group06.dto.response.AccountResponse;
+import iuh.fit.dhktpm117ctt.group06.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import iuh.fit.dhktpm117ctt.group06.dto.request.OrderDetailRequest;
 import iuh.fit.dhktpm117ctt.group06.dto.request.OrderRequest;
 import iuh.fit.dhktpm117ctt.group06.dto.response.OrderResponse;
 import iuh.fit.dhktpm117ctt.group06.entities.CartDetail;
-import iuh.fit.dhktpm117ctt.group06.service.OrderDetailService;
-import iuh.fit.dhktpm117ctt.group06.service.OrderService;
-import iuh.fit.dhktpm117ctt.group06.service.ProductItemService;
-import iuh.fit.dhktpm117ctt.group06.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
@@ -44,11 +36,34 @@ public class OrderController {
 	@Autowired
 	private UserService userService;
 
+	@Autowired
+	private MailSenderService mailSenderService;
+
+	@Autowired
+	private AccountService accountService;
+
 	@GetMapping
 	public ResponseEntity<?> getAllOrders() {
 		Map<String, Object> response = new LinkedHashMap<>();
 
 		List<OrderResponse> orders = orderService.findAll();
+
+		if (orders.isEmpty()) {
+			response.put("status", HttpStatus.NOT_FOUND);
+			response.put("data", "Order not found");
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+		}
+
+		response.put("status", HttpStatus.OK);
+		response.put("data", orders);
+		return ResponseEntity.ok(response);
+	}
+
+	@GetMapping("/search")
+	public ResponseEntity<?> searchOrder(@RequestParam String keyword) {
+		Map<String, Object> response = new LinkedHashMap<>();
+
+		List<OrderResponse> orders = orderService.searchOrders(keyword);
 
 		if (orders.isEmpty()) {
 			response.put("status", HttpStatus.NOT_FOUND);
@@ -97,6 +112,12 @@ public class OrderController {
 			});
 
 			httpSession.setAttribute("cart", cartDetails);
+		}
+
+		// send mail
+		Optional<AccountResponse> accountResponse = accountService.findByUser(orderRequest.getUserId());
+		if (accountResponse.isPresent()) {
+			mailSenderService.sendMail(accountResponse.get().getEmail(), "Order confirmation", "Your order has been confirmed");
 		}
 
 		response.put("status", HttpStatus.OK);

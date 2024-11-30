@@ -38,4 +38,7 @@ public interface ProductItemRepository extends JpaRepository<ProductItem, String
     
     @Query("SELECT p FROM ProductItem p WHERE p.product.id = ?1 and p.color = ?2 and p.size = ?3")
     Optional<ProductItem> findByProductAndSizeAndColor(String productId, ProductColor color, String size );
+
+    @Query("SELECT p FROM ProductItem p WHERE p.color = ?1 OR p.size = ?2 OR p.price BETWEEN ?3 AND ?4 OR p.product.name LIKE %?5%")
+    List<ProductItem> searchProductItemsByColorOrAndSizeOrPriceBetweenOrProductName(ProductColor color, String size, double minPrice, double maxPrice, String productName);
 }

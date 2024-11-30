@@ -186,9 +186,16 @@ public class ProductItemServiceImpl implements ProductItemService {
 		return productItemRepository.findByProductAndSizeAndColor(productId, color, size);
 	}
 
+
 	@Override
 	public Page<ProductItem> listNewProductItems(Pageable pageable) {
 		return productItemRepository.listNewProductItems(pageable);
 	}
 
+
+
+	@Override
+	public List<ProductItem> searchProductItemsByColorOrAndSizeOrPriceBetweenOrProductName(ProductColor color, String size, double minPrice, double maxPrice, String productName) {
+		return productItemRepository.searchProductItemsByColorOrAndSizeOrPriceBetweenOrProductName(color, size, minPrice, maxPrice, productName);
+	}
 }
