@@ -190,7 +190,10 @@ public class ProductItemServiceImpl implements ProductItemService {
 	public Optional<ProductItem> findByProductAndSizeAndColor(String productId, String size, ProductColor color) {
 		return productItemRepository.findByProductAndSizeAndColor(productId, color, size);
 	}
-	
-	
 
+
+	@Override
+	public List<ProductItem> searchProductItemsByColorOrAndSizeOrPriceBetweenOrProductName(ProductColor color, String size, double minPrice, double maxPrice, String productName) {
+		return productItemRepository.searchProductItemsByColorOrAndSizeOrPriceBetweenOrProductName(color, size, minPrice, maxPrice, productName);
+	}
 }

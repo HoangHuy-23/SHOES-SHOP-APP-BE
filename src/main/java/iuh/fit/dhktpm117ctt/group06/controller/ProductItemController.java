@@ -39,353 +39,321 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/api/product-items")
 public class ProductItemController {
-	@Autowired
-	private ProductItemService productItemService;
-
-	@Autowired
-	private ProductService productService;
-
-	@GetMapping("getListProductItems/{productId}")
-	public ResponseEntity<?> getAllProductItems(@PathVariable String productId) {
-		Map<String, Object> response = new LinkedHashMap();
-		response.put("status", HttpStatus.OK.value());
-		response.put("data", productItemService.findByProduct(productId));
-		return ResponseEntity.status(HttpStatus.OK).body(response);
-	}
-
-	@GetMapping("/{id}")
-	public ResponseEntity<?> getProductItemById(@PathVariable String id, HttpSession httpSession) {
-		Map<String, Object> response = new LinkedHashMap<>();
-
-		Optional<ProductItem> productItemOptional = productItemService.findById(id);
-
-		if (productItemOptional.isEmpty()) {
-			response.put("status", HttpStatus.NOT_FOUND.value());
-			response.put("data", "Product item not found");
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-		}
-
-		ProductItem productItem = productItemOptional.get();
-
-		saveProductToSession(httpSession, productItem);
-
-		// Build the response DTO
-
-		Product product = productItem.getProduct();
-
-		List<ProductColor> colors = productService.getListColors(product.getId());
-		List<String> sizes = productService.getListSizes(product.getId());
-
-		ProductResponse productResponse = productService.getProductById(product.getId());
-
-		productResponse.setColors(colors);
-		productResponse.setSizes(sizes);
-
-		ProductItemResponse itemResponse = ProductItemResponse.builder().id(productItem.getId())
-				.price(productItem.getPrice()).quantity(productItem.getQuantity())
-				.listDetailImages(productItem.getListDetailImages()).color(productItem.getColor().toString())
-				.size(productItem.getSize()).product(productResponse).status(productItem.getStatus().name()).build();
-
-		response.put("status", HttpStatus.OK.value());
-		response.put("data", itemResponse);
-
-		return ResponseEntity.status(HttpStatus.OK).body(response);
-	}
-
-	@PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseEntity<?> addNewProductItem(@Valid @ModelAttribute ProductItemRequest productItemRequest,
-			BindingResult bindingResult) {
-		Map<String, Object> response = new LinkedHashMap<>();
-
-		if (bindingResult.hasErrors()) {
-			Map<String, String> errors = new LinkedHashMap<>();
-			bindingResult.getFieldErrors().forEach(error -> {
-				errors.put(error.getField(), error.getDefaultMessage());
-			});
-			response.put("status", HttpStatus.BAD_REQUEST.value());
-			response.put("errors", errors);
-		}
-
-		Optional<ProductItemResponse> productItemResponse = productItemService.save(productItemRequest);
-
-		if (productItemResponse.isEmpty()) {
-			response.put("status", HttpStatus.BAD_REQUEST.value());
-			response.put("data", ErrorCode.UNCATEGORIZED_EXCEPTION.getMessage());
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-		}
-
-		response.put("status", HttpStatus.OK.value());
-		response.put("data", productItemResponse.get());
-		return ResponseEntity.status(HttpStatus.OK).body(response);
-	}
-
-	@PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseEntity<?> updateProductItem(@PathVariable String id,
-			@Valid @ModelAttribute ProductItemRequest productItemRequest, BindingResult bindingResult) {
-		Map<String, Object> response = new LinkedHashMap<>();
-
-		if (bindingResult.hasErrors()) {
-			Map<String, String> errors = new LinkedHashMap<>();
-			bindingResult.getFieldErrors().forEach(error -> {
-				errors.put(error.getField(), error.getDefaultMessage());
-			});
-			response.put("status", HttpStatus.BAD_REQUEST.value());
-			response.put("errors", errors);
-		}
-
-		Optional<ProductItemResponse> productItemResponse = productItemService.update(id, productItemRequest);
-
-		if (productItemResponse.isEmpty()) {
-			response.put("status", HttpStatus.BAD_REQUEST.value());
-			response.put("data", ErrorCode.UNCATEGORIZED_EXCEPTION.getMessage());
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-		}
-
-		response.put("status", HttpStatus.OK.value());
-		response.put("data", productItemService.update(id, productItemRequest));
-		return ResponseEntity.status(HttpStatus.OK).body(response);
-	}
-
-	@DeleteMapping("/{id}")
-	public ResponseEntity<?> deleteProductItem(@PathVariable String id) {
-		Map<String, Object> response = new LinkedHashMap<>();
-		try {
-			productItemService.findById(id);
-		} catch (Exception e) {
-			// TODO: handle exception
-			response.put("status", HttpStatus.BAD_REQUEST.value());
-			response.put("data", ErrorCode.PRODUCT_ITEM_EXISTED_IN_ORDER_DETAILS.getMessage());
-
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-		}
-		response.put("status", HttpStatus.OK.value());
-		response.put("data", "Product item deleted");
-		return ResponseEntity.status(HttpStatus.OK).body(response);
-	}
-
-	@GetMapping("/recent")
-	public ResponseEntity<?> getRecentProducts(HttpSession httpSession) {
-		Map<String, Object> response = new LinkedHashMap<>();
-		List<ProductItem> products = (List<ProductItem>) httpSession.getAttribute("recentProducts");
-		if (products == null) {
-			response.put("status", HttpStatus.NOT_FOUND.value());
-			response.put("data", "No recent products");
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-		}
-
-		List<ProductItemResponse> productItemResponses = new ArrayList<>();
-
-		for (ProductItem productItem : products) {
-			Product product = productItem.getProduct();
-
-			List<ProductColor> colors = productService.getListColors(product.getId());
-			List<String> sizes = productService.getListSizes(product.getId());
-
-			ProductResponse productResponse = productService.getProductById(product.getId());
-
-			productResponse.setColors(colors);
-			productResponse.setSizes(sizes);
-
-			ProductItemResponse itemResponse = ProductItemResponse.builder().id(productItem.getId())
-					.price(productItem.getPrice()).quantity(productItem.getQuantity())
-					.listDetailImages(productItem.getListDetailImages()).color(productItem.getColor().toString())
-					.size(productItem.getSize()).product(productResponse).status(productItem.getStatus().name())
-					.build();
-
-			productItemResponses.add(itemResponse);
-		}
-
-		response.put("status", HttpStatus.OK.value());
-		response.put("data", productItemResponses);
-		return ResponseEntity.status(HttpStatus.OK).body(response);
-	}
-
-	@GetMapping("/top-sale")
-	public ResponseEntity<?> getTopSaleProductItems(@RequestParam(defaultValue = "0") int page,
-			@RequestParam(defaultValue = "9") int size) {
-		Map<String, Object> response = new LinkedHashMap<>();
-		Pageable pageable = PageRequest.of(page, size);
-		Page<ProductItem> pageObject = productItemService.listTopSaleProductItems(pageable);
-		List<ProductItem> productItems = pageObject.getContent();
-
-		List<ProductItemResponse> productItemResponses = new ArrayList<>();
-
-		for (ProductItem productItem : productItems) {
-			Product product = productItem.getProduct();
-
-			List<ProductColor> colors = productService.getListColors(product.getId());
-			List<String> sizes = productService.getListSizes(product.getId());
-
-			ProductResponse productResponse = productService.getProductById(product.getId());
-
-			productResponse.setColors(colors);
-			productResponse.setSizes(sizes);
-
-			ProductItemResponse itemResponse = ProductItemResponse.builder().id(productItem.getId())
-					.price(productItem.getPrice()).quantity(productItem.getQuantity())
-					.listDetailImages(productItem.getListDetailImages()).color(productItem.getColor().toString())
-					.size(productItem.getSize()).product(productResponse).status(productItem.getStatus().name())
-					.build();
-
-			productItemResponses.add(itemResponse);
-		}
-
-		ListProductItemsPagegination listProductItemsPagegination = ListProductItemsPagegination.builder()
-				.currentPage(pageObject.getPageable().getPageNumber()).totalPage(pageObject.getTotalPages())
-				.totalItems(pageObject.getTotalElements()).pageSize(pageable.getPageSize()).data(productItemResponses)
-				.build();
-
-		response.put("status", HttpStatus.OK.value());
-		response.put("data", listProductItemsPagegination);
-		return ResponseEntity.status(HttpStatus.OK).body(response);
-	}
-
-	@GetMapping("/new")
-	public ResponseEntity<?> getNewProductItems(@RequestParam(defaultValue = "0") int page,
-			@RequestParam(defaultValue = "9") int size) {
-		Map<String, Object> response = new LinkedHashMap<>();
-		Pageable pageable = PageRequest.of(page, size);
-		Page<ProductItem> pageObject = productItemService.listNewProductItems(pageable);
-		List<ProductItem> productItems = pageObject.getContent();
-
-		List<ProductItemResponse> productItemResponses = new ArrayList<>();
-
-		for (ProductItem productItem : productItems) {
-			Product product = productItem.getProduct();
-
-			List<ProductColor> colors = productService.getListColors(product.getId());
-			List<String> sizes = productService.getListSizes(product.getId());
-
-			ProductResponse productResponse = productService.getProductById(product.getId());
-
-			productResponse.setColors(colors);
-			productResponse.setSizes(sizes);
-
-			ProductItemResponse itemResponse = ProductItemResponse.builder().id(productItem.getId())
-					.price(productItem.getPrice()).quantity(productItem.getQuantity())
-					.listDetailImages(productItem.getListDetailImages()).color(productItem.getColor().toString())
-					.size(productItem.getSize()).product(productResponse).status(productItem.getStatus().name())
-					.build();
-
-			productItemResponses.add(itemResponse);
-		}
-
-		ListProductItemsPagegination listProductItemsPagegination = ListProductItemsPagegination.builder()
-				.currentPage(pageObject.getPageable().getPageNumber()).totalPage(pageObject.getTotalPages())
-				.totalItems(pageObject.getTotalElements()).pageSize(pageable.getPageSize()).data(productItemResponses)
-				.build();
-
-		response.put("status", HttpStatus.OK.value());
-		response.put("data", listProductItemsPagegination);
-		return ResponseEntity.status(HttpStatus.OK).body(response);
-	}
-
-	@GetMapping("/get-by-color-and-size")
-	public ResponseEntity<?> getProductItemByColorAndSize(@RequestParam String productId, @RequestParam String color,
-			@RequestParam String size) {
-		Map<String, Object> response = new LinkedHashMap<>();
-
-		Optional<ProductItem> productItemOptional = productItemService.findByProductAndSizeAndColor(productId,
-				 size, ProductColor.valueOf(color));
-		if (productItemOptional.isEmpty()) {
-			response.put("status", HttpStatus.NOT_FOUND.value());
-			response.put("data", "Product item not found");
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-		}
-
-		ProductItem productItem = productItemOptional.get();
-		Product product = productItem.getProduct();
-
-		List<ProductColor> colors = productService.getListColors(product.getId());
-		List<String> sizes = productService.getListSizes(product.getId());
-
-		ProductResponse productResponse = productService.getProductById(product.getId());
-
-		productResponse.setColors(colors);
-		productResponse.setSizes(sizes);
-
-		ProductItemResponse itemResponse = ProductItemResponse.builder().id(productItem.getId())
-				.price(productItem.getPrice()).quantity(productItem.getQuantity())
-				.listDetailImages(productItem.getListDetailImages()).color(productItem.getColor().toString())
-				.size(productItem.getSize()).product(productResponse).status(productItem.getStatus().name()).build();
-
-		response.put("status", HttpStatus.OK.value());
-		response.put("data", itemResponse);
-		return ResponseEntity.status(HttpStatus.OK).body(response);
-	}
-
-	private void saveProductToSession(HttpSession httpSession, ProductItem product) {
-		List<ProductItem> products = (List<ProductItem>) httpSession.getAttribute("recentProducts");
-		if (products == null) {
-			products = new ArrayList<>();
-			products.add(product);
-		} else {
-
-			for (ProductItem p : products) {
-				if (p.getId().equals(product.getId())) {
-					return;
-				}
-			}
-			products.add(product);
-		}
-		httpSession.setAttribute("recentProducts", products);
-
-	}
-
-	@GetMapping("/colors")
-	public ResponseEntity<?> getDistinctColorsByProductId(@RequestParam String productId) {
-		Map<String, Object> response = new LinkedHashMap<>();
-		response.put("status", HttpStatus.OK.value());
-		response.put("data", productItemService.findDistinctColorsByProductId(productId));
-		return ResponseEntity.status(HttpStatus.OK).body(response);
-	}
-
-	@GetMapping("/sizes")
-	public ResponseEntity<?> getDistinctSizesByProductId(@RequestParam String productId) {
-		Map<String, Object> response = new LinkedHashMap<>();
-		response.put("status", HttpStatus.OK.value());
-		response.put("data", productItemService.findDistinctSizesByProductId(productId));
-		return ResponseEntity.status(HttpStatus.OK).body(response);
-	}
-	
-//	@GetMapping("/search")
-//	public ResponseEntity<?> search(@RequestParam String name, @RequestParam(defaultValue = "0") int page,
-//			@RequestParam(defaultValue = "9") int size) {
-//		Map<String, Object> response = new LinkedHashMap<>();
-//		Pageable pageable = PageRequest.of(page, size);
-//		Page<ProductItem> pageObject = productItemService.search(name, pageable);
-//		List<ProductItem> productItems = pageObject.getContent();
-//
-//		List<ProductItemResponse> productItemResponses = new ArrayList<>();
-//
-//		for (ProductItem productItem : productItems) {
-//			Product product = productItem.getProduct();
-//
-//			List<ProductColor> colors = productService.getListColors(product.getId());
-//			List<String> sizes = productService.getListSizes(product.getId());
-//
-//			ProductResponse productResponse = productService.getProductById(product.getId());
-//
-//			productResponse.setColors(colors);
-//			productResponse.setSizes(sizes);
-//
-//			ProductItemResponse itemResponse = ProductItemResponse.builder().id(productItem.getId())
-//					.price(productItem.getPrice()).quantity(productItem.getQuantity())
-//					.listDetailImages(productItem.getListDetailImages()).color(productItem.getColor().toString())
-//					.size(productItem.getSize()).product(productResponse).status(productItem.getStatus().name())
-//					.build();
-//
-//			productItemResponses.add(itemResponse);
-//		}
-//
-//		ListProductItemsPagegination listProductItemsPagegination = ListProductItemsPagegination.builder()
-//				.currentPage(pageObject.getPageable().getPageNumber()).totalPage(pageObject.getTotalPages())
-//				.totalItems(pageObject.getTotalElements()).pageSize(pageable.getPageSize()).data(productItemResponses)
-//				.build();
-//
-//		response.put("status", HttpStatus.OK.value());
-//		response.put("data", listProductItemsPagegination);
-//		return ResponseEntity.status(HttpStatus.OK).body(response);
-//		
-//	}
+    @Autowired
+    private ProductItemService productItemService;
+
+    @Autowired
+    private ProductService productService;
+
+    @GetMapping("getListProductItems/{productId}")
+    public ResponseEntity<?> getAllProductItems(@PathVariable String productId) {
+        Map<String, Object> response = new LinkedHashMap();
+        response.put("status", HttpStatus.OK.value());
+        response.put("data", productItemService.findByProduct(productId));
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getProductItemById(@PathVariable String id, HttpSession httpSession) {
+        Map<String, Object> response = new LinkedHashMap<>();
+
+        Optional<ProductItem> productItemOptional = productItemService.findById(id);
+
+        if (productItemOptional.isEmpty()) {
+            response.put("status", HttpStatus.NOT_FOUND.value());
+            response.put("data", "Product item not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+
+        ProductItem productItem = productItemOptional.get();
+
+        saveProductToSession(httpSession, productItem);
+
+        // Build the response DTO
+
+        Product product = productItem.getProduct();
+
+        List<ProductColor> colors = productService.getListColors(product.getId());
+        List<String> sizes = productService.getListSizes(product.getId());
+
+        ProductResponse productResponse = productService.getProductById(product.getId());
+
+        productResponse.setColors(colors);
+        productResponse.setSizes(sizes);
+
+        ProductItemResponse itemResponse = ProductItemResponse.builder().id(productItem.getId()).price(productItem.getPrice()).quantity(productItem.getQuantity()).listDetailImages(productItem.getListDetailImages()).color(productItem.getColor().toString()).size(productItem.getSize()).product(productResponse).status(productItem.getStatus().name()).build();
+
+        response.put("status", HttpStatus.OK.value());
+        response.put("data", itemResponse);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> addNewProductItem(@Valid @ModelAttribute ProductItemRequest productItemRequest, BindingResult bindingResult) {
+        Map<String, Object> response = new LinkedHashMap<>();
+
+        if (bindingResult.hasErrors()) {
+            Map<String, String> errors = new LinkedHashMap<>();
+            bindingResult.getFieldErrors().forEach(error -> {
+                errors.put(error.getField(), error.getDefaultMessage());
+            });
+            response.put("status", HttpStatus.BAD_REQUEST.value());
+            response.put("errors", errors);
+        }
+
+        Optional<ProductItemResponse> productItemResponse = productItemService.save(productItemRequest);
+
+        if (productItemResponse.isEmpty()) {
+            response.put("status", HttpStatus.BAD_REQUEST.value());
+            response.put("data", ErrorCode.UNCATEGORIZED_EXCEPTION.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+
+        response.put("status", HttpStatus.OK.value());
+        response.put("data", productItemResponse.get());
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> updateProductItem(@PathVariable String id, @Valid @ModelAttribute ProductItemRequest productItemRequest, BindingResult bindingResult) {
+        Map<String, Object> response = new LinkedHashMap<>();
+
+        if (bindingResult.hasErrors()) {
+            Map<String, String> errors = new LinkedHashMap<>();
+            bindingResult.getFieldErrors().forEach(error -> {
+                errors.put(error.getField(), error.getDefaultMessage());
+            });
+            response.put("status", HttpStatus.BAD_REQUEST.value());
+            response.put("errors", errors);
+        }
+
+        Optional<ProductItemResponse> productItemResponse = productItemService.update(id, productItemRequest);
+
+        if (productItemResponse.isEmpty()) {
+            response.put("status", HttpStatus.BAD_REQUEST.value());
+            response.put("data", ErrorCode.UNCATEGORIZED_EXCEPTION.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+
+        response.put("status", HttpStatus.OK.value());
+        response.put("data", productItemService.update(id, productItemRequest));
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteProductItem(@PathVariable String id) {
+        Map<String, Object> response = new LinkedHashMap<>();
+        try {
+            productItemService.findById(id);
+        } catch (Exception e) {
+            // TODO: handle exception
+            response.put("status", HttpStatus.BAD_REQUEST.value());
+            response.put("data", ErrorCode.PRODUCT_ITEM_EXISTED_IN_ORDER_DETAILS.getMessage());
+
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+        response.put("status", HttpStatus.OK.value());
+        response.put("data", "Product item deleted");
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping("/recent")
+    public ResponseEntity<?> getRecentProducts(HttpSession httpSession) {
+        Map<String, Object> response = new LinkedHashMap<>();
+        List<ProductItem> products = (List<ProductItem>) httpSession.getAttribute("recentProducts");
+        if (products == null) {
+            response.put("status", HttpStatus.NOT_FOUND.value());
+            response.put("data", "No recent products");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+
+        List<ProductItemResponse> productItemResponses = new ArrayList<>();
+
+        for (ProductItem productItem : products) {
+            Product product = productItem.getProduct();
+
+            List<ProductColor> colors = productService.getListColors(product.getId());
+            List<String> sizes = productService.getListSizes(product.getId());
+
+            ProductResponse productResponse = productService.getProductById(product.getId());
+
+            productResponse.setColors(colors);
+            productResponse.setSizes(sizes);
+
+            ProductItemResponse itemResponse = ProductItemResponse.builder().id(productItem.getId()).price(productItem.getPrice()).quantity(productItem.getQuantity()).listDetailImages(productItem.getListDetailImages()).color(productItem.getColor().toString()).size(productItem.getSize()).product(productResponse).status(productItem.getStatus().name()).build();
+
+            productItemResponses.add(itemResponse);
+        }
+
+        response.put("status", HttpStatus.OK.value());
+        response.put("data", productItemResponses);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping("/top-sale")
+    public ResponseEntity<?> getTopSaleProductItems(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+        Map<String, Object> response = new LinkedHashMap<>();
+        Pageable pageable = PageRequest.of(page, size);
+        Page<ProductItem> pageObject = productItemService.listTopSaleProductItems(pageable);
+        List<ProductItem> productItems = pageObject.getContent();
+
+        List<ProductItemResponse> productItemResponses = new ArrayList<>();
+
+        for (ProductItem productItem : productItems) {
+            Product product = productItem.getProduct();
+
+            List<ProductColor> colors = productService.getListColors(product.getId());
+            List<String> sizes = productService.getListSizes(product.getId());
+
+            ProductResponse productResponse = productService.getProductById(product.getId());
+
+            productResponse.setColors(colors);
+            productResponse.setSizes(sizes);
+
+            ProductItemResponse itemResponse = ProductItemResponse.builder().id(productItem.getId()).price(productItem.getPrice()).quantity(productItem.getQuantity()).listDetailImages(productItem.getListDetailImages()).color(productItem.getColor().toString()).size(productItem.getSize()).product(productResponse).status(productItem.getStatus().name()).build();
+
+            productItemResponses.add(itemResponse);
+        }
+
+        ListProductItemsPagegination listProductItemsPagegination = ListProductItemsPagegination.builder().currentPage(pageObject.getPageable().getPageNumber()).totalPage(pageObject.getTotalPages()).totalItems(pageObject.getTotalElements()).pageSize(pageable.getPageSize()).data(productItemResponses).build();
+
+        response.put("status", HttpStatus.OK.value());
+        response.put("data", listProductItemsPagegination);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping("/new")
+    public ResponseEntity<?> getNewProductItems(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+        Map<String, Object> response = new LinkedHashMap<>();
+        Pageable pageable = PageRequest.of(page, size);
+        Page<ProductItem> pageObject = productItemService.listNewProductItems(pageable);
+        List<ProductItem> productItems = pageObject.getContent();
+
+        List<ProductItemResponse> productItemResponses = new ArrayList<>();
+
+        for (ProductItem productItem : productItems) {
+            Product product = productItem.getProduct();
+
+            List<ProductColor> colors = productService.getListColors(product.getId());
+            List<String> sizes = productService.getListSizes(product.getId());
+
+            ProductResponse productResponse = productService.getProductById(product.getId());
+
+            productResponse.setColors(colors);
+            productResponse.setSizes(sizes);
+
+            ProductItemResponse itemResponse = ProductItemResponse.builder().id(productItem.getId()).price(productItem.getPrice()).quantity(productItem.getQuantity()).listDetailImages(productItem.getListDetailImages()).color(productItem.getColor().toString()).size(productItem.getSize()).product(productResponse).status(productItem.getStatus().name()).build();
+
+            productItemResponses.add(itemResponse);
+        }
+
+        ListProductItemsPagegination listProductItemsPagegination = ListProductItemsPagegination.builder().currentPage(pageObject.getPageable().getPageNumber()).totalPage(pageObject.getTotalPages()).totalItems(pageObject.getTotalElements()).pageSize(pageable.getPageSize()).data(productItemResponses).build();
+
+        response.put("status", HttpStatus.OK.value());
+        response.put("data", listProductItemsPagegination);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping("/get-by-color-and-size")
+    public ResponseEntity<?> getProductItemByColorAndSize(@RequestParam String productId, @RequestParam String color, @RequestParam String size) {
+        Map<String, Object> response = new LinkedHashMap<>();
+
+        Optional<ProductItem> productItemOptional = productItemService.findByProductAndSizeAndColor(productId, size, ProductColor.valueOf(color));
+        if (productItemOptional.isEmpty()) {
+            response.put("status", HttpStatus.NOT_FOUND.value());
+            response.put("data", "Product item not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+
+        ProductItem productItem = productItemOptional.get();
+        Product product = productItem.getProduct();
+
+        List<ProductColor> colors = productService.getListColors(product.getId());
+        List<String> sizes = productService.getListSizes(product.getId());
+
+        ProductResponse productResponse = productService.getProductById(product.getId());
+
+        productResponse.setColors(colors);
+        productResponse.setSizes(sizes);
+
+        ProductItemResponse itemResponse = ProductItemResponse.builder().id(productItem.getId()).price(productItem.getPrice()).quantity(productItem.getQuantity()).listDetailImages(productItem.getListDetailImages()).color(productItem.getColor().toString()).size(productItem.getSize()).product(productResponse).status(productItem.getStatus().name()).build();
+
+        response.put("status", HttpStatus.OK.value());
+        response.put("data", itemResponse);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    private void saveProductToSession(HttpSession httpSession, ProductItem product) {
+        List<ProductItem> products = (List<ProductItem>) httpSession.getAttribute("recentProducts");
+        if (products == null) {
+            products = new ArrayList<>();
+            products.add(product);
+        } else {
+
+            for (ProductItem p : products) {
+                if (p.getId().equals(product.getId())) {
+                    return;
+                }
+            }
+            products.add(product);
+        }
+        httpSession.setAttribute("recentProducts", products);
+
+    }
+
+    @GetMapping("/colors")
+    public ResponseEntity<?> getDistinctColorsByProductId(@RequestParam String productId) {
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("status", HttpStatus.OK.value());
+        response.put("data", productItemService.findDistinctColorsByProductId(productId));
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping("/sizes")
+    public ResponseEntity<?> getDistinctSizesByProductId(@RequestParam String productId) {
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("status", HttpStatus.OK.value());
+        response.put("data", productItemService.findDistinctSizesByProductId(productId));
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<?> search(@RequestParam(defaultValue = "0.0") double minPrice,
+                                    @RequestParam(defaultValue = "0.0") String maxPrice, @RequestParam(defaultValue = "") String color,
+                                    @RequestParam(defaultValue = "") String size, @RequestParam(defaultValue = "") String productName) {
+        Map<String, Object> response = new LinkedHashMap<>();
+        double maxPriceDouble = maxPrice.equals("0.0") ? Double.MAX_VALUE : Double.parseDouble(maxPrice);
+        ProductColor colorEnum = color.isEmpty() ? null : ProductColor.valueOf(color);
+        List<ProductItem> productItems = productItemService.searchProductItemsByColorOrAndSizeOrPriceBetweenOrProductName(
+                colorEnum, size, minPrice, maxPriceDouble, productName);
+
+        List<ProductItemResponse> productItemResponses = new ArrayList<>();
+
+        for (ProductItem productItem : productItems) {
+            Product product = productItem.getProduct();
+
+            List<ProductColor> colors = productService.getListColors(product.getId());
+            List<String> sizes = productService.getListSizes(product.getId());
+
+            ProductResponse productResponse = productService.getProductById(product.getId());
+
+            productResponse.setColors(colors);
+            productResponse.setSizes(sizes);
+
+            ProductItemResponse itemResponse = ProductItemResponse.builder().id(productItem.getId())
+                    .price(productItem.getPrice()).quantity(productItem.getQuantity())
+                    .listDetailImages(productItem.getListDetailImages()).color(productItem.getColor().toString())
+                    .size(productItem.getSize()).product(productResponse).status(productItem.getStatus().name())
+                    .build();
+
+            productItemResponses.add(itemResponse);
+        }
+
+
+
+        response.put("status", HttpStatus.OK.value());
+        response.put("data", productItemResponses);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
 }
