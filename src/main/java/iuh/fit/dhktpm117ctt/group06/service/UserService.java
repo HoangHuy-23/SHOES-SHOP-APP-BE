@@ -29,4 +29,6 @@ public interface UserService {
     Optional<UserResponse> updateAvatar(String id, MultipartFile avatar);
 
 	Optional<User> getUserById(String id);
+
+    List<UserResponse> search(String keyword);
 }

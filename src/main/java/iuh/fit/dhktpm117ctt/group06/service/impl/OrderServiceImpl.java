@@ -118,6 +118,11 @@ public class OrderServiceImpl implements OrderService {
 	}
 
 	@Override
+	public List<OrderResponse> searchOrders(String keyword) {
+		return orderRepository.search(keyword).stream().map(this::mapToOrderResponse).collect(Collectors.toList());
+	}
+
+	@Override
 	public Optional<OrderResponse> saveOrder(OrderRequest orderRequest) {
 		Optional<User> user = userRepository.findById(orderRequest.getUserId());
 		Optional<Address> addresOptional = addressRepository.findById(orderRequest.getAddressId());

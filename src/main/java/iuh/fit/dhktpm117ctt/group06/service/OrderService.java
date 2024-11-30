@@ -14,4 +14,5 @@ public interface OrderService {
     Optional<OrderResponse> updateStatus(String id, OrderRequest orderRequest);
 	Optional<OrderResponse> saveOrder(OrderRequest orderRequest);
 	Optional<OrderResponse> updateQuantity(String id, OrderDetailRequest orderRequest);
+    List<OrderResponse> searchOrders(String keyword);
 }
