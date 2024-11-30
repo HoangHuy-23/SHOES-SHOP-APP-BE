@@ -7,6 +7,7 @@ import iuh.fit.dhktpm117ctt.group06.repository.CategoryRepository;
 import iuh.fit.dhktpm117ctt.group06.service.CategoryService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.ModelMap;
 
@@ -34,11 +35,13 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+//    @PreAuthorize("hasRole('ADMIN')")
     public Optional<CategoryResponse> save(CategoryRequest categoryRequest) {
         return Optional.of(mapToCategoryResponse(categoryRepository.save(mapToCategory(categoryRequest))));
     }
 
     @Override
+//    @PreAuthorize("hasRole('ADMIN')")
     public Optional<CategoryResponse> update(String id, CategoryRequest categoryRequest) {
         Category category = categoryRepository.getReferenceById(id);
         Category updatedCategory = mapToCategory(categoryRequest);
@@ -53,7 +56,11 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+//    @PreAuthorize("hasRole('ADMIN')")
     public void deleteById(String id) {
+        if  (!categoryRepository.checkCategoryNotProduct(id)) {
+            throw new RuntimeException("Category has product");
+        }
         categoryRepository.deleteById(id);
     }
 

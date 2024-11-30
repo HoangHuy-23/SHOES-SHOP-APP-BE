@@ -2,12 +2,14 @@ package iuh.fit.dhktpm117ctt.group06.service.impl;
 
 import iuh.fit.dhktpm117ctt.group06.cloudinary.CloudinaryProvider;
 import iuh.fit.dhktpm117ctt.group06.dto.request.UserRequest;
+import iuh.fit.dhktpm117ctt.group06.dto.response.AccountResponse;
 import iuh.fit.dhktpm117ctt.group06.dto.response.UserResponse;
 import iuh.fit.dhktpm117ctt.group06.entities.Account;
 import iuh.fit.dhktpm117ctt.group06.entities.User;
 import iuh.fit.dhktpm117ctt.group06.exception.AppException;
 import iuh.fit.dhktpm117ctt.group06.exception.ErrorCode;
 import iuh.fit.dhktpm117ctt.group06.jwt.JwtProvider;
+import iuh.fit.dhktpm117ctt.group06.repository.AccountRepository;
 import iuh.fit.dhktpm117ctt.group06.repository.UserRepository;
 import iuh.fit.dhktpm117ctt.group06.service.AccountService;
 import iuh.fit.dhktpm117ctt.group06.service.UserService;
@@ -29,6 +31,8 @@ public class UserServiceImpl implements UserService {
     private AccountService accountService;
     private CloudinaryProvider cloudinaryProvider;
     private ModelMapper modelMapper = new ModelMapper();
+    @Autowired
+    private AccountRepository accountRepository;
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository, JwtProvider jwtProvider, AccountService accountService, CloudinaryProvider cloudinaryProvider) {
@@ -94,12 +98,20 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+//    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public void deleteById(String id) {
+        if (!userRepository.checkUserNotOrder(id)) {
+            throw new AppException(ErrorCode.USER_EXISTED_IN_ORDER);
+        }
+        AccountResponse account = accountService.findByUser(id).orElse(null);
+        if (account != null) {
+            accountRepository.deleteById(account.getId());
+        }
         userRepository.deleteById(id);
     }
 
     @Override
-//    @PreAuthorize("hasRole('ROLE_CUSTOMER')")
+    @PreAuthorize("hasRole('ROLE_CUSTOMER')")
     public Optional<UserResponse> updateInfo(String id, UserRequest userRequest) {
         System.out.println("Update user info");
         User userUpdate = userRepository.findById(id).orElse(null);

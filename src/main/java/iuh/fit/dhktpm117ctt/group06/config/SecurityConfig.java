@@ -24,14 +24,28 @@ import java.util.Collections;
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
+    private final String[] PUBLIC_URL = { "/api/user/register", "/api/user/login", "/api/user/logout", "/api/auth/refreshToken",
+    "/api/user/verify", "/api/user/forgotPassword", "/api/user/resetPassword", "/api/user/changePassword",
+    "/api/user/changeEmail", "/api/user/changeUsername", "/api/user/changeAvatar", "/api/user/changeRole",
+    "/api/user/changeStatus", "/api/user/changePhone", "/api/user/changeAddress", "/api/user/changeName",
+            "/api/product-items/**", "/api/cart/**", "/api/order/**", "/api/product/**", "/api/category/**", "/api/address/**",
+            "/api/order-detail/**", "/api/post/**", "/api/comment/**", "/api/like/**", "/api/rating/**", "/api/feedback/**",
+            "/api/brands/**", "/api/size/**", "/api/color/**", "/api/role/**", "/api/permission/**", "/api/role-permission/**",
+            "/api/categories/**", "/api/products/**", "/api/users/**", "/api/posts/**", "/api/collections/**", "/api/orders/**",
+
+
+    };
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.sessionManagement(sessionManagement ->
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
-//                .authorizeHttpRequests(authorize ->
-//                        authorize.requestMatchers("/api/admin/**").hasAnyRole("ADMIN")
-//                        .requestMatchers("/api/user/**").authenticated().anyRequest().permitAll())
-//                .addFilterBefore(new JwtValidator(), BasicAuthenticationFilter.class)
+                .authorizeHttpRequests(authorize ->
+                        authorize
+                                .requestMatchers("/api/**").permitAll()
+                        .requestMatchers("/api/admin/**").hasAnyRole("ADMIN"))
+//                        .requestMatchers("/api/user/**").authenticated().permitAll()
+
+                .addFilterBefore(new JwtValidator(), BasicAuthenticationFilter.class)
 
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(new CorsConfigurationSource() {

@@ -28,6 +28,12 @@ public class ProductCollectionController {
         return ResponseEntity.ok(productCollectionService.update(id, request));
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteById(@PathVariable String id) {
+        productCollectionService.deleteById(id);
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<?> findById(@PathVariable String id) {
         return ResponseEntity.ok(productCollectionService.findById(id));

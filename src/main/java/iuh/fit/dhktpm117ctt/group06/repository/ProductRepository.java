@@ -35,5 +35,6 @@ public interface ProductRepository extends JpaRepository<Product, String> {
 	@Query("select DISTINCT pi.color from ProductItem pi where pi.product.id = ?1")
 	List<ProductColor> getListColors(String productId);
 
-
+	@Query("SELECT CASE WHEN COUNT(p) = 0 THEN true ELSE false END FROM Product p LEFT JOIN p.collection c WHERE c.id = ?1")
+	Boolean checkCollectionNotProduct(String id);
 }

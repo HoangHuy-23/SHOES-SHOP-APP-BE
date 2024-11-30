@@ -4,11 +4,14 @@ import iuh.fit.dhktpm117ctt.group06.dto.request.ProductCollectionRequest;
 import iuh.fit.dhktpm117ctt.group06.dto.response.ProductCollectionResponse;
 import iuh.fit.dhktpm117ctt.group06.entities.Brand;
 import iuh.fit.dhktpm117ctt.group06.entities.ProductCollection;
+import iuh.fit.dhktpm117ctt.group06.exception.AppException;
 import iuh.fit.dhktpm117ctt.group06.repository.BrandRepository;
 import iuh.fit.dhktpm117ctt.group06.repository.ProductCollectionRepository;
+import iuh.fit.dhktpm117ctt.group06.repository.ProductRepository;
 import iuh.fit.dhktpm117ctt.group06.service.ProductCollectionService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,6 +22,9 @@ public class ProductCollectionServiceImpl implements ProductCollectionService {
 
     @Autowired
     private ProductCollectionRepository productCollectionRepository;
+
+    @Autowired
+    private ProductRepository productRepository;
 
     @Autowired
     private BrandRepository brandRepository;
@@ -34,6 +40,7 @@ public class ProductCollectionServiceImpl implements ProductCollectionService {
     }
 
     @Override
+//    @PreAuthorize("hasRole('ADMIN')")
     public Optional<ProductCollectionResponse> save(ProductCollectionRequest request) {
         ProductCollection productCollection = new ProductCollection();
         productCollection.setName(request.getName());
@@ -48,11 +55,16 @@ public class ProductCollectionServiceImpl implements ProductCollectionService {
     }
 
     @Override
+//    @PreAuthorize("hasRole('ADMIN')")
     public void deleteById(String id) {
+        if (!productRepository.checkCollectionNotProduct(id)) {
+            throw new RuntimeException("Collection has product");
+        }
         productCollectionRepository.deleteById(id);
     }
 
     @Override
+//    @PreAuthorize("hasRole('ADMIN')")
     public Optional<ProductCollectionResponse> update(String id, ProductCollectionRequest request) {
         Optional<ProductCollection> productCollection = productCollectionRepository.findById(id);
         if (productCollection.isPresent()) {

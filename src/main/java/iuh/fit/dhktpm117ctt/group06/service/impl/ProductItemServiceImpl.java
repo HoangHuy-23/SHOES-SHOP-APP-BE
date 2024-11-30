@@ -13,6 +13,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -41,6 +42,7 @@ public class ProductItemServiceImpl implements ProductItemService {
 
 	@Transactional
 	@Override
+	@PreAuthorize("hasRole('ADMIN')")
 	public Optional<ProductItemResponse> save(ProductItemRequest productItemRequest) {
 		ProductItem productItem = mapToProductItem(productItemRequest);
 		if (productItemRequest.getListDetailImages() != null) {
@@ -63,6 +65,7 @@ public class ProductItemServiceImpl implements ProductItemService {
 
 	@Transactional
 	@Override
+	@PreAuthorize("hasRole('ADMIN')")
 	public Optional<ProductItemResponse> update(String id, ProductItemRequest productItemRequest) {
 		Optional<ProductItem> optionalProductItem = productItemRepository.findById(id);
 		if (optionalProductItem.isPresent()) {
@@ -111,6 +114,7 @@ public class ProductItemServiceImpl implements ProductItemService {
 
 	@Override
 	@Transactional
+	@PreAuthorize("hasRole('ADMIN')")
 	public Optional<ProductItem> updateQuantity(String id, int quantity) {
 		Optional<ProductItem> optionalProductItem = productItemRepository.findById(id);
 		if (optionalProductItem.isPresent()) {
@@ -129,6 +133,7 @@ public class ProductItemServiceImpl implements ProductItemService {
 
 	@Transactional
 	@Override
+	@PreAuthorize("hasRole('ADMIN')")
 	public void deleteById(String productItemId) {
 
 		if (productItemRepository.exexistedByOrders(productItemId).size() > 0) {

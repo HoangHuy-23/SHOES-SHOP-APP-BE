@@ -15,4 +15,8 @@ public interface UserRepository extends JpaRepository<User, String> {
     Boolean existsByPhone(String phone);
     @Query("SELECT u FROM User u WHERE u.firstName LIKE %?1% OR u.lastName LIKE %?1% OR u.phone LIKE %?1%")
     List<User> search(String keyword);
+
+    @Query("SELECT CASE WHEN COUNT(o) = 0 THEN true ELSE false END FROM User u LEFT JOIN u.orders o WHERE u.id = ?1")
+    Boolean checkUserNotOrder(String id);
+
 }

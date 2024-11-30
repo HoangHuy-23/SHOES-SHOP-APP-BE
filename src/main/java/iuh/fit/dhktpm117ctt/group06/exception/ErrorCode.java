@@ -21,6 +21,9 @@ public enum ErrorCode {
     USER_EXISTED(1111, "User existed", HttpStatus.BAD_REQUEST),
     USER_NOT_FOUND(1099, "User not found", HttpStatus.NOT_FOUND),
     USER_NOT_AUTHORIZED(1401, "User not authorized", HttpStatus.UNAUTHORIZED),
+    USER_NOT_ACTIVE(1403, "User not active", HttpStatus.FORBIDDEN),
+    USER_NOT_VERIFIED(1404, "User not verified", HttpStatus.FORBIDDEN),
+    USER_EXISTED_IN_ORDER(1405, "User existed in order", HttpStatus.BAD_REQUEST),
     // Address
     HOME_NUMBER_INVALID(2101, "Home number contains only letters and numbers, {min}-{max} characters long", HttpStatus.BAD_REQUEST),
     STREET_INVALID(2102, "Street contains only letters and spaces, {min}-{max} characters long", HttpStatus.BAD_REQUEST),
@@ -34,6 +37,7 @@ public enum ErrorCode {
     PRODUCT_NOT_FOUND(4404, "Product not found!", HttpStatus.NOT_FOUND),
     PRODUCT_EXISTED(4405, "Product existed!", HttpStatus.BAD_REQUEST),
     PRODUCT_INVALID(4406, "Product invalid!", HttpStatus.BAD_REQUEST),
+
     
     //ProductItem
     PRODUCT_ITEM_NOT_FOUND(4504, "Product item not found!", HttpStatus.NOT_FOUND),
@@ -45,6 +49,9 @@ public enum ErrorCode {
     ORDER_DETAIL_NOT_FOUND(4510, "Order detail not found!", HttpStatus.NOT_FOUND),
     
     ADDRESS_NOT_FOUND(4604, "Address not found!", HttpStatus.NOT_FOUND),
+
+    //Brand
+    BRAND_HAS_PRODUCT(4701, "Brand has product!", HttpStatus.BAD_REQUEST),
     ;
 	
 

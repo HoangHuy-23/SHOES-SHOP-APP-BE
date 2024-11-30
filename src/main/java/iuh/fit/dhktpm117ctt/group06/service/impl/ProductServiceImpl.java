@@ -14,6 +14,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -44,6 +45,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Transactional
     @Override
+    @PreAuthorize("hasRole('ADMIN')")
     public Optional<ProductResponse> addProduct(ProductRequest productRequest) {
         Product product = mapToProduct(productRequest);
         product.setCreatedDate(LocalDateTime.now());
@@ -52,6 +54,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Transactional
     @Override
+    @PreAuthorize("hasRole('ADMIN')")
     public Optional<ProductResponse> updateProduct(String productId, ProductRequest productRequest) {
         Optional<Product> product = productRepository.findById(productId);
         if (product.isPresent()) {
@@ -64,6 +67,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Transactional
     @Override
+    @PreAuthorize("hasRole('ADMIN')")
     public void deleteById(String productId) {
         productRepository.deleteById(productId);
     }
