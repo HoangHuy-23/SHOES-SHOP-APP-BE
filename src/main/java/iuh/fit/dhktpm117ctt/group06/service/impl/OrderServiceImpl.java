@@ -70,6 +70,11 @@ public class OrderServiceImpl implements OrderService {
 	}
 
 	@Override
+	public List<OrderResponse> findAll() {
+		return orderRepository.findAll().stream().map(this::mapToOrderResponse).collect(Collectors.toList());
+	}
+
+	@Override
 	public Optional<OrderResponse> findById(String id) {
 		return orderRepository.findById(id).map(this::mapToOrderResponse);
 	}
@@ -119,6 +124,11 @@ public class OrderServiceImpl implements OrderService {
 
 		Order updatedOrder = orderRepository.save(order);
 		return Optional.of(mapToOrderResponse(updatedOrder));
+	}
+
+	@Override
+	public List<OrderResponse> searchOrders(String keyword) {
+		return orderRepository.search(keyword).stream().map(this::mapToOrderResponse).collect(Collectors.toList());
 	}
 
 	@Override

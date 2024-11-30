@@ -1,5 +1,6 @@
 package iuh.fit.dhktpm117ctt.group06.controller;
 
+import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -37,6 +38,11 @@ public class ProductController {
 	@GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> getAllProducts() {
 		return ResponseEntity.ok(productService.getAllProducts());
+	}
+
+	@GetMapping("/searchByKeyword")
+	public ResponseEntity<?> searchByKeyword(@RequestParam String keyword) {
+		return ResponseEntity.ok(productService.searchProducts(keyword));
 	}
 
 	@GetMapping("/{id}")

@@ -65,23 +65,30 @@ public class BrandServiceImpl implements BrandService {
     @Override
     public Optional<BrandResponse> update(String id,BrandRequest brandRequest) {
         Optional<Brand> brand = brandRepository.findById(id);
+
         if (brand.isEmpty()) {
             return Optional.empty();
         }
         else {
+            String avatar = brand.get().getAvatar();
             if (brandRequest.getAvatar() == null) {
-                return Optional.empty();
+                Brand updatedBrand = new Brand();
+                updatedBrand.setId(brand.get().getId());
+                updatedBrand.setAvatar(avatar);
+                updatedBrand.setBrandName(brandRequest.getBrandName());
+                return Optional.of(mapToBrandResponse(brandRepository.save(updatedBrand)));
             } else {
                 try {
                     Map uploadResult = cloudinaryProvider.upload(brandRequest.getAvatar(),"Brand", brandRequest.getBrandName());
-                    Brand updatedBrand = new Brand();
-                    updatedBrand.setId(brand.get().getId());
-                    updatedBrand.setAvatar(uploadResult.get("url").toString());
-                    updatedBrand.setBrandName(brandRequest.getBrandName());
-                    return Optional.of(mapToBrandResponse(brandRepository.save(updatedBrand)));
+                    avatar = uploadResult.get("url").toString();
                 } catch (Exception e) {
                     throw new AppException(ErrorCode.AVATAR_INVALID);
                 }
+                Brand updatedBrand = new Brand();
+                updatedBrand.setId(brand.get().getId());
+                updatedBrand.setAvatar(avatar);
+                updatedBrand.setBrandName(brandRequest.getBrandName());
+                return Optional.of(mapToBrandResponse(brandRepository.save(updatedBrand)));
             }
         }
     }

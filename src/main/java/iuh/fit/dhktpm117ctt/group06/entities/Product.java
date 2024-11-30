@@ -1,6 +1,7 @@
 package iuh.fit.dhktpm117ctt.group06.entities;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -45,9 +46,8 @@ public class Product implements Serializable{
     private String id;
     private String name;
     private String description;
-    private String avatar;
     private double rating;
-    private Date createdDate;
+    private LocalDateTime createdDate;
 
     @Enumerated(EnumType.STRING)
     private ProductGender gender;
