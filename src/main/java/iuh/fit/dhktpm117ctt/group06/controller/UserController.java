@@ -12,10 +12,17 @@ import iuh.fit.dhktpm117ctt.group06.service.UserService;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/users")
@@ -32,10 +39,11 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping()
+    @GetMapping()
     public ResponseEntity<?> findAll() {
         return ResponseEntity.ok(userService.findAll());
     }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<?> findById(@PathVariable String id) {
@@ -47,10 +55,31 @@ public class UserController {
         userService.deleteById(id);
         return ResponseEntity.ok().build();
     }
+    
+    @GetMapping("/search")
+    public ResponseEntity<?> search(@RequestParam String keyword) {
+        return ResponseEntity.ok(userService.search(keyword));
+    }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<?> updateById(@PathVariable String id, @Valid @RequestBody UserRequest userRequest) {
-        UserResponse user = userService.updateInfo(id,userRequest).orElse(null);
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> updateById(@PathVariable String id, @Valid @ModelAttribute UserRequest userRequest, BindingResult bindingResult) {
+        Map<String, Object> response = new LinkedHashMap<>();
+
+        if (bindingResult.hasErrors()) {
+            Map<String, String> errors = new LinkedHashMap<>();
+            bindingResult.getFieldErrors().forEach(error -> {
+                errors.put(error.getField(), error.getDefaultMessage());
+            });
+            response.put("status", HttpStatus.BAD_REQUEST.value());
+            response.put("errors", errors);
+        }
+
+        Optional<UserResponse> user = userService.updateInfo(id,userRequest);
+        if (user.isEmpty()) {
+            response.put("status", HttpStatus.NOT_FOUND.value());
+            response.put("message", "User not found");
+            return ResponseEntity.badRequest().body(response);
+        }
         return ResponseEntity.ok(user);
     }
 
@@ -71,6 +100,8 @@ public class UserController {
             ),
             security = @SecurityRequirement(name = "bearer-jwt")
     )
+
+
     public ResponseEntity<?> updateAvatar(@PathVariable String id, @RequestParam("avatar") MultipartFile avatar) {
         if (avatar.isEmpty()) {
             return ResponseEntity.badRequest().body("No file uploaded");

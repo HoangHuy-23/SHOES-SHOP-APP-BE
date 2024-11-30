@@ -1,6 +1,7 @@
 package iuh.fit.dhktpm117ctt.group06.service.impl;
 
 import iuh.fit.dhktpm117ctt.group06.dto.request.ResetPasswordRequest;
+import iuh.fit.dhktpm117ctt.group06.dto.response.AccountResponse;
 import iuh.fit.dhktpm117ctt.group06.entities.Account;
 import iuh.fit.dhktpm117ctt.group06.repository.AccountRepository;
 import iuh.fit.dhktpm117ctt.group06.service.AccountService;
@@ -30,8 +31,15 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public Optional<Account> findByUser(String userId) {
-        return accountRepository.findByUser(userId);
+    public Optional<AccountResponse> findByUser(String userId) {
+        Account account = accountRepository.findByUser(userId).orElse(null);
+        if (account == null) {
+            return Optional.empty();
+        }
+        AccountResponse accountResponse = new AccountResponse();
+        accountResponse.setId(account.getId());
+        accountResponse.setEmail(account.getEmail());
+        return Optional.of(accountResponse);
     }
 
     @Override

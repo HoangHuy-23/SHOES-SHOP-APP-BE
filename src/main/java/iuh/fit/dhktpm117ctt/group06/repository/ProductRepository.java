@@ -18,7 +18,7 @@ public interface ProductRepository extends JpaRepository<Product, String> {
 	@Query("SELECT p FROM Product p WHERE p.category.id = ?1")
 	List<Product> findByCategory(String category);
 
-	@Query("SELECT DISTINCT p FROM Product p " +
+	@Query("SELECT p FROM Product p " +
 		       "JOIN p.collection pc " +
 		       "LEFT JOIN pc.brand b " +
 		       "WHERE p.name LIKE %?1% " +
@@ -28,7 +28,7 @@ public interface ProductRepository extends JpaRepository<Product, String> {
 		       "OR pc.name LIKE %?1%")
 	List<Product> search(String keyword);
 
-	
+
 	@Query("select DISTINCT pi.size from ProductItem pi where pi.product.id = ?1")
 	List<String> getListSizes(String productId);
 	

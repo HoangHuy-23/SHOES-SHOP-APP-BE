@@ -42,7 +42,10 @@ public class ProductItemController {
     @Autowired
     private ProductItemService productItemService;
 
-    @Autowired
+	@Autowired
+	private ProductService productService;
+
+	 @Autowired
     private ProductService productService;
 
     @GetMapping("getListProductItems/{productId}")
@@ -89,76 +92,78 @@ public class ProductItemController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> addNewProductItem(@Valid @ModelAttribute ProductItemRequest productItemRequest, BindingResult bindingResult) {
-        Map<String, Object> response = new LinkedHashMap<>();
+	@PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ResponseEntity<?> addNewProductItem(@Valid @ModelAttribute ProductItemRequest productItemRequest,
+			BindingResult bindingResult) {
+		Map<String, Object> response = new LinkedHashMap<>();
 
-        if (bindingResult.hasErrors()) {
-            Map<String, String> errors = new LinkedHashMap<>();
-            bindingResult.getFieldErrors().forEach(error -> {
-                errors.put(error.getField(), error.getDefaultMessage());
-            });
-            response.put("status", HttpStatus.BAD_REQUEST.value());
-            response.put("errors", errors);
-        }
+		if (bindingResult.hasErrors()) {
+			Map<String, String> errors = new LinkedHashMap<>();
+			bindingResult.getFieldErrors().forEach(error -> {
+				errors.put(error.getField(), error.getDefaultMessage());
+			});
+			response.put("status", HttpStatus.BAD_REQUEST.value());
+			response.put("errors", errors);
+		}
 
-        Optional<ProductItemResponse> productItemResponse = productItemService.save(productItemRequest);
+		Optional<ProductItemResponse> productItemResponse = productItemService.save(productItemRequest);
 
-        if (productItemResponse.isEmpty()) {
-            response.put("status", HttpStatus.BAD_REQUEST.value());
-            response.put("data", ErrorCode.UNCATEGORIZED_EXCEPTION.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-        }
+		if (productItemResponse.isEmpty()) {
+			response.put("status", HttpStatus.BAD_REQUEST.value());
+			response.put("data", ErrorCode.UNCATEGORIZED_EXCEPTION.getMessage());
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+		}
 
-        response.put("status", HttpStatus.OK.value());
-        response.put("data", productItemResponse.get());
-        return ResponseEntity.status(HttpStatus.OK).body(response);
-    }
+		response.put("status", HttpStatus.OK.value());
+		response.put("data", productItemResponse.get());
+		return ResponseEntity.status(HttpStatus.OK).body(response);
+	}
 
-    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> updateProductItem(@PathVariable String id, @Valid @ModelAttribute ProductItemRequest productItemRequest, BindingResult bindingResult) {
-        Map<String, Object> response = new LinkedHashMap<>();
+	@PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ResponseEntity<?> updateProductItem(@PathVariable String id,
+			@Valid @ModelAttribute ProductItemRequest productItemRequest, BindingResult bindingResult) {
+		Map<String, Object> response = new LinkedHashMap<>();
 
-        if (bindingResult.hasErrors()) {
-            Map<String, String> errors = new LinkedHashMap<>();
-            bindingResult.getFieldErrors().forEach(error -> {
-                errors.put(error.getField(), error.getDefaultMessage());
-            });
-            response.put("status", HttpStatus.BAD_REQUEST.value());
-            response.put("errors", errors);
-        }
+		if (bindingResult.hasErrors()) {
+			Map<String, String> errors = new LinkedHashMap<>();
+			bindingResult.getFieldErrors().forEach(error -> {
+				errors.put(error.getField(), error.getDefaultMessage());
+			});
+			response.put("status", HttpStatus.BAD_REQUEST.value());
+			response.put("errors", errors);
+		}
 
-        Optional<ProductItemResponse> productItemResponse = productItemService.update(id, productItemRequest);
+		Optional<ProductItemResponse> productItemResponse = productItemService.update(id, productItemRequest);
 
-        if (productItemResponse.isEmpty()) {
-            response.put("status", HttpStatus.BAD_REQUEST.value());
-            response.put("data", ErrorCode.UNCATEGORIZED_EXCEPTION.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-        }
+		if (productItemResponse.isEmpty()) {
+			response.put("status", HttpStatus.BAD_REQUEST.value());
+			response.put("data", ErrorCode.UNCATEGORIZED_EXCEPTION.getMessage());
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+		}
 
-        response.put("status", HttpStatus.OK.value());
-        response.put("data", productItemService.update(id, productItemRequest));
-        return ResponseEntity.status(HttpStatus.OK).body(response);
-    }
+		response.put("status", HttpStatus.OK.value());
+		response.put("data", productItemResponse.get());
+		return ResponseEntity.status(HttpStatus.OK).body(response);
+	}
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteProductItem(@PathVariable String id) {
-        Map<String, Object> response = new LinkedHashMap<>();
-        try {
-            productItemService.findById(id);
-        } catch (Exception e) {
-            // TODO: handle exception
-            response.put("status", HttpStatus.BAD_REQUEST.value());
-            response.put("data", ErrorCode.PRODUCT_ITEM_EXISTED_IN_ORDER_DETAILS.getMessage());
+	@DeleteMapping("/{id}")
+	public ResponseEntity<?> deleteProductItem(@PathVariable String id) {
+		Map<String, Object> response = new LinkedHashMap<>();
+		try {
+			productItemService.findById(id);
+		} catch (Exception e) {
+			// TODO: handle exception
+			response.put("status", HttpStatus.BAD_REQUEST.value());
+			response.put("data", ErrorCode.PRODUCT_ITEM_EXISTED_IN_ORDER_DETAILS.getMessage());
 
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-        }
-        response.put("status", HttpStatus.OK.value());
-        response.put("data", "Product item deleted");
-        return ResponseEntity.status(HttpStatus.OK).body(response);
-    }
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+		}
+		response.put("status", HttpStatus.OK.value());
+		response.put("data", "Product item deleted");
+		return ResponseEntity.status(HttpStatus.OK).body(response);
+	}
 
-    @GetMapping("/recent")
+	 @GetMapping("/recent")
     public ResponseEntity<?> getRecentProducts(HttpSession httpSession) {
         Map<String, Object> response = new LinkedHashMap<>();
         List<ProductItem> products = (List<ProductItem>) httpSession.getAttribute("recentProducts");
@@ -356,4 +361,5 @@ public class ProductItemController {
         response.put("data", productItemResponses);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
+
 }

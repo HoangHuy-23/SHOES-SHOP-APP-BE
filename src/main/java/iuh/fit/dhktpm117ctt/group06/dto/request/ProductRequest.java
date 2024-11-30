@@ -1,5 +1,7 @@
 package iuh.fit.dhktpm117ctt.group06.dto.request;
 
+import iuh.fit.dhktpm117ctt.group06.entities.ProductCollection;
+import iuh.fit.dhktpm117ctt.group06.entities.enums.ProductGender;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -13,6 +15,7 @@ import iuh.fit.dhktpm117ctt.group06.entities.Category;
 import iuh.fit.dhktpm117ctt.group06.entities.enums.ProductColor;
 import iuh.fit.dhktpm117ctt.group06.entities.enums.ProductSize;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -22,13 +25,14 @@ public class ProductRequest {
     @NotNull(message = "PRODUCT_NAME_INVALID")
     @NotBlank(message = "PRODUCT_NAME_INVALID")
     private String name;
-    private MultipartFile avatar;
     private String description;
-    @DateTimeFormat(pattern = "dd-MM-yyyy")
-    private Date createdDate;
-//    @NotNull(message = "BRAND_ID_INVALID")
-//    private Brand brand;
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime createdDate;
+    @NotNull(message = "COLLECTION_ID_INVALID")
+    private ProductCollection collection;
     @NotNull(message = "CATEGORY_ID_INVALID")
     private Category category;
+    @NotNull(message = "PRODUCT_GENDER_INVALID")
+    private ProductGender gender;
     private double rating;
 }

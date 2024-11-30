@@ -54,7 +54,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @PreAuthorize("hasRole('ROLE_CUSTOMER')")
+//    @PreAuthorize("hasRole('ROLE_CUSTOMER')")
     public Optional<UserResponse> findById(String id) {
         User user = userRepository.findById(id).orElse(null);
         return Optional.of(mapToUserResponse(user));
@@ -99,10 +99,28 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @PreAuthorize("hasRole('ROLE_CUSTOMER')")
+//    @PreAuthorize("hasRole('ROLE_CUSTOMER')")
     public Optional<UserResponse> updateInfo(String id, UserRequest userRequest) {
-        User userUpdate = userRepository.getReferenceById(id);
+        System.out.println("Update user info");
+        User userUpdate = userRepository.findById(id).orElse(null);
+        if (userUpdate == null) {
+            System.out.println("User not found");
+            return Optional.empty();
+        }
         String avatar = userUpdate.getAvatar();
+        if (userRequest.getImage() == null) {
+            avatar = userUpdate.getAvatar();
+            System.out.println("Avatar not found");
+        } else {
+           //upload avatar
+            try {
+                Map uploadResult = cloudinaryProvider.upload(userRequest.getImage(),"User", userUpdate.getId());
+                System.out.println("Upload avatar"+uploadResult.get("url").toString());
+                avatar = uploadResult.get("url").toString();
+            } catch (Exception e) {
+                throw new AppException(ErrorCode.AVATAR_INVALID);
+            }
+        }
         User user = mapToUser(userRequest);
         user.setId(id);
         user.setRole(userRepository.findById(id).get().getRole());
@@ -126,7 +144,6 @@ public class UserServiceImpl implements UserService {
                     throw new AppException(ErrorCode.AVATAR_INVALID);
                 }
             }
-
         }
         return Optional.empty();
     }
@@ -137,6 +154,11 @@ public class UserServiceImpl implements UserService {
 	public Optional<User> getUserById(String id) {
 		return userRepository.findById(id);
 	}
+
+    @Override
+    public List<UserResponse> search(String keyword) {
+        return userRepository.search(keyword).stream().map(this::mapToUserResponse).toList();
+    }
 
 
 }
