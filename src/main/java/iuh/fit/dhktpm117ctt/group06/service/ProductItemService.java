@@ -28,4 +28,6 @@ public interface ProductItemService {
 	Page<ProductItem> listNewProductItems(Pageable pageable);
 	Page<ProductItem> listTopSaleProductItems(Pageable pageable);
 	Optional<ProductItem> findByProductAndSizeAndColor(String productId, String size, ProductColor color);
+
+    List<ProductItem> searchProductItemsByColorOrAndSizeOrPriceBetweenOrProductName(ProductColor color, String size, double minPrice, double maxPrice, String productName);
 }

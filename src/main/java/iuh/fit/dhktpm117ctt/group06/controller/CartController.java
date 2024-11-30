@@ -245,6 +245,7 @@ public class CartController {
 			syncCartWithDatabase(cartDetails);
 		} catch (Exception e) {
 			// TODO: handle exception
+			System.out.println("Loi tai day");
 			e.printStackTrace();
 		}
 
