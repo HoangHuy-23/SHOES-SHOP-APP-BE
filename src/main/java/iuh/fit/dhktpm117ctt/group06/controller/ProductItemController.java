@@ -8,6 +8,8 @@ import iuh.fit.dhktpm117ctt.group06.entities.enums.ProductColor;
 import jakarta.servlet.http.HttpSession;
 
 import org.hibernate.Hibernate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -39,14 +41,13 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/api/product-items")
 public class ProductItemController {
+    private final static Logger logger = LoggerFactory.getLogger(ProductItemController.class.getName());
+
     @Autowired
     private ProductItemService productItemService;
 
 	@Autowired
 	private ProductService productService;
-
-	 @Autowired
-    private ProductService productService;
 
     @GetMapping("getListProductItems/{productId}")
     public ResponseEntity<?> getAllProductItems(@PathVariable String productId) {
@@ -324,12 +325,19 @@ public class ProductItemController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<?> search(@RequestParam(defaultValue = "0.0") double minPrice,
-                                    @RequestParam(defaultValue = "0.0") String maxPrice, @RequestParam(defaultValue = "") String color,
-                                    @RequestParam(defaultValue = "") String size, @RequestParam(defaultValue = "") String productName) {
+    public ResponseEntity<?> search(@RequestParam(defaultValue = "") String color,
+                                    @RequestParam(defaultValue = "") String size,
+                                    @RequestParam(defaultValue = "0.0") double minPrice,
+                                    @RequestParam(defaultValue = "0.0") double maxPrice,
+                                     @RequestParam(defaultValue = "") String productName) {
         Map<String, Object> response = new LinkedHashMap<>();
-        double maxPriceDouble = maxPrice.equals("0.0") ? Double.MAX_VALUE : Double.parseDouble(maxPrice);
-        ProductColor colorEnum = color.isEmpty() ? null : ProductColor.valueOf(color);
+        double maxPriceDouble = maxPrice == 0.0 ? Double.MAX_VALUE : maxPrice;
+        ProductColor colorEnum = color.isEmpty() ? null : ProductColor.valueOf(color.toUpperCase());
+
+        size = size.isEmpty() ? null : size;
+
+        logger.info("color: " + color + " size: " + size + " minPrice: " + minPrice + " maxPrice: " + maxPriceDouble + " productName: " + productName);
+
         List<ProductItem> productItems = productItemService.searchProductItemsByColorOrAndSizeOrPriceBetweenOrProductName(
                 colorEnum, size, minPrice, maxPriceDouble, productName);
 

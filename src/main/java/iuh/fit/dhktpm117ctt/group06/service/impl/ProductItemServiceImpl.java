@@ -196,6 +196,6 @@ public class ProductItemServiceImpl implements ProductItemService {
 
 	@Override
 	public List<ProductItem> searchProductItemsByColorOrAndSizeOrPriceBetweenOrProductName(ProductColor color, String size, double minPrice, double maxPrice, String productName) {
-		return productItemRepository.searchProductItemsByColorOrAndSizeOrPriceBetweenOrProductName(color, size, minPrice, maxPrice, productName);
+		return productItemRepository.searchProductItemsByFilters(color , size, minPrice, maxPrice, productName);
 	}
 }

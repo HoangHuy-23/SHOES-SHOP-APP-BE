@@ -71,7 +71,11 @@ public class CartController {
 		}
 		httpSession.setAttribute("cart", cartDetails);
 
-		syncCartWithDatabase(cartDetails);
+		try {
+			syncCartWithDatabase(cartDetails);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		
 		List<CartDetailResponse> cartDetailResponses = new ArrayList<>();
 
@@ -127,25 +131,31 @@ public class CartController {
 		session.setAttribute("cart", cartDetails);
 
 		// check user login
-		var context = SecurityContextHolder.getContext();
-		String emailString = context.getAuthentication().getName();
-		
-		
-		if (emailString != null || emailString.equalsIgnoreCase("anonymousUser") == false) {
-			
-			Optional<UserResponse> userOptional = userService.findByEmail(emailString);
-			
-			if (userOptional.isPresent()) {
-				Cart cart = cartService.findCartByUser(userOptional.get().getId());
+//		var context = SecurityContextHolder.getContext();
+//		String emailString = context.getAuthentication().getName();
+//
+//
+//		if (emailString != null || emailString.equalsIgnoreCase("anonymousUser") == false) {
+//
+//			Optional<UserResponse> userOptional = userService.findByEmail(emailString);
+//
+//			if (userOptional.isPresent()) {
+//				Cart cart = cartService.findCartByUser(userOptional.get().getId());
+//
+//				// update cart detail in database
+//				CartDetailPK cartDetailPK = new CartDetailPK(cart.getId(), cartDetailRequest.getProductId());
+//				if (cartDetailService.findById(cartDetailPK).isPresent()) {
+//					cartDetailService.updateQuantity(cartDetailPK, cartDetailRequest.getQuantity());
+//				}
+//			}
+//
+//
+//		}
 
-				// update cart detail in database
-				CartDetailPK cartDetailPK = new CartDetailPK(cart.getId(), cartDetailRequest.getProductId());
-				if (cartDetailService.findById(cartDetailPK).isPresent()) {
-					cartDetailService.updateQuantity(cartDetailPK, cartDetailRequest.getQuantity());
-				}
-			}
-			
-			
+		try{
+			syncCartWithDatabase(cartDetails);
+		}catch (Exception e) {
+			e.printStackTrace();
 		}
 		
 		List<CartDetailResponse> cartDetailResponses = new ArrayList<>();
@@ -201,19 +211,24 @@ public class CartController {
 	    }
 
 	    
-	    var context = SecurityContextHolder.getContext();
-	    String emailString = context.getAuthentication().getName();
-	    if (emailString != null) {
-	        Optional<UserResponse> optionalUser = userService.findByEmail(emailString);
-	        if (optionalUser.isPresent()) {
-	            UserResponse user = optionalUser.get();
-	            Cart cart = cartService.findCartByUser(user.getId());
-
-	           
-	            CartDetailPK cartDetailPK = new CartDetailPK(cart.getId(), productId);
-	            cartDetailService.deleteById(cartDetailPK);
-	        }
-	    }
+//	    var context = SecurityContextHolder.getContext();
+//	    String emailString = context.getAuthentication().getName();
+//	    if (emailString != null) {
+//	        Optional<UserResponse> optionalUser = userService.findByEmail(emailString);
+//	        if (optionalUser.isPresent()) {
+//	            UserResponse user = optionalUser.get();
+//	            Cart cart = cartService.findCartByUser(user.getId());
+//
+//
+//	            CartDetailPK cartDetailPK = new CartDetailPK(cart.getId(), productId);
+//	            cartDetailService.deleteById(cartDetailPK);
+//	        }
+//	    }
+		try {
+			syncCartWithDatabase(cartDetails);
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
 
 	    
 	    List<CartDetailResponse> cartDetailResponses = new ArrayList<>();

@@ -4,15 +4,18 @@ import iuh.fit.dhktpm117ctt.group06.dto.request.OrderDetailRequest;
 import iuh.fit.dhktpm117ctt.group06.dto.request.OrderRequest;
 import iuh.fit.dhktpm117ctt.group06.dto.response.OrderDetailResponse;
 import iuh.fit.dhktpm117ctt.group06.dto.response.OrderResponse;
+import iuh.fit.dhktpm117ctt.group06.entities.Account;
 import iuh.fit.dhktpm117ctt.group06.entities.Address;
 import iuh.fit.dhktpm117ctt.group06.entities.Order;
 import iuh.fit.dhktpm117ctt.group06.entities.User;
 import iuh.fit.dhktpm117ctt.group06.entities.enums.OrderStatus;
 import iuh.fit.dhktpm117ctt.group06.exception.AppException;
 import iuh.fit.dhktpm117ctt.group06.exception.ErrorCode;
+import iuh.fit.dhktpm117ctt.group06.repository.AccountRepository;
 import iuh.fit.dhktpm117ctt.group06.repository.AddressRepository;
 import iuh.fit.dhktpm117ctt.group06.repository.OrderRepository;
 import iuh.fit.dhktpm117ctt.group06.repository.UserRepository;
+import iuh.fit.dhktpm117ctt.group06.service.MailSenderService;
 import iuh.fit.dhktpm117ctt.group06.service.OrderDetailService;
 import iuh.fit.dhktpm117ctt.group06.service.OrderService;
 import iuh.fit.dhktpm117ctt.group06.service.UserService;
@@ -44,6 +47,12 @@ public class OrderServiceImpl implements OrderService {
 	
 	@Autowired
 	private AddressRepository addressRepository;
+
+	@Autowired
+	MailSenderService mailSenderService;
+
+	@Autowired
+	AccountRepository accountRepository;
 
 	private final ModelMapper modelMapper = new ModelMapper();
 
@@ -150,6 +159,8 @@ public class OrderServiceImpl implements OrderService {
 
 		Order savedOrder = orderRepository.save(order);
 
+
+
 		List<OrderDetailRequest> detailRequests = orderRequest.getOrderDetails();
 		
 		List<OrderDetailResponse> orderDetailResponses = new ArrayList<>();
@@ -159,6 +170,12 @@ public class OrderServiceImpl implements OrderService {
 		}
 		
 		Optional<OrderResponse> orderResponseOptional = Optional.of(mapToOrderResponse(savedOrder));
+
+		if(savedOrder.getId() != null){
+			Optional<Account> account = accountRepository.findByUser(userEntity.getId());
+
+            account.ifPresent(value -> mailSenderService.sendMail(value.getEmail(), "Order Confirmation", "Your order has been placed successfully"));
+		}
 
 		return orderResponseOptional;
 	}
