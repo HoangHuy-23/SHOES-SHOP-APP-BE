@@ -39,6 +39,7 @@ public class SecurityConfig {
                         authorize.requestMatchers(HttpMethod.GET,"/api/cart/**").permitAll()
                                 .requestMatchers(HttpMethod.PUT, "/api/cart/**").permitAll()
                                 .requestMatchers( HttpMethod.POST,"/api/cart/**").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/product-items").permitAll()
                                 .requestMatchers("/**").permitAll()
                                 .requestMatchers("/api/**").permitAll()
 

@@ -1,5 +1,7 @@
 package iuh.fit.dhktpm117ctt.group06.entities.enums;
 
+import lombok.ToString;
+
 public enum ProductColor {
     PINK,
     RED,
@@ -13,5 +15,5 @@ public enum ProductColor {
     BLACK,
     GRAY,
     SILVER,
-    MULTICOLOR,
+    MULTICOLOR;
 }
