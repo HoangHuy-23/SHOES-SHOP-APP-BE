@@ -114,12 +114,6 @@ public class OrderController {
 			httpSession.setAttribute("cart", cartDetails);
 		}
 
-		// send mail
-		Optional<AccountResponse> accountResponse = accountService.findByUser(orderRequest.getUserId());
-		if (accountResponse.isPresent()) {
-			mailSenderService.sendMail(accountResponse.get().getEmail(), "Order confirmation", "Your order has been confirmed");
-		}
-
 		response.put("status", HttpStatus.OK);
 		response.put("data", orderResponse.get());
 		return ResponseEntity.ok(response);

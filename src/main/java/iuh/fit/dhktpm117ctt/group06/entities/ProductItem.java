@@ -1,5 +1,6 @@
 package iuh.fit.dhktpm117ctt.group06.entities;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 
@@ -25,18 +26,19 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+@Entity
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 @ToString
-@Entity
 @Table(name = "product_items")
 public class ProductItem implements Serializable{
     /**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+	@Serial
+    private static final long serialVersionUID = 1L;
 	@Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
