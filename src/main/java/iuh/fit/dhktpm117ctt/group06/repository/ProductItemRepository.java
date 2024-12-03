@@ -4,6 +4,7 @@ package iuh.fit.dhktpm117ctt.group06.repository;
 import java.util.List;
 import java.util.Optional;
 
+import iuh.fit.dhktpm117ctt.group06.entities.Product;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -51,4 +52,6 @@ public interface ProductItemRepository extends JpaRepository<ProductItem, String
                                                   @Param("minPrice") double minPrice,
                                                   @Param("maxPrice") double maxPrice,
                                                   @Param("productName") String productName);
+
+
 }
