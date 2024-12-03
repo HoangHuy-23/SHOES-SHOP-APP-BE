@@ -1,5 +1,6 @@
 package iuh.fit.dhktpm117ctt.group06.entities;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 import jakarta.persistence.Embeddable;
@@ -15,6 +16,7 @@ public class CartDetailPK implements Serializable{
     /**
 	 * 
 	 */
+	@Serial
 	private static final long serialVersionUID = 1L;
 	private String cartId;
     private String productItemId;

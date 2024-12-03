@@ -7,6 +7,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import iuh.fit.dhktpm117ctt.group06.dto.response.CartDetailSessionDTO;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -61,8 +64,9 @@ public class CartController {
 
 		List<CartDetail> cartDetails = getCartFromSession(httpSession);
 
+
 		try {
-			handleCartDetail(cartDetails, cartDetailRequest);
+			handleCartDetail(cartDetails, cartDetailRequest, httpSession);
 		} catch (IllegalArgumentException e) {
 			// TODO: handle exception
 			response.put("status", HttpStatus.BAD_REQUEST.value());
@@ -130,27 +134,6 @@ public class CartController {
 
 		session.setAttribute("cart", cartDetails);
 
-		// check user login
-//		var context = SecurityContextHolder.getContext();
-//		String emailString = context.getAuthentication().getName();
-//
-//
-//		if (emailString != null || emailString.equalsIgnoreCase("anonymousUser") == false) {
-//
-//			Optional<UserResponse> userOptional = userService.findByEmail(emailString);
-//
-//			if (userOptional.isPresent()) {
-//				Cart cart = cartService.findCartByUser(userOptional.get().getId());
-//
-//				// update cart detail in database
-//				CartDetailPK cartDetailPK = new CartDetailPK(cart.getId(), cartDetailRequest.getProductId());
-//				if (cartDetailService.findById(cartDetailPK).isPresent()) {
-//					cartDetailService.updateQuantity(cartDetailPK, cartDetailRequest.getQuantity());
-//				}
-//			}
-//
-//
-//		}
 
 		try{
 			syncCartWithDatabase(cartDetails);
@@ -204,9 +187,7 @@ public class CartController {
 	    }
 
 	   
-	    if (cartDetails.isEmpty()) {
-	        session.removeAttribute("cart"); 
-	    } else {
+	    if (!cartDetails.isEmpty()) {
 	        session.setAttribute("cart", cartDetails);
 	    }
 
@@ -289,12 +270,20 @@ public class CartController {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	private List<CartDetail> getCartFromSession(HttpSession httpSession) {
-		List<CartDetail> cartDetails = (List<CartDetail>) httpSession.getAttribute("cart");
-		return cartDetails == null ? new ArrayList<>() : cartDetails;
+		List<CartDetail> cartDetails = null;
+		try {
+			cartDetails = (List<CartDetail>) httpSession.getAttribute("cart");
+
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return cartDetails == null || cartDetails.isEmpty() ? new ArrayList<>() : cartDetails;
 	}
 
-	private void handleCartDetail(List<CartDetail> cartDetails, CartDetailRequest cartDetailRequest)
+	private void handleCartDetail(List<CartDetail> cartDetails, CartDetailRequest cartDetailRequest, HttpSession httpSession)
 			throws IllegalArgumentException {
 
 		Optional<ProductItem> productItemResponseOpt = productItemService.findById(cartDetailRequest.getProductId());
@@ -325,6 +314,13 @@ public class CartController {
 
 		newCartDetail.setQuantity(cartDetailRequest.getQuantity());
 		newCartDetail.setProductItem(productItem);
+
+		CartDetailPK cartDetailPK = new CartDetailPK();
+		cartDetailPK.setCartId(httpSession.getId());
+		cartDetailPK.setProductItemId(productItem.getId());
+
+		newCartDetail.setCartDetailPK(cartDetailPK);
+
 		cartDetails.add(newCartDetail);
 	}
 

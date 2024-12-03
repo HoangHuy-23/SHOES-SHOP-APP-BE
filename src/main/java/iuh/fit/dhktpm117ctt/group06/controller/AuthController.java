@@ -33,6 +33,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.crypto.SecretKey;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -86,7 +88,14 @@ public class AuthController {
             String refreshToken = jwtProvider.generateRefreshToken(account.getEmail(),savedUser.getRole().toString());
             session.setMaxInactiveInterval(60*60*24*7);
             session.setAttribute("REFRESH_TOKEN", refreshToken);
-            mailSenderService.sendMail(email, "Welcome to our website", "You have successfully registered an account on our website");
+//            mailSenderService.sendMail(email, "Welcome to our website", "You have successfully registered an account on our website");
+
+            Map<String, Object> messageObject = new LinkedHashMap<>();
+            messageObject.put("receiver", email);
+            messageObject.put("type", "registration");
+            messageObject.put("content", "Hi! " + firstName + " " + lastName + "\n"
+                    + "You have successfully registered an account on our website");
+
             return ResponseEntity.ok(new AuthResponse(accessToken, savedUser.getId()));
         } else {
             throw new BadCredentialsException("Invalid User Request !");
