@@ -59,6 +59,9 @@ public class CartController {
     @Autowired
     private ProductService productService;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
 //	@PostMapping("/addToCart")
 //	public ResponseEntity<?> addToCart(HttpSession httpSession, @RequestBody CartDetailRequest cartDetailRequest) {
 //		Map<String, Object> response = new LinkedHashMap<>();
@@ -110,7 +113,7 @@ public class CartController {
         }
 
         try {
-            ObjectMapper objectMapper = new ObjectMapper();
+//            ObjectMapper objectMapper = new ObjectMapper();
             String cartDetailsJson = objectMapper.writeValueAsString(cartDetails);
             httpSession.setAttribute("cart", cartDetailsJson);
         } catch (Exception e) {
@@ -238,7 +241,7 @@ public class CartController {
 
         if (cartDetailsJson != null && !cartDetailsJson.isEmpty()) {
             try {
-                ObjectMapper objectMapper = new ObjectMapper();
+//                ObjectMapper objectMapper = new ObjectMapper();
                 cartDetails = objectMapper.readValue(cartDetailsJson, objectMapper.getTypeFactory().constructCollectionType(List.class, CartDetail.class));
             } catch (Exception e) {
                 e.printStackTrace();
@@ -310,7 +313,6 @@ public class CartController {
     @GetMapping
     public ResponseEntity<?> viewCart(HttpSession session) {
         Map<String, Object> response = new LinkedHashMap();
-//		List<CartDetail> cartDetails = (List<CartDetail>) session.getAttribute("cart");
 
         String cartDetailsJson = (String) session.getAttribute("cart");
 
@@ -318,10 +320,14 @@ public class CartController {
 
         if (cartDetailsJson != null && !cartDetailsJson.isEmpty()) {
             try {
+                System.out.println(cartDetailsJson);
                 ObjectMapper objectMapper = new ObjectMapper();
                 cartDetails = objectMapper.readValue(cartDetailsJson, objectMapper.getTypeFactory().constructCollectionType(List.class, CartDetail.class));
             } catch (Exception e) {
                 e.printStackTrace();
+                response.put("status", HttpStatus.BAD_REQUEST.value());
+                response.put("data", "Error in view cart");
+                return ResponseEntity.badRequest().body(response);
             }
         }
 
@@ -375,7 +381,7 @@ public class CartController {
     private List<CartDetail> getCartFromSession(HttpSession httpSession) {
         List<CartDetail> cartDetails = new ArrayList<>();
         try {
-            ObjectMapper objectMapper = new ObjectMapper();
+//            ObjectMapper objectMapper = new ObjectMapper();
             String cartDetailsJson = (String) httpSession.getAttribute("cart");
 
             if (cartDetailsJson != null && !cartDetailsJson.isEmpty()) {
