@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  mysql-service:
+    image: mysql:8.0.28
+    container_name: mysql-shoes-store-app-be-container
+    ports:
+      - 3309:3306
+    volumes:
+      - mysql-springboot-data:/var/lib/mysql
+      - mysql-springboot-config-deamond:/etc/mysql/conf.d
+    environment:
+        MYSQL_ROOT_PASSWORD: root
+        MYSQL_DATABASE: shoes_store_app
+        MYSQL_USER: lean1123
+        MYSQL_PASSWORD: root
+    networks:
+        - backend
+  shoes-store-app-be-service:
+    image: lean1123/shoes-store-app-be:v1.0.0
+    container_name: shoes-store-app-be-container
+    ports:
+      - 8081:8080
+    volumes:
+      - ./:/app
+    networks:
+        - backend
+  apache-activemq-service:
+    image: apache/activemq-classic:6.1.4
+    container_name: activemq-container
+    networks:
+        - backend
+networks:
+  backend:
+    name: shoes-store-app-network
+volumes:
+    mysql-springboot-data:
+    mysql-springboot-config-deamond:

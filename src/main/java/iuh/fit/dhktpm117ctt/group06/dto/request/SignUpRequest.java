@@ -6,7 +6,8 @@ import jakarta.validation.constraints.*;
 import lombok.*;
 
 @Data
-@Builder
+//@Builder
+@NoArgsConstructor
 public class SignUpRequest {
     @Email(message = "EMAIL_INVALID")
     @NotBlank(message = "EMAIL_INVALID")

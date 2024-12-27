@@ -47,7 +47,11 @@ public class UserController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> findById(@PathVariable String id) {
-        return ResponseEntity.ok(userService.findById(id));
+        Optional<UserResponse> user = userService.findById(id);
+        if (user.isEmpty()) {
+            return ResponseEntity.badRequest().body("User not found");
+        }
+        return ResponseEntity.ok(user.get());
     }
 
     @DeleteMapping("/{id}")

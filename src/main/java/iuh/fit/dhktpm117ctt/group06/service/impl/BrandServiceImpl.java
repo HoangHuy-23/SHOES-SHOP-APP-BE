@@ -20,7 +20,7 @@ import java.util.Optional;
 @Service
 public class BrandServiceImpl implements BrandService {
 
-    private BrandRepository brandRepository;
+    private final BrandRepository brandRepository;
 
     @Autowired
     private CloudinaryProvider cloudinaryProvider;
@@ -29,7 +29,7 @@ public class BrandServiceImpl implements BrandService {
     public BrandServiceImpl(BrandRepository brandRepository) {
         this.brandRepository = brandRepository;
     }
-    private ModelMapper modelMapper = new ModelMapper();
+    private final ModelMapper modelMapper = new ModelMapper();
 
     public Brand mapToBrand(BrandRequest brandRequest) {
         return modelMapper.map(brandRequest, Brand.class);

@@ -26,12 +26,12 @@ public class BrandController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getBrandById(@PathVariable String id) {
-        return ResponseEntity.ok(brandService.findById(id));
+        return ResponseEntity.ok(brandService.findById(id).get());
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> saveBrand(@Valid @ModelAttribute BrandRequest brandRequest) {
-        return ResponseEntity.ok(brandService.save(brandRequest));
+        return ResponseEntity.ok(brandService.save(brandRequest).get());
     }
 
     @PutMapping(path = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

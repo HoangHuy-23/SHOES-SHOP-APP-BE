@@ -102,17 +102,21 @@ public class OrderController {
 		}
 
 //	    handle remove cart item ordered
-		List<CartDetail> cartDetails = (List<CartDetail>) httpSession.getAttribute("cart");
+//		List<CartDetail> cartDetails = (List<CartDetail>) httpSession.getAttribute("cart");
+//
+//		if (cartDetails != null) {
+//
+//			orderRequest.getOrderDetails().forEach(orderDetail -> {
+//				String productItemId = orderDetail.getProductItemId();
+//				cartDetails.removeIf(cartDetail -> cartDetail.getProductItem().getId().equals(productItemId));
+//			});
+//
+//			httpSession.setAttribute("cart", cartDetails);
+//		}
 
-		if (cartDetails != null) {
+		httpSession.invalidate();
 
-			orderRequest.getOrderDetails().forEach(orderDetail -> {
-				String productItemId = orderDetail.getProductItemId();
-				cartDetails.removeIf(cartDetail -> cartDetail.getProductItem().getId().equals(productItemId));
-			});
 
-			httpSession.setAttribute("cart", cartDetails);
-		}
 
 		response.put("status", HttpStatus.OK);
 		response.put("data", orderResponse.get());

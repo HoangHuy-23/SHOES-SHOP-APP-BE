@@ -20,12 +20,12 @@ public class CategoryController {
 
     @PostMapping()
     public ResponseEntity<?> save(@Valid @RequestBody CategoryRequest request) {
-        return ResponseEntity.ok(categoryService.save(request));
+        return ResponseEntity.ok(categoryService.save(request).get());
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@PathVariable String id, @Valid @RequestBody CategoryRequest request) {
-        return ResponseEntity.ok(categoryService.update(id, request));
+        return ResponseEntity.ok(categoryService.update(id, request).get());
     }
 
     @GetMapping("/{id}")

@@ -30,6 +30,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.crypto.SecretKey;
@@ -60,7 +61,7 @@ public class AuthController {
 
 
     @PostMapping("/signUp")
-    public ResponseEntity<AuthResponse> createUserHandler(@RequestBody @Valid SignUpRequest signUpRequest, HttpSession session) {
+    public ResponseEntity<AuthResponse> createUserHandler(@Valid @RequestBody SignUpRequest signUpRequest, BindingResult result, HttpSession session) {
         String email = signUpRequest.getEmail();
         String password = signUpRequest.getPassword();
         String firstName = signUpRequest.getFirstName();
